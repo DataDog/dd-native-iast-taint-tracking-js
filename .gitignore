@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+# Ctags
+tags
+
+#node-gyp
+build/
+dist/
+
+#npm
+node_modules/
+package-lock.json

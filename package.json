@@ -1,5 +1,5 @@
 {
-  "name": "iast-native-taint-tracking-js",
+  "name": "native-iast-taint-tracking-js",
   "version": "0.1.0",
   "description": "C addon source code and build process",
   "main": "iast-nativemethods.node",

@@ -3,6 +3,7 @@
         {
             "target_name": "iastnativemethods",
             "sources": [
+                "./src/Pool.h",
                 "./src/IAST.cc"
             ],
             "include_dirs" : [

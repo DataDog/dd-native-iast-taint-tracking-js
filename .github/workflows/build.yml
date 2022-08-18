@@ -1,0 +1,96 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+jobs:
+  build-native:
+    strategy:
+      matrix:
+        target:
+          - name: macos
+            os: macos-latest
+            artifact: darwin-x64-unknown
+            arch: x64
+          - name: windows 64 bits
+            os: windows-2019
+            artifact: win32-x64-unknown
+            arch: x64
+    
+    runs-on: ${{ matrix.target.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          architecture: ${{ matrix.target.arch }}
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '>3.6.0'
+          architecture: ${{ matrix.target.arch }}
+      - run: npm i --ignore-scripts
+      - run: npm run build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.target.artifact }}
+          path: ${{ matrix.target.artifact }}.tgz
+
+  build-docker:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - dockerfile: Dockerfile
+            libc: libc
+            artifact: linux-x64-glibc
+          - dockerfile: alpine.Dockerfile
+            libc: musl
+            artifact: linux-x64-musl
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: npm i --ignore-scripts
+        env:
+          PLATFORM: 'linux'
+          LIBC: ${{ matrix.target.libc }}
+      - run: docker build -t build -f ./docker/${{ matrix.target.dockerfile }} .
+      - run: docker run --name builder build
+      - run: docker run --name tester build test ci
+      - run: docker cp builder:/build/${{ matrix.target.artifact }}.tgz .
+      - run: docker cp tester:/build/test/cpputest/results/ .
+      - uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/results/cpputest_*.xml'
+          check_name: junit test report ${{ matrix.target.name }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.target.artifact }}
+          path: ${{ matrix.target.artifact }}.tgz
+
+  cpp-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+      - run: pip install cpplint
+      - run: cpplint --linelength=120 --recursive ./src
+
+
+  all-good:
+    needs:
+      - build-native
+      - build-docker
+      - cpp-lint
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo '🚀🚀🚀🚀🚀'

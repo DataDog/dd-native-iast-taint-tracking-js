@@ -1,4 +1,4 @@
-// Copyright 2021 Datadog, Inc.
+// Copyright 2022 Datadog, Inc.
 
 #include <node.h>
 

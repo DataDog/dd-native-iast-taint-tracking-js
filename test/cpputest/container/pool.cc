@@ -1,4 +1,4 @@
-#include "container/Pool.h"
+#include "container/pool.h"
 
 #include <iostream>
 #include <vector>
@@ -10,7 +10,7 @@
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
-using namespace container;
+using namespace iast::container;
 
 TEST_GROUP(PoolInitialization)
 {

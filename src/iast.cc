@@ -2,10 +2,10 @@
 
 #include <node.h>
 
-namespace IAST {
+namespace iast {
 
     void Init(v8::Local<v8::Object> exports) {
     }
 
     NODE_MODULE(NODE_GYP_MODULE_NAME, Init);
-}   // namespace IAST
+}   // namespace iast

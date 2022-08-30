@@ -2,7 +2,7 @@
 
 #include <node.h>
 
-namespace IAST {
+namespace iast {
 
     void Init(v8::Local<v8::Object> exports) {
     }

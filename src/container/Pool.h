@@ -7,6 +7,8 @@
 #include <utility>
 
 using std::size_t;
+
+namespace iast {
 namespace container {
 
 template<class T, size_t N>
@@ -122,4 +124,5 @@ class Pool final {
 };
 
 }  // namespace container
+}  // namespace IAST
 #endif  // SRC_CONTAINER_POOL_H_

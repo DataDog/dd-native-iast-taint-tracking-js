@@ -8,4 +8,4 @@ namespace iast {
     }
 
     NODE_MODULE(NODE_GYP_MODULE_NAME, Init);
-}   // namespace IAST
+}   // namespace iast

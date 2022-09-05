@@ -9,7 +9,7 @@
 
 #include <string>
 #include <iostream>
-#include "WeakObjIface.h"
+#include "weakiface.h"
 
 using namespace iast;
 

@@ -1,7 +1,7 @@
 // Copyright 2022 Datadog, Inc.
 
-#ifndef SRC_WEAKOBJIFACE_H_
-#define SRC_WEAKOBJIFACE_H_
+#ifndef SRC_WEAKIFACE_H_
+#define SRC_WEAKIFACE_H_
 
 #include <cstdint>
 #include <utility>
@@ -21,4 +21,4 @@ struct WeakObjIface {
     }
 };
 }  // namespace iast
-#endif  // SRC_WEAKOBJIFACE_H_
+#endif  // SRC_WEAKIFACE_H_

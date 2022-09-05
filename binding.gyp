@@ -3,7 +3,7 @@
         {
             "target_name": "iastnativemethods",
             "sources": [
-                "./src/IAST.cc"
+                "./src/iast.cc"
             ],
             "include_dirs" : [
                 "<!(node -e \"require('nan')\")"

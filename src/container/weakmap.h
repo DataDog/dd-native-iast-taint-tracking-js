@@ -7,50 +7,9 @@
 #include <cstdint>
 #include <iostream>
 
-#include "WeakObjIface.h"
+#include "weakiface.h"
 
 #define GET_INDEX(ptr, mask) (ptr >> 3 & (mask))
-
-#define INSERT_HANDLE_COLLISION(key, obj, arr)  do {                                                    \
-                                                    auto index = GET_INDEX(key, MASK);                  \
-                                                    auto taintedObjectInArray = arr[index];             \
-                                                    if (taintedObjectInArray != nullptr) {              \
-                                                        obj->_next = taintedObjectInArray;              \
-                                                    } else {                                            \
-                                                        obj->_next = nullptr;                           \
-                                                    }                                                   \
-                                                    arr[index] = obj;                                   \
-                                                } while (0);
-
-#define INSERT_COERCE_COLLISION(key, obj, arr)  do {                            \
-                                                    arr[GET_INDEX(key, MASK)] = obj;  \
-                                                } while (0);
-#define FIND_HANDLE_COLLISION(key, ret) do {                                                                \
-                                            auto index = GET_INDEX(key, MASK);                              \
-                                            auto obj = static_cast<T>(this->items[index]);                  \
-                                            while (obj != nullptr) {                                        \
-                                                if (obj->_key == key) {                                     \
-                                                    ret = obj->IsEmpty() ? nullptr : static_cast<T>(obj);   \
-                                                    break;                                                  \
-                                                } else {                                                    \
-                                                    obj = static_cast<T>(obj->_next);                       \
-                                                }                                                           \
-                                            }                                                               \
-                                        } while (0);
-
-#define FIND_COERCE_COLLISION(key)  do {                                                                \
-                                        auto index = GET_INDEX(key, MASK);                              \
-                                        auto obj = static_cast<T>(this->items[index]);                  \
-                                        return obj != nullptr && obj->_key == key ? obj : nullptr;      \
-                                    } while (0);
-
-#ifdef IMPROVE_INSERT
-#define INSERT  INSERT_COERCE_COLLISION
-#define FIND    FIND_COERCE_COLLISION
-#else
-#define INSERT  INSERT_HANDLE_COLLISION
-#define FIND    FIND_HANDLE_COLLISION
-#endif
 
 enum {
     WEAK_MAP_SUCCESS = 0,
@@ -88,7 +47,17 @@ class WeakMap {
 
     inline T find(weak_key_t key) {
         T ret = nullptr;
-        FIND(key, ret);
+        auto index = GET_INDEX(key, MASK);
+        auto obj = static_cast<T>(this->items[index]);
+
+        while (obj != nullptr) {
+            if (obj->_key == key) {
+                ret = obj->IsEmpty() ? nullptr : static_cast<T>(obj);
+                break;
+            } else {
+                obj = static_cast<T>(obj->_next);
+            }
+        }
         return ret;
     }
 
@@ -104,16 +73,25 @@ class WeakMap {
         if (_count >= N) {
             return WEAK_MAP_MAX_ELEM;
         }
-        INSERT(key, obj, this->items);
+
+        auto index = GET_INDEX(key, MASK);
+        auto taintedObjectInArray = this->items[index];
+        if (taintedObjectInArray != nullptr) {
+            obj->_next = taintedObjectInArray;
+        } else {
+            obj->_next = nullptr;
+        }
+        this->items[index] = obj;
         _count++;
         return WEAK_MAP_SUCCESS;
     }
 
     inline void del(weak_key_t key) {
-        auto root = this->items[GET_INDEX(key, MASK)];
+        auto index = GET_INDEX(key, MASK);
+        auto root = this->items[index];
         auto prev = root;
         if (root->_key == key) {
-            this->items[GET_INDEX(key, MASK)] = root->_next;
+            this->items[index] = root->_next;
             delete root;
             _count--;
         } else {

@@ -4,8 +4,8 @@
 #include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <cstdint>
 
-#include "WeakObjIface.h"
-#include "container/WeakMap.h"
+#include "weakiface.h"
+#include "container/weakmap.h"
 
 
 using namespace iast;

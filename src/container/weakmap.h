@@ -11,15 +11,6 @@
 
 #define GET_INDEX(ptr, mask) (ptr >> 3 & (mask))
 
-#define INSERT_HANDLE_COLLISION(key, obj, arr)  do {                                                    \
-                                                } while (0);
-
-#define FIND_HANDLE_COLLISION(key, ret) do {                                                                \
-                                        } while (0);
-
-#define INSERT  INSERT_HANDLE_COLLISION
-#define FIND    FIND_HANDLE_COLLISION
-
 enum {
     WEAK_MAP_SUCCESS = 0,
     WEAK_MAP_INVALID_ARG,
@@ -62,7 +53,7 @@ class WeakMap {
         while (obj != nullptr) {
             if (obj->_key == key) {
                 ret = obj->IsEmpty() ? nullptr : static_cast<T>(obj);
-                    break;
+                break;
             } else {
                 obj = static_cast<T>(obj->_next);
             }
@@ -86,9 +77,9 @@ class WeakMap {
         auto index = GET_INDEX(key, MASK);
         auto taintedObjectInArray = this->items[index];
         if (taintedObjectInArray != nullptr) {
-         obj->_next = taintedObjectInArray;
+            obj->_next = taintedObjectInArray;
         } else {
-         obj->_next = nullptr;
+            obj->_next = nullptr;
         }
         this->items[index] = obj;
         _count++;
@@ -96,7 +87,7 @@ class WeakMap {
     }
 
     inline void del(weak_key_t key) {
-    auto index = GET_INDEX(key, MASK);
+        auto index = GET_INDEX(key, MASK);
         auto root = this->items[index];
         auto prev = root;
         if (root->_key == key) {

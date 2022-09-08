@@ -3,8 +3,7 @@
         {
             "target_name": "iastnativemethods",
             "sources": [
-                "./src/container/Pool.h",
-                "./src/IAST.cc"
+                "./src/iast.cc"
             ],
             "include_dirs" : [
                 "<!(node -e \"require('nan')\")"

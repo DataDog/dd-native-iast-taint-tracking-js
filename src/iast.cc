@@ -2,32 +2,17 @@
 
 #include <node.h>
 #include "iast.h"
-#include "transaction.h"
+#include "gc/gc.h"
+#include "tainted/string_methods.h"
 
 
 
 namespace iast {
 
-template<>
-void IastManager<Transaction>::RehashAll(void) {
-    for (auto entry : _map) {
-        if (entry.second)
-            entry.second->RehashMap();
-    }
-}
-
-template<>
-void IastManager<Transaction>Remove(iast_key_t id) {
-    auto found = _map.find(id);
-    if (found != _map.end()) {
-        T* item = found->second;
-        _map.erase(found);
-        item->clean();
-        _pool.push(item);
-    }
-}
-
 void Init(v8::Local<v8::Object> exports) {
+    tainted::StringMethods::Init(exports);
+    exports->GetIsolate()->AddGCEpilogueCallback(iast::gc::OnScavenge, v8::GCType::kGCTypeScavenge);
+    exports->GetIsolate()->AddGCEpilogueCallback(iast::gc::OnMarkSweepCompact, v8::GCType::kGCTypeMarkSweepCompact);
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Init);

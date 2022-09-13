@@ -1,38 +1,41 @@
 #ifndef _IAST_H_
 #define _IAST_H_
 
+#include <cstddef>
 #include <map>
 #include <cstdint>
 #include <iostream>
 
+
 #include "container/queued_pool.h"
+#include "iast_types.h"
+#include "tainted/transaction.h"
 
-namespace iast {
-
+using iast::tainted::Transaction;
 using iast_key_t = uintptr_t;
 
-template<typename T>
+namespace iast {
 class IastManager {
  public:
-    static IastManager<T>& GetInstance(void) {
-        static IastManager<T> _ctx;
+    static IastManager& GetInstance(void) {
+        static IastManager _ctx;
         return _ctx;
     }
 
     IastManager(IastManager const&) = delete;
     void operator=(IastManager const&) = delete;
 
-    T* New(iast_key_t id) {
+    Transaction* New(iast_key_t id) {
         if (_map.size() >= _maxItems) {
             return nullptr;
         }
 
         auto found = _map.find(id);
         if (found == _map.end()) {
-            T* item = _pool.pop();
+            Transaction* item = _pool.pop();
             if (item != nullptr) {
                 _map[id] = item;
-                //item->setId(id);
+                item->setId(id);
             }
             return item;
         } else {
@@ -41,10 +44,9 @@ class IastManager {
         }
     }
 
-    T* Get(iast_key_t id) {
+    Transaction* Get(iast_key_t id) {
         auto found = _map.find(id);
         if (found == _map.end()) {
-
             return nullptr;
         } else {
             return found->second;
@@ -54,14 +56,21 @@ class IastManager {
     void Remove(iast_key_t id) {
         auto found = _map.find(id);
         if (found != _map.end()) {
-            T* item = found->second;
+            Transaction* item = found->second;
             _map.erase(found);
-            //item->clean();
+            item->clean();
             _pool.push(item);
         }
     }
 
-    void RehashAll(void);
+    void RehashAll(void) {
+        for (auto entry : _map) {
+            if (entry.second)
+                //entry.second->taintedMap->rehash();
+                entry.second->RehashMap();
+        }
+    }
+
     void Clear(void) {
         for (auto it = _map.begin(); it != _map.end(); ++it) {
             _map.erase(it);
@@ -70,15 +79,16 @@ class IastManager {
 
         _pool.clear();
     }
+
     size_t Size() { return _map.size(); }
-    void setMaxItems(int max) { _maxItems = max; }
+    void setMaxItems(size_t max) { _maxItems = max; }
     int getMaxItems(void) { return _maxItems; }
 
  private:
     IastManager() = default;
-    int _maxItems = 2;
-    container::QueuedPool<T> _pool;
-    std::map<iast_key_t, T*> _map;
+    size_t _maxItems = 2;
+    TransactionPool _pool;
+    std::map<iast_key_t, Transaction*> _map;
 };
 }  // namespace iast
 

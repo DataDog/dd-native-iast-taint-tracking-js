@@ -7,18 +7,9 @@
 #include <cstdint>
 #include <iostream>
 
-#include "weakiface.h"
+#include "../weakiface.h"
 
 #define GET_INDEX(ptr, mask) (ptr >> 3 & (mask))
-
-#define INSERT_HANDLE_COLLISION(key, obj, arr)  do {                                                    \
-                                                } while (0);
-
-#define FIND_HANDLE_COLLISION(key, ret) do {                                                                \
-                                        } while (0);
-
-#define INSERT  INSERT_HANDLE_COLLISION
-#define FIND    FIND_HANDLE_COLLISION
 
 enum {
     WEAK_MAP_SUCCESS = 0,
@@ -49,7 +40,7 @@ class WeakMap {
 
     void clean() {
         // TODO(julio): check memset std::fill for performance.
-        for (int i = 0; i < N; i++) {
+        for (size_t i = 0; i < N; i++) {
             this->items[i] = nullptr;
         }
         _count = 0;
@@ -117,7 +108,7 @@ class WeakMap {
     }
 
     void rehash() {
-        for (int index = 0; index < N; index++) {
+        for (size_t index = 0; index < N; index++) {
             T prev = nullptr;
             auto obj = static_cast<T>(this->items[index]);
             while (obj != nullptr) {
@@ -151,7 +142,7 @@ class WeakMap {
 
  private:
     const int MASK = N - 1;
-    int _count;
+    size_t _count;
     WeakObjIface<T>* items[N] = {};
 
     inline void remove(int index, T prev, T obj) {

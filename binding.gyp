@@ -3,6 +3,13 @@
         {
             "target_name": "iastnativemethods",
             "sources": [
+                "./src/gc/gc.cc",
+                "./src/utils/jsobject_utils.cc",
+                "./src/tainted/input_info.cc",
+                "./src/tainted/range.cc",
+                "./src/tainted/tainted_object.cc",
+                "./src/tainted/transaction.cc",
+                "./src/tainted/string_methods.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

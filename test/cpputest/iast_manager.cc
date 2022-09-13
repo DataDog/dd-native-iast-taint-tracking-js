@@ -22,28 +22,25 @@ struct FakeTransaction final {
 TEST_GROUP(IastManager)
 {
     void setup() {
-        //Since the object tested is a singleton the framework detects a leak
-        //because the object is cleared after leakage detection
-        MemoryLeakWarningPlugin::saveAndDisableNewDeleteOverloads();
-        IastManager<FakeTransaction>::GetInstance().Clear();
     }
+
     void teardown() {
-        MemoryLeakWarningPlugin::restoreNewDeleteOverloads();
     }
 };
 
 TEST(IastManager, initialization)
 {
     int elems = 0;
-    elems = IastManager<FakeTransaction>::GetInstance().getMaxItems();
+    IastManager<FakeTransaction> iastManager;
+    elems = iastManager.getMaxItems();
     CHECK_EQUAL(2, elems);
 
-    IastManager<FakeTransaction>::GetInstance().setMaxItems(4);
+    iastManager.setMaxItems(4);
 
-    elems = IastManager<FakeTransaction>::GetInstance().getMaxItems();
+    elems = iastManager.getMaxItems();
     CHECK_EQUAL(4, elems);
 
-    elems = IastManager<FakeTransaction>::GetInstance().Size();
+    elems = iastManager.Size();
     CHECK_EQUAL(0, elems);
 }
 
@@ -51,69 +48,77 @@ TEST(IastManager, initialization)
 
 TEST(IastManager, new_item)
 {
+    IastManager<FakeTransaction> iastManager;
     FakeTransaction* ptr = nullptr;
     size_t elems = 0;
     iast_key_t key;
 
     key = 1;
-    IastManager<FakeTransaction>::GetInstance().New(key);
-    ptr = IastManager<FakeTransaction>::GetInstance().Get(key);
+    iastManager.New(key);
+    ptr = iastManager.Get(key);
     CHECK(ptr != nullptr);
 
-    elems = IastManager<FakeTransaction>::GetInstance().Size();
+    elems = iastManager.Size();
     CHECK_EQUAL(1, elems);
+
+    iastManager.Clear();
 }
 
 TEST(IastManager, item_reused)
 {
+    IastManager<FakeTransaction> iastManager;
     FakeTransaction* ptr = nullptr;
     FakeTransaction* ptr2 = nullptr;
     size_t elems = 0;
     iast_key_t key;
 
     key = 2;
-    IastManager<FakeTransaction>::GetInstance().New(key);
-    ptr = IastManager<FakeTransaction>::GetInstance().Get(key);
+    iastManager.New(key);
+    ptr = iastManager.Get(key);
     CHECK(ptr != nullptr);
 
-    IastManager<FakeTransaction>::GetInstance().Remove(key);
-    elems = IastManager<FakeTransaction>::GetInstance().Size();
+    iastManager.Remove(key);
+    elems = iastManager.Size();
     CHECK_EQUAL(0, elems);
 
     key = 3;
-    IastManager<FakeTransaction>::GetInstance().New(key);
-    ptr2 = IastManager<FakeTransaction>::GetInstance().Get(key);
+    iastManager.New(key);
+    ptr2 = iastManager.Get(key);
     POINTERS_EQUAL(ptr2, ptr);
-    IastManager<FakeTransaction>::GetInstance().Remove(key);
+    iastManager.Remove(key);
 
-    elems = IastManager<FakeTransaction>::GetInstance().Size();
+    elems = iastManager.Size();
     CHECK_EQUAL(0, elems);
 }
 
 
 TEST(IastManager, insert_beyond_limit)
 {
+    IastManager<FakeTransaction> iastManager;
     FakeTransaction* ptr = nullptr;
     FakeTransaction* ptr2 = nullptr;
     FakeTransaction* ptr3 = nullptr;
     size_t elems = 0;
     iast_key_t key1, key2, key3;
 
-    elems = IastManager<FakeTransaction>::GetInstance().Size();
+    elems = iastManager.Size();
     CHECK_EQUAL(0, elems);
 
     key1 = 1;
-    IastManager<FakeTransaction>::GetInstance().New(key1);
-    ptr = IastManager<FakeTransaction>::GetInstance().Get(key1);
+    iastManager.New(key1);
+    ptr = iastManager.Get(key1);
     CHECK(ptr != nullptr);
 
     key2 = 2;
-    IastManager<FakeTransaction>::GetInstance().New(key2);
-    ptr2 = IastManager<FakeTransaction>::GetInstance().Get(key2);
+    iastManager.New(key2);
+    ptr2 = iastManager.Get(key2);
     CHECK(ptr != nullptr);
 
     key3 = 3;
-    IastManager<FakeTransaction>::GetInstance().New(key3);
-    ptr3 = IastManager<FakeTransaction>::GetInstance().Get(key3);
+    iastManager.New(key3);
+    ptr3 = iastManager.Get(key3);
     CHECK(ptr3 == nullptr);
+
+    iastManager.Remove(key1);
+    iastManager.Remove(key2);
 }

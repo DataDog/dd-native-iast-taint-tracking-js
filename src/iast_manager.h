@@ -1,5 +1,4 @@
 // Copyright 2022 Datadog, Inc.
-
 #include <cstdint>
 #include <map>
 #include <iostream>
@@ -11,11 +10,7 @@ namespace iast {
 template <typename T>
 class IastManager {
  public:
-    static IastManager<T>& GetInstance(void) {
-        static IastManager<T> _ctx;
-        return _ctx;
-    }
-
+    IastManager() = default;
     IastManager(IastManager const&) = delete;
     void operator=(IastManager const&) = delete;
 
@@ -77,7 +72,6 @@ class IastManager {
     int getMaxItems(void) { return _maxItems; }
 
  private:
-    IastManager() = default;
     size_t _maxItems = 2;
     container::QueuedPool<T> _pool;
     std::map<iast_key_t, T*> _map;

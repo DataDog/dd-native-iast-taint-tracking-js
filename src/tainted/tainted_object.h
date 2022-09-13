@@ -8,7 +8,6 @@
 
 #include "../weakiface.h"
 #include "../utils/string_utils.h"
-//#include "../iast_types.h"
 #include "range.h"
 #include "../container/pool.h"
 #include "../container/weakmap.h"

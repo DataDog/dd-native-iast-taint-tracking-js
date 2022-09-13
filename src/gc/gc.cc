@@ -6,11 +6,11 @@ namespace iast {
 namespace gc {
 
 void OnMarkSweepCompact(v8::Isolate *isolate, v8::GCType type, v8::GCCallbackFlags flags) {
-    iast::IastManager::GetInstance().RehashAll();
+    RehashAllTransactions();
 }
 
 void OnScavenge(v8::Isolate *isolate, v8::GCType type, v8::GCCallbackFlags flags) {
-    iast::IastManager::GetInstance().RehashAll();
+    RehashAllTransactions();
 }
 
 void OnGarbageCollected(const v8::WeakCallbackInfo<tainted::TaintedObject> &info) {
@@ -18,7 +18,7 @@ void OnGarbageCollected(const v8::WeakCallbackInfo<tainted::TaintedObject> &info
     if (!tainted->IsEmpty()) {
         tainted->Reset();
     }
-    auto transactionRanges = iast::IastManager::GetInstance().Get(tainted->getId());
+    auto transactionRanges = GetTransaction(tainted->getId());
     if (transactionRanges!= nullptr) {
         auto ranges = tainted->getRanges();
         // Just one ref wich belongs to inUse array so it can be cleared and returned to availabe queue.

@@ -41,7 +41,7 @@ void AddRangeInstanceMethod(const FunctionCallbackInfo<Value>& args) {
     }
     if (args[1]->IsString()) {
         uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
-        Transaction* transactionRanges = IastManager::GetInstance().Get(transactionId);
+        Transaction* transactionRanges = GetTransaction(transactionId);
         if (transactionRanges != nullptr) {
             uintptr_t ptrToFind = utils::GetLocalStringPointer(args[1]);
             auto ranges = transactionRanges->GetRanges(ptrToFind);
@@ -72,7 +72,7 @@ void NewTaintedStringInstanceMethod(const FunctionCallbackInfo<Value>& args) {
 
     if (parameterValue->IsString()) {
         uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
-        Transaction *transactionRanges = IastManager::GetInstance().New(transactionId);
+        Transaction *transactionRanges = NewTransaction(transactionId);
         if (transactionRanges != nullptr) {
             uintptr_t ptrToFind = utils::GetLocalStringPointer(parameterValue);
             auto existingRanges = transactionRanges->GetRanges(ptrToFind);
@@ -116,7 +116,7 @@ void NewTaintedStringWithRangesInstanceMethod(const FunctionCallbackInfo<Value>&
     try {
         uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
         if (args[1]->IsString()) {
-            Transaction *transactionRanges = IastManager::GetInstance().New(transactionId);
+            Transaction *transactionRanges = NewTransaction(transactionId);
             if (transactionRanges != nullptr) {
                 uintptr_t ptrToFind = utils::GetLocalStringPointer(args[1]);
                 auto existingRanges = transactionRanges->GetRanges(ptrToFind);
@@ -152,7 +152,7 @@ void IsTaintedInstanceMethod(const FunctionCallbackInfo<Value>& args) {
     }
     //Isolate* isolate = args.GetIsolate();
     uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
-    auto transactionRanges = IastManager::GetInstance().Get(transactionId);
+    auto transactionRanges = GetTransaction(transactionId);
     if (transactionRanges != nullptr) {
         auto argsSize = args.Length();
         for (int i = 1; i < argsSize; i++) {
@@ -179,7 +179,7 @@ void GetRangesInstanceMethod(const FunctionCallbackInfo<Value>& args) {
         return;
     }
     uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
-    auto transactionRanges = IastManager::GetInstance().Get(transactionId);
+    auto transactionRanges = GetTransaction(transactionId);
     if (transactionRanges != nullptr) {
         auto ptr = utils::GetLocalStringPointer(args[1]);
         auto ranges = transactionRanges->GetRanges(ptr);
@@ -205,7 +205,7 @@ void GetAllTaintedObjectsInstanceMethod(const FunctionCallbackInfo<Value>& args)
     }
     Isolate* isolate = args.GetIsolate();
     auto transactionId = utils::GetLocalStringPointer(args[0]);
-    auto transactionRanges = IastManager::GetInstance().Get(transactionId);
+    auto transactionRanges = GetTransaction(transactionId);
     if (transactionRanges != nullptr) {
         auto currentContext = isolate->GetCurrentContext();
         //TaintedMap* taintedMap = transactionRanges->taintedMap;
@@ -240,7 +240,7 @@ void EndTransactionInstanceMethod(const FunctionCallbackInfo<Value>& args) {
         return;
     }
     auto transactionId = utils::GetLocalStringPointer(args[0]);
-    IastManager::GetInstance().Remove(transactionId);
+    RemoveTransaction(transactionId);
 }
 
 void StringMethods::Init(Local<Object> exports) {

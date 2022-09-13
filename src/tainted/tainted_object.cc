@@ -5,7 +5,6 @@
 
 #include "tainted_object.h"
 #include "range.h"
-//#include "../iast_types.h"
 
 namespace iast {
 namespace tainted {

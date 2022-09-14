@@ -1,4 +1,4 @@
-#include "iast_manager.h"
+#include "transaction_manager.h"
 #include <CppUTest/UtestMacros.h>
 #include <CppUTest/TestHarness.h>
 
@@ -19,7 +19,7 @@ struct FakeTransaction final {
     void clean(void) { return; }
 };
 
-TEST_GROUP(IastManager)
+TEST_GROUP(TransactionManager)
 {
     void setup() {
     }
@@ -28,10 +28,10 @@ TEST_GROUP(IastManager)
     }
 };
 
-TEST(IastManager, initialization)
+TEST(TransactionManager, initialization)
 {
     int elems = 0;
-    IastManager<FakeTransaction> iastManager;
+    TransactionManager<FakeTransaction> iastManager;
     elems = iastManager.getMaxItems();
     CHECK_EQUAL(2, elems);
 
@@ -46,9 +46,9 @@ TEST(IastManager, initialization)
 
 
 
-TEST(IastManager, new_item)
+TEST(TransactionManager, new_item)
 {
-    IastManager<FakeTransaction> iastManager;
+    TransactionManager<FakeTransaction> iastManager;
     FakeTransaction* ptr = nullptr;
     size_t elems = 0;
     iast_key_t key;
@@ -64,9 +64,9 @@ TEST(IastManager, new_item)
     iastManager.Clear();
 }
 
-TEST(IastManager, item_reused)
+TEST(TransactionManager, item_reused)
 {
-    IastManager<FakeTransaction> iastManager;
+    TransactionManager<FakeTransaction> iastManager;
     FakeTransaction* ptr = nullptr;
     FakeTransaction* ptr2 = nullptr;
     size_t elems = 0;
@@ -92,9 +92,9 @@ TEST(IastManager, item_reused)
 }
 
 
-TEST(IastManager, insert_beyond_limit)
+TEST(TransactionManager, insert_beyond_limit)
 {
-    IastManager<FakeTransaction> iastManager;
+    TransactionManager<FakeTransaction> iastManager;
     FakeTransaction* ptr = nullptr;
     FakeTransaction* ptr2 = nullptr;
     FakeTransaction* ptr3 = nullptr;

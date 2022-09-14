@@ -4,27 +4,28 @@
 #include "iast.h"
 #include "gc/gc.h"
 #include "container/singleton.h"
+#include "transaction_manager.h"
 #include "tainted/string_methods.h"
 #include "tainted/transaction.h"
 
-using iastManager = iast::container::Singleton<iast::IastManager<iast::tainted::Transaction>>;
+using transactionManger = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction>>;
 
 namespace iast {
 
 void RehashAllTransactions(void) {
-    iastManager::GetInstance().RehashAll();
+    transactionManger::GetInstance().RehashAll();
 }
 
 void RemoveTransaction(iast_key_t id) {
-    iastManager::GetInstance().Remove(id);
+    transactionManger::GetInstance().Remove(id);
 }
 
 Transaction* GetTransaction(iast_key_t id) {
-    return iastManager::GetInstance().Get(id);
+    return transactionManger::GetInstance().Get(id);
 }
 
 Transaction* NewTransaction(iast_key_t id) {
-    return iastManager::GetInstance().New(id);
+    return transactionManger::GetInstance().New(id);
 }
 
 void Init(v8::Local<v8::Object> exports) {

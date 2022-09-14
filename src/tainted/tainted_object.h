@@ -40,12 +40,7 @@ class TaintedObject: public iast::WeakObjIface<TaintedObject*> {
         target.Reset();
     }
 
-    void SetWeak(v8::WeakCallbackInfo<TaintedObject>::Callback callback, v8::WeakCallbackType type) {
-        // TODO(julio): define a closure?
-        target.SetWeak(this, callback, type);
-    }
-
-    v8::Local<v8::Object> toJSObject(v8::Isolate*);
+    v8::Local<v8::Object> toJSObject(v8::Isolate* isolate);
     SharedRanges* getRanges(void) { return _ranges; }
     void setRanges(SharedRanges* ranges) { _ranges = ranges; }
     uintptr_t getId(void) { return _transactionId; }

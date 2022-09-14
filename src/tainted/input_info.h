@@ -24,6 +24,7 @@ class InputInfo {
 
     InputInfo& operator=(const InputInfo& inputInfo);
 
+    // TODO(julio): parameterValue must be weak.
     v8::Persistent<v8::Value> parameterValue;
     v8::Persistent<v8::Value> parameterName;
     v8::Persistent<v8::Value> type;

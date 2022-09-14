@@ -27,16 +27,17 @@ class Transaction {
  public:
     Transaction();
     ~Transaction();
-    void clean();
+
+    void clean(void);
 
     inline void setId(uintptr_t id) { transactionId = id;}
     InputInfo* createNewInputInfo(v8::Local<v8::Value> parameterName,
             v8::Local<v8::Value> parameterValue,
             v8::Local<v8::Value> type);
-    void cleanInputInfos();
-    void cleanSharedVectors();
+    void cleanInputInfos(void);
+    void cleanSharedVectors(void);
 
-    inline TaintedObject* getAvailableTaintedObject() {
+    inline TaintedObject* getAvailableTaintedObject(void) {
         return taintedObjPool.pop(this->transactionId);
     }
 
@@ -52,7 +53,7 @@ class Transaction {
         return availableTaintedRanges.pop(start, end, inputInfo);
     }
 
-    inline SharedRanges* getAvailableSharedVector() {
+    inline SharedRanges* getAvailableSharedVector(void) {
         SharedRanges* taintedRangeVector = nullptr;
         if (!this->availableSharedVectors->empty()) {
             taintedRangeVector = this->availableSharedVectors->front();

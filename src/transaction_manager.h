@@ -1,5 +1,5 @@
-#ifndef SRC_IAST_MANAGER_H_
-#define SRC_IAST_MANAGER_H_
+#ifndef SRC_TRANSACTION_MANAGER_H_
+#define SRC_TRANSACTION_MANAGER_H_
 // Copyright 2022 Datadog, Inc.
 #include <cstdint>
 #include <map>
@@ -10,11 +10,11 @@ using iast_key_t = uintptr_t;
 
 namespace iast {
 template <typename T>
-class IastManager {
+class TransactionManager {
  public:
-    IastManager() = default;
-    IastManager(IastManager const&) = delete;
-    void operator=(IastManager const&) = delete;
+    TransactionManager() = default;
+    TransactionManager(TransactionManager const&) = delete;
+    void operator=(TransactionManager const&) = delete;
 
     T* New(iast_key_t id) {
         if (_map.size() >= _maxItems) {
@@ -56,8 +56,9 @@ class IastManager {
 
     void RehashAll(void) {
         for (auto entry : _map) {
-            if (entry.second)
+            if (entry.second) {
                 entry.second->RehashMap();
+            }
         }
     }
 
@@ -80,4 +81,4 @@ class IastManager {
 };
 
 }   // namespace iast
-#endif  // SRC_IAST_MANAGER_H_
+#endif  // SRC_TRANSACTION_MANAGER_H_

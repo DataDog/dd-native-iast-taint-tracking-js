@@ -38,7 +38,6 @@ void SaveTaintedRanges(v8::Local<v8::Value> string, SharedRanges* taintedRanges,
         tainted->_key = stringPointer;
         tainted->setRanges(taintedRanges);
         tainted->Reset(string);
-        tainted->SetWeak(iast::gc::OnGarbageCollected, v8::WeakCallbackType::kParameter);
         transaction->AddTainted(stringPointer, tainted);
     }
 }
@@ -58,36 +57,37 @@ void NewTaintedStringInstanceMethod(const FunctionCallbackInfo<Value>& args) {
     auto parameterName = args[2];
     auto type = args[3];
 
+    // TODO(julio): if string length == 1 then avoid chache issues.
     args.GetReturnValue().Set(parameterValue);
     if (!parameterValue->IsString()) {
         return;
     }
     try {
-    uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
-    auto transaction = NewTransaction(transactionId);
-    if (transaction != nullptr) {
-        uintptr_t ptrToFind = utils::GetLocalStringPointer(parameterValue);
-        auto existingRanges = transaction->GetRanges(ptrToFind);
-        if (existingRanges == nullptr) {
-            auto result = parameterValue;
-            InputInfo* inputInfo =
-                transaction->createNewInputInfo(
-                        parameterName, parameterValue, type);
+        uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
+        auto transaction = NewTransaction(transactionId);
+        if (transaction != nullptr) {
+            uintptr_t ptrToFind = utils::GetLocalStringPointer(parameterValue);
+            auto existingRanges = transaction->GetRanges(ptrToFind);
+            if (existingRanges == nullptr) {
+                auto result = parameterValue;
+                InputInfo* inputInfo =
+                    transaction->createNewInputInfo(
+                            parameterName, parameterValue, type);
 
-            if (inputInfo == nullptr) {
-                return;
-            }
+                if (inputInfo == nullptr) {
+                    return;
+                }
 
-            auto range = transaction->getAvailableTaintedRange(0,
-                    utils::GetLength(args.GetIsolate(), parameterValue),
-                    inputInfo);
-            if (range != nullptr) {
-                auto ranges = transaction->getAvailableSharedVector();
-                ranges->push_back(range);
-                SaveTaintedRanges(result, ranges, transaction);
+                auto range = transaction->getAvailableTaintedRange(0,
+                        utils::GetLength(args.GetIsolate(), parameterValue),
+                        inputInfo);
+                if (range != nullptr) {
+                    auto ranges = transaction->getAvailableSharedVector();
+                    ranges->push_back(range);
+                    SaveTaintedRanges(result, ranges, transaction);
+                }
             }
         }
-    }
     } catch (const tainted::NotAvailableRangeVectorsException& err) {
         // TODO(julio): propagate exception to JS?
     }
@@ -103,17 +103,20 @@ void IsTaintedInstanceMethod(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    args.GetReturnValue().Set(false);
     uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
     auto transaction = GetTransaction(transactionId);
     if (!transaction) {
+        args.GetReturnValue().Set(false);
         return;
     }
 
     uintptr_t ptr1 = utils::GetLocalStringPointer(args[1]);
     if (transaction->GetRanges(ptr1)) {
         args.GetReturnValue().Set(true);
+        return;
     }
+
+    args.GetReturnValue().Set(false);
 }
 
 void GetRangesInstanceMethod(const FunctionCallbackInfo<Value>& args) {
@@ -164,7 +167,7 @@ void EndTransactionInstanceMethod(const FunctionCallbackInfo<Value>& args) {
 
 void StringMethods::Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "newTaintedString", NewTaintedStringInstanceMethod);
-    NODE_SET_METHOD(exports, "isTainted", IsTaintedInstanceMethod);
+    NODE_SET_METHOD(exports, "isTainted", IsTaintedInstanceMethod);  // TODO(julio): support several objects.
     NODE_SET_METHOD(exports, "getRanges", GetRangesInstanceMethod);
     NODE_SET_METHOD(exports, "endTransaction", EndTransactionInstanceMethod);
 }

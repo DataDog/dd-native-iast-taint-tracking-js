@@ -1,6 +1,3 @@
-#ifndef RANGESMANAGER_CC
-#define RANGESMANAGER_CC
-
 #include <cstdint>
 #include <string>
 #include <map>
@@ -23,7 +20,6 @@ namespace tainted {
         this->availableTaintedRanges.clear();
         this->cleanSharedVectors();
         this->taintedObjPool.clear();
-        //TransactionRanges::availableTransactionRanges->push(this);
     }
 
     Transaction::Transaction() {
@@ -57,26 +53,9 @@ namespace tainted {
         }
     }
 
-void SaveTaintedRanges(v8::Local<v8::Value> string, SharedRanges* taintedRanges, Transaction* transaction) {
-    auto stringPointer = utils::GetLocalStringPointer(string);
-    //auto isolate = v8::Isolate::GetCurrent();
-    auto tainted = transaction->getAvailableTaintedObject();
-    if (tainted != nullptr) {
-        tainted->_key = stringPointer;
-        tainted->setRanges(taintedRanges);
-        //tainted->ranges = taintedRanges;
-        tainted->Reset(string);
-        //tainted->target.Reset(isolate, string);
-        //tainted->target.SetWeak(tainted, HdivNative::OnGarbageCollected, v8::WeakCallbackType::kParameter);
-        tainted->SetWeak(iast::gc::OnGarbageCollected, v8::WeakCallbackType::kParameter);
-        transaction->AddTainted(stringPointer, tainted);
-        //transactionRanges->taintedMap->insert(stringPointer, tainted);
-    }
-}
-
-
-    InputInfo* Transaction::createNewInputInfo(v8::Local<v8::Value> parameterName, v8::Local<v8::Value> parameterValue, v8::Local<v8::Value> type)
-    {
+    InputInfo* Transaction::createNewInputInfo(v8::Local<v8::Value> parameterName,
+            v8::Local<v8::Value> parameterValue,
+            v8::Local<v8::Value> type) {
         InputInfo* newInputInfo = new InputInfo(parameterName, parameterValue, type);
         if (newInputInfo != nullptr) {
           this->inputInfoVector.push_back(newInputInfo);
@@ -85,14 +64,5 @@ void SaveTaintedRanges(v8::Local<v8::Value> string, SharedRanges* taintedRanges,
         return newInputInfo;
     }
 
-
-    Range* GetTaintedRangeFromJsObject(Transaction* transaction, v8::Object* jsTaintedRange, v8::Isolate* isolate, v8::Local<v8::Context> context) {
-        int start = utils::GetIntFromV8ObjectProperty(isolate, context, jsTaintedRange, "start");
-        int end = utils::GetIntFromV8ObjectProperty(isolate, context, jsTaintedRange, "end");
-        auto jsInputInfo = v8::Object::Cast(*(jsTaintedRange->Get(context, utils::NewV8String(isolate, "iinfo")).ToLocalChecked()));
-        return transaction->getAvailableTaintedRange(start, end, GetInputInfoFromJsObject(jsInputInfo, isolate, context));
-    }
 }  // namespace tainted
 }  // namespace iast
-
-#endif

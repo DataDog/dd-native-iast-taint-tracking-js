@@ -12,12 +12,12 @@ namespace tainted {
             explicit Range(int start, int end, InputInfo *inputInfo);
             Range(const Range& taintedRange);
             ~Range();
+            v8::Local<v8::Object> toJSObject(v8::Isolate* isolate);
             int start;
             int end;
             InputInfo* inputInfo;
     };
 
-    v8::Local<v8::Object> GetJsObjectFromRange(v8::Isolate* isolate, v8::Local<v8::Context> context, Range* taintedRange);
 } // namespace tainted
 } // namespace iast
 #endif // SRC_TAINTED_RANGE_H_

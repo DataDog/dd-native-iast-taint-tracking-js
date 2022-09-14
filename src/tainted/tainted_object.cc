@@ -1,5 +1,4 @@
-#include <v8.h>
-#include <vector>
+#include <node.h>
 
 #include "../utils/jsobject_utils.h"
 
@@ -49,7 +48,7 @@ namespace tainted {
         int length = this->_ranges->size();
         for (int i = 0; i < length; i++) {
             auto range = this->_ranges->at(i);
-            auto jsRange = GetJsObjectFromRange(isolate, context, range);
+            auto jsRange = range->toJSObject(isolate);
             jsRanges->Set(context, i, jsRange);
         }
 

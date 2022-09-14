@@ -26,15 +26,16 @@ namespace tainted {
         this->inputInfo = inputInfo;
     }
 
-    Range::Range(const Range& taintedRange) {
-        this->start = taintedRange.start;
-        this->end = taintedRange.end;
-        this->inputInfo = taintedRange.inputInfo;
+    Range::Range(const Range& range) {
+        this->start = range.start;
+        this->end = range.end;
+        this->inputInfo = range.inputInfo;
     }
 
     Range::~Range() {}
 
-    v8::Local<v8::Object> GetJsObjectFromRange(Isolate* isolate, v8::Local<v8::Context> context, Range* taintedRange) {
+    v8::Local<v8::Object> Range::toJSObject(v8::Isolate* isolate) {
+        auto context = isolate->GetCurrentContext();
         auto taintedRangev8Obj = v8::Object::New(isolate);
         v8::Local<v8::Value> startLabelLocal;
         v8::Local<v8::Value> endLabelLocal;
@@ -52,9 +53,9 @@ namespace tainted {
             endLabelLocal = v8::Local<v8::Value>::New(isolate, endLabel);
             iinfoLabelLocal = v8::Local<v8::Value>::New(isolate, iinfoLabel);
         }
-        taintedRangev8Obj->Set(context, startLabelLocal, v8::Number::New(isolate, taintedRange->start)).CHECK();
-        taintedRangev8Obj->Set(context, endLabelLocal, v8::Number::New(isolate, taintedRange->end)).CHECK();
-        taintedRangev8Obj->Set(context, iinfoLabelLocal, GetJsObjectFromInputInfo(isolate, context, taintedRange->inputInfo)).CHECK();
+        taintedRangev8Obj->Set(context, startLabelLocal, v8::Number::New(isolate, this->start)).CHECK();
+        taintedRangev8Obj->Set(context, endLabelLocal, v8::Number::New(isolate, this->end)).CHECK();
+        taintedRangev8Obj->Set(context, iinfoLabelLocal, GetJsObjectFromInputInfo(isolate, context, this->inputInfo)).CHECK();
 
         return taintedRangev8Obj;
     }

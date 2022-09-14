@@ -12,20 +12,6 @@
 #include "../container/queued_pool.h"
 #include "../container/shared_vector.h"
 
-
-#define CREATE_RANGE_AND_INSERT_OR_BREAK(newRange, newRanges, transactionRanges, start, end, inputInfo) \
-auto newRange = transactionRanges->getAvailableTaintedRange(start, end, inputInfo); \
-if (newRange != nullptr) { \
-    newRanges->push_back(newRange); \
-} else { \
-    break; \
-}
-#define CREATE_RANGE_AND_INSERT(newRange, newRanges, transactionRanges, start, end, inputInfo) \
-auto newRange = transactionRanges->getAvailableTaintedRange(start, end, inputInfo); \
-if (newRange != nullptr) { \
-    newRanges->push_back(newRange); \
-}
-
 using SharedRanges = iast::container::SharedVector<iast::tainted::Range*>;
 using WeakMap = iast::container::WeakMap<iast::tainted::TaintedObject*, iast::Limits::MAX_TAINTED_OBJECTS>;
 using TaintedPool = iast::container::Pool<iast::tainted::TaintedObject, iast::Limits::MAX_TAINTED_OBJECTS>;
@@ -35,7 +21,6 @@ namespace iast {
 namespace tainted {
 
 struct NotAvailableRangeVectorsException { };
-
 
 class Transaction {
     public:
@@ -122,14 +107,6 @@ class Transaction {
         std::vector<InputInfo*> inputInfoVector;
         uintptr_t transactionId;
 };
-
-void SaveTaintedRanges(v8::Local<v8::Value> string,
-        SharedRanges* ranges,
-        Transaction* transaction);
-
-Range* GetTaintedRangeFromJsObject(v8::Object* jsTaintedRange, v8::Isolate* isolate, v8::Local<v8::Context> context);
-Range* GetTaintedRangeFromJsObject(Transaction* transaction, v8::Object* jsTaintedRange, v8::Isolate* isolate, v8::Local<v8::Context> context);
-
 
 }  // namespace tainted
 }  // namespace iast

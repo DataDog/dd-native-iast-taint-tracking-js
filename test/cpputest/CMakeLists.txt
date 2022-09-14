@@ -1,7 +1,6 @@
 cmake_minimum_required (VERSION 3.7)
 project (cpptest)
 
-
 add_executable(native_test
                 main.cc
                 iast_manager.cc

@@ -18,7 +18,7 @@ class Singleton {
  private:
     Singleton();
 };
-} // namespace container
-} // namespace iast
-#endif /* SRC_CONTAINER_SINGLETON_H_ */
+}   // namespace container
+}   // namespace iast
+#endif  // SRC_CONTAINER_SINGLETON_H_
 

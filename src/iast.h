@@ -1,5 +1,6 @@
-#ifndef _IAST_H_
-#define _IAST_H_
+// Copyright 2022 Datadog, Inc.
+#ifndef SRC_IAST_H_
+#define SRC_IAST_H_
 
 #include <cstddef>
 #include <map>
@@ -22,5 +23,5 @@ Transaction* NewTransaction(iast_key_t id);
 
 }  // namespace iast
 
-#endif /* ifndef _IAST_H_ */
+#endif  // SRC_IAST_H_
 

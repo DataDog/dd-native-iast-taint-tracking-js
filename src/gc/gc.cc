@@ -1,3 +1,4 @@
+// Copyright 2022 Datadog, Inc.
 #include "gc.h"
 #include "../iast.h"
 
@@ -31,6 +32,6 @@ void OnGarbageCollected(const v8::WeakCallbackInfo<tainted::TaintedObject> &info
     tainted->setRanges(nullptr);
 }
 
-} // namespace v8
-} // namespace iast
+}   // namespace gc
+}   // namespace iast
 

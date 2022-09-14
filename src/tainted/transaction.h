@@ -1,3 +1,4 @@
+// Copyright 2022 Datadog, Inc.
 #ifndef SRC_TAINTED_TRANSACTION_H_
 #define SRC_TAINTED_TRANSACTION_H_
 
@@ -23,89 +24,88 @@ namespace tainted {
 struct NotAvailableRangeVectorsException { };
 
 class Transaction {
-    public:
-        Transaction();
-        ~Transaction();
-        void clean();
+ public:
+    Transaction();
+    ~Transaction();
+    void clean();
 
-        inline void setId(uintptr_t id) { transactionId = id;}
-        InputInfo* createNewInputInfo(v8::Local<v8::Value> parameterName,
-                v8::Local<v8::Value> parameterValue,
-                v8::Local<v8::Value> type);
-        void cleanInputInfos();
-        void cleanSharedVectors();
+    inline void setId(uintptr_t id) { transactionId = id;}
+    InputInfo* createNewInputInfo(v8::Local<v8::Value> parameterName,
+            v8::Local<v8::Value> parameterValue,
+            v8::Local<v8::Value> type);
+    void cleanInputInfos();
+    void cleanSharedVectors();
 
-        inline TaintedObject* getAvailableTaintedObject() {
-            return taintedObjPool.pop(this->transactionId);
+    inline TaintedObject* getAvailableTaintedObject() {
+        return taintedObjPool.pop(this->transactionId);
+    }
+
+    inline void returnTaintedObject(TaintedObject* taintedObject) {
+        if (!taintedObject) {
+            return;
         }
 
-        inline void returnTaintedObject(TaintedObject* taintedObject) {
-            if (!taintedObject) {
-                return;
-            }
+        taintedObjPool.push(taintedObject);
+    }
 
-            taintedObjPool.push(taintedObject);
+    inline Range* getAvailableTaintedRange(int start, int end, InputInfo *inputInfo) {
+        return availableTaintedRanges.pop(start, end, inputInfo);
+    }
+
+    inline SharedRanges* getAvailableSharedVector() {
+        SharedRanges* taintedRangeVector = nullptr;
+        if (!this->availableSharedVectors->empty()) {
+            taintedRangeVector = this->availableSharedVectors->front();
+            taintedRangeVector->clear();
+            this->availableSharedVectors->pop();
+        } else if (this->createdSharedVectors < Limits::MAX_TAINTED_RANGE_VECTORS) {
+            taintedRangeVector = new SharedRanges(this->createdSharedVectors++);
         }
-
-        inline Range* getAvailableTaintedRange(int start, int end, InputInfo *inputInfo) {
-            return availableTaintedRanges.pop(start, end, inputInfo);
+        if (taintedRangeVector != nullptr) {
+            inUseSharedVectors[taintedRangeVector->getId()] = taintedRangeVector;
+            return taintedRangeVector;
         }
+        throw NotAvailableRangeVectorsException();
+    }
 
-        inline SharedRanges* getAvailableSharedVector() {
-            SharedRanges* taintedRangeVector = nullptr;
-            if (!this->availableSharedVectors->empty()) {
-                taintedRangeVector = this->availableSharedVectors->front();
-                taintedRangeVector->clear();
-                this->availableSharedVectors->pop();
-            } else if (this->createdSharedVectors < Limits::MAX_TAINTED_RANGE_VECTORS) {
-                taintedRangeVector = new SharedRanges(this->createdSharedVectors++);
-            }
-            if (taintedRangeVector != nullptr) {
-                inUseSharedVectors[taintedRangeVector->getId()] = taintedRangeVector;
-                //taintedRangeVector->refs = 1;
-                return taintedRangeVector;
-            }
-            throw NotAvailableRangeVectorsException();
+    inline SharedRanges* GetRanges(uintptr_t stringPointer) {
+        auto taintedObject = taintedMap->find(stringPointer);
+        if (taintedObject != nullptr) {
+            return taintedObject->getRanges();
         }
+        return nullptr;
+    }
 
-        inline SharedRanges* GetRanges(uintptr_t stringPointer) {
-            auto taintedObject = taintedMap->find(stringPointer);
-            if (taintedObject != nullptr) {
-                return taintedObject->getRanges();
-            }
-            return nullptr;
+    inline void UpdateRanges(uintptr_t stringPointer, SharedRanges* taintedRanges) {
+        auto taintedObject = taintedMap->find(stringPointer);
+        if (taintedObject != nullptr) {
+            taintedObject->setRanges(taintedRanges);
         }
+    }
 
-        inline void UpdateRanges(uintptr_t stringPointer, SharedRanges* taintedRanges) {
-            auto taintedObject = taintedMap->find(stringPointer);
-            if (taintedObject != nullptr) {
-                taintedObject->setRanges(taintedRanges);
-                //taintedObject->ranges = taintedRanges;
-            }
-        }
+    inline void RehashMap(void) {
+        taintedMap->rehash();
+    }
+    inline void AddTainted(uintptr_t key, TaintedObject* tainted) {
+        taintedMap->insert(key, tainted);
+    }
 
-        inline void RehashMap(void) {
-            taintedMap->rehash();
-        }
-        inline void AddTainted(uintptr_t key, TaintedObject* tainted) {
-            taintedMap->insert(key, tainted);
-        }
-
-        inline void ReturnSharedVector(SharedRanges* ranges) {
-            availableSharedVectors->push(ranges);
-            inUseSharedVectors[ranges->getId()] = nullptr;
-        }
+    inline void ReturnSharedVector(SharedRanges* ranges) {
+        availableSharedVectors->push(ranges);
+        inUseSharedVectors[ranges->getId()] = nullptr;
+    }
 
 
-        TaintedPool taintedObjPool;
-    private:
-        SharedRanges* inUseSharedVectors[Limits::MAX_TAINTED_OBJECTS] = {};
-        std::queue<SharedRanges*>* availableSharedVectors;
-        WeakMap* taintedMap;
-        int createdSharedVectors;
-        RangePool availableTaintedRanges;
-        std::vector<InputInfo*> inputInfoVector;
-        uintptr_t transactionId;
+    TaintedPool taintedObjPool;
+
+ private:
+    SharedRanges* inUseSharedVectors[Limits::MAX_TAINTED_OBJECTS] = {};
+    std::queue<SharedRanges*>* availableSharedVectors;
+    WeakMap* taintedMap;
+    int createdSharedVectors;
+    RangePool availableTaintedRanges;
+    std::vector<InputInfo*> inputInfoVector;
+    uintptr_t transactionId;
 };
 
 }  // namespace tainted

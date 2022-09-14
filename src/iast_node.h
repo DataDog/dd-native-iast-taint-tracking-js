@@ -1,5 +1,6 @@
-#ifndef IASTNODE_H_
-#define IASTNODE_H_
+// Copyright 2022 Datadog, Inc.
+#ifndef SRC_IAST_NODE_H_
+#define SRC_IAST_NODE_H_
 
 #if defined(NODE_VERSION_v4) || defined(NODE_VERSION_v6)
 #define CHECK() FromJust()
@@ -27,4 +28,4 @@
 #define IS_EXTERNAL()   IsExternal()
 #endif
 
-#endif /* ifndef IASTNODE_H_ */
+#endif  // SRC_IAST_NODE_H_

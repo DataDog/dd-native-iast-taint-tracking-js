@@ -1,3 +1,5 @@
+#ifndef SRC_IAST_MANAGER_H_
+#define SRC_IAST_MANAGER_H_
 // Copyright 2022 Datadog, Inc.
 #include <cstdint>
 #include <map>
@@ -78,3 +80,4 @@ class IastManager {
 };
 
 }   // namespace iast
+#endif  // SRC_IAST_MANAGER_H_

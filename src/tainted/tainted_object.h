@@ -1,5 +1,6 @@
-#ifndef TAINTED_OBJECT_H
-#define TAINTED_OBJECT_H
+// Copyright 2022 Datadog, Inc.
+#ifndef SRC_TAINTED_TAINTED_OBJECT_H_
+#define SRC_TAINTED_TAINTED_OBJECT_H_
 #include <node.h>
 
 #include <cstdint>
@@ -14,13 +15,13 @@
 #include "../container/shared_vector.h"
 #include "../iastlimits.h"
 
+using SharedRanges = iast::container::SharedVector<iast::tainted::Range*>;
 namespace iast {
 namespace tainted {
 class TaintedObject: public iast::WeakObjIface<TaintedObject*> {
- using SharedRanges = iast::container::SharedVector<iast::tainted::Range*>;
  public:
     TaintedObject();
-    TaintedObject(uintptr_t transactionIdPointer);
+    explicit TaintedObject(uintptr_t transactionIdPointer);
     TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges, TaintedObject* next);
     TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges);
     ~TaintedObject();
@@ -45,16 +46,15 @@ class TaintedObject: public iast::WeakObjIface<TaintedObject*> {
     }
 
     v8::Local<v8::Object> toJSObject(v8::Isolate*);
-    SharedRanges* getRanges(void) { return _ranges; };
+    SharedRanges* getRanges(void) { return _ranges; }
     void setRanges(SharedRanges* ranges) { _ranges = ranges; }
     uintptr_t getId(void) { return _transactionId; }
+
  private:
     uintptr_t _transactionId;
     SharedRanges* _ranges;
     v8::Persistent<v8::Value> target;
-
 };
-
-} // namespace tainted
-} // namespace iast
-#endif
+}   // namespace tainted
+}   // namespace iast
+#endif  // SRC_TAINTED_TAINTED_OBJECT_H_

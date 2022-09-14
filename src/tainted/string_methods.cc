@@ -1,5 +1,6 @@
-#include <cstddef>
+// Copyright 2022 Datadog, Inc.
 #include <node.h>
+#include <cstddef>
 #include <string>
 #include <map>
 #include <locale>

@@ -1,3 +1,4 @@
+// Copyright 2022 Datadog, Inc.
 #ifndef SRC_TAINTED_STRING_METHODS_H_
 #define SRC_TAINTED_STRING_METHODS_H_
 
@@ -9,14 +10,14 @@ using v8::Local;
 using v8::Object;
 
 class StringMethods {
-    public:
-        static void Init(Local<Object> exports);
+ public:
+    static void Init(Local<Object> exports);
 
-    private:
-        explicit StringMethods();
-        ~StringMethods();
+ private:
+    StringMethods();
+    ~StringMethods();
 };
-} // namespace tainted
-} // namespace iast
+}    // namespace tainted
+}    // namespace iast
 
 #endif  // SRC_TAINTED_STRING_METHODS_H_

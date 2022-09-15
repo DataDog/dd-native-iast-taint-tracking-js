@@ -18,6 +18,7 @@ InputInfo::InputInfo(v8::Local<v8::Value> parameterName,
     Isolate *isolate = v8::Isolate::GetCurrent();
     this->parameterName.Reset(isolate, parameterName);
     this->parameterValue.Reset(isolate, parameterValue);
+    this->parameterValue.SetWeak();
     this->type.Reset(isolate, type);
 }
 
@@ -25,21 +26,23 @@ InputInfo::InputInfo(const InputInfo& inputInfo) {
     auto isolate = v8::Isolate::GetCurrent();
 
     if (!inputInfo.parameterName.IsEmpty()) {
-      this->parameterName.Reset(isolate, inputInfo.parameterName);
+        this->parameterName.Reset(isolate, inputInfo.parameterName);
     } else {
-      this->parameterName.Reset();
+        this->parameterName.Reset();
     }
 
     if (!inputInfo.parameterValue.IsEmpty()) {
-      this->parameterValue.Reset(isolate, inputInfo.parameterValue);
+        this->parameterValue.Reset(isolate, inputInfo.parameterValue);
+        this->parameterValue.SetWeak();
     } else {
-      this->parameterValue.Reset();
+        this->parameterValue.Reset();
     }
 
+
     if (!inputInfo.type.IsEmpty()) {
-      this->type.Reset(isolate, inputInfo.type);
+        this->type.Reset(isolate, inputInfo.type);
     } else {
-      this->type.Reset();
+        this->type.Reset();
     }
 }
 

@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const tar = require('tar')
-const getLibc = require(path.join(__dirname, '.', 'libc'))
+const getLibc = require(path.join(__dirname, 'libc'))
 const archFolder = `${os.platform()}-${os.arch()}-${getLibc()}`
 
 fs.mkdirSync(path.join(__dirname, '..', 'dist', archFolder), { recursive: true })

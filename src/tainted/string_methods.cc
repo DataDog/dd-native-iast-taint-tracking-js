@@ -11,6 +11,7 @@
 #include <iostream>
 #include <memory>
 
+#include "string_resource.h"
 #include "string_methods.h"
 #include "input_info.h"
 #include "tainted_object.h"
@@ -42,9 +43,14 @@ void SaveTaintedRanges(v8::Local<v8::Value> string, SharedRanges* taintedRanges,
     }
 }
 
-void NewTaintedStringInstanceMethod(const FunctionCallbackInfo<Value>& args) {
+void CreateTransaction(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    args.GetReturnValue().Set(tainted::NewExternalString(isolate, args[0]));
+}
+
+void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
+    auto isolate = args.GetIsolate();
     if (args.Length() < 4) {
-        auto isolate = args.GetIsolate();
         isolate->ThrowException(v8::Exception::TypeError(
                         v8::String::NewFromUtf8(isolate,
                         "Wrong number of arguments",
@@ -57,11 +63,20 @@ void NewTaintedStringInstanceMethod(const FunctionCallbackInfo<Value>& args) {
     auto parameterName = args[2];
     auto type = args[3];
 
-    // TODO(julio): if string length == 1 then avoid chache issues.
-    args.GetReturnValue().Set(parameterValue);
-    if (!parameterValue->IsString()) {
+    if (!(args[1]->IsString())) {
+        args.GetReturnValue().Set(args[1]);
         return;
     }
+
+    // if string length == 1 then make a new one in order to avoid chache issues.
+    if (v8::Local<v8::String>::Cast(args[1])->Length() == 1) {
+        v8::String::Utf8Value param1(isolate, args[1]);
+        std::string cppStr(*param1);
+        v8::Local<v8::String> newStr = v8::String::NewFromUtf8(isolate, cppStr.c_str()).ToLocalChecked();
+        parameterValue = newStr;
+    }
+
+    args.GetReturnValue().Set(parameterValue);
     try {
         uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
         auto transaction = NewTransaction(transactionId);
@@ -93,7 +108,7 @@ void NewTaintedStringInstanceMethod(const FunctionCallbackInfo<Value>& args) {
     }
 }
 
-void IsTaintedInstanceMethod(const FunctionCallbackInfo<Value>& args) {
+void IsTainted(const FunctionCallbackInfo<Value>& args) {
     if (args.Length() < 2) {
         auto isolate = args.GetIsolate();
         isolate->ThrowException(v8::Exception::TypeError(
@@ -113,13 +128,12 @@ void IsTaintedInstanceMethod(const FunctionCallbackInfo<Value>& args) {
     uintptr_t ptr1 = utils::GetLocalStringPointer(args[1]);
     if (transaction->GetRanges(ptr1)) {
         args.GetReturnValue().Set(true);
-        return;
+    } else {
+        args.GetReturnValue().Set(false);
     }
-
-    args.GetReturnValue().Set(false);
 }
 
-void GetRangesInstanceMethod(const FunctionCallbackInfo<Value>& args) {
+void GetRanges(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
     if (args.Length() != 2) {
@@ -150,7 +164,7 @@ void GetRangesInstanceMethod(const FunctionCallbackInfo<Value>& args) {
     args.GetReturnValue().SetNull();
 }
 
-void EndTransactionInstanceMethod(const FunctionCallbackInfo<Value>& args) {
+void DeleteTransaction(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
     if (args.Length() != 1) {
         // Throw an Error that is passed back to JavaScript
@@ -166,10 +180,11 @@ void EndTransactionInstanceMethod(const FunctionCallbackInfo<Value>& args) {
 }
 
 void StringMethods::Init(Local<Object> exports) {
-    NODE_SET_METHOD(exports, "newTaintedString", NewTaintedStringInstanceMethod);
-    NODE_SET_METHOD(exports, "isTainted", IsTaintedInstanceMethod);  // TODO(julio): support several objects.
-    NODE_SET_METHOD(exports, "getRanges", GetRangesInstanceMethod);
-    NODE_SET_METHOD(exports, "endTransaction", EndTransactionInstanceMethod);
+    NODE_SET_METHOD(exports, "createTransaction", CreateTransaction);
+    NODE_SET_METHOD(exports, "newTaintedString", NewTaintedString);
+    NODE_SET_METHOD(exports, "isTainted", IsTainted);  // TODO(julio): support several objects.
+    NODE_SET_METHOD(exports, "getRanges", GetRanges);
+    NODE_SET_METHOD(exports, "removeTransaction", DeleteTransaction);
 }
 }  // namespace tainted
 }  // namespace iast

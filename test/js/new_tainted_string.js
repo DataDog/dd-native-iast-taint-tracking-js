@@ -7,7 +7,7 @@ describe('Taint strings', function () {
     let id = '1';
 
     afterEach(function () {
-        iastnativemethods.endTransaction(id);
+        iastnativemethods.removeTransaction(id);
     });
 
     it('Taint new string', function () {
@@ -102,12 +102,13 @@ describe('Taint strings', function () {
 
     it('Beyond Max values', function () {
         let ret;
+        //let id = '1';
         let values = new Array(16384);
         for (let i = 0; i < values.length; i++) {
             values[i] = i.toString();
             ret = iastnativemethods.newTaintedString(id, values[i], 'param', 'REQUEST');
             assert.strictEqual(ret, values[i], "Unexpected value");
-            ret = iastnativemethods.isTainted(id, values[i]);
+            ret = iastnativemethods.isTainted(id, ret);
             assert.strictEqual(ret, true, "Unexpected value");
         }
 

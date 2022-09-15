@@ -7,7 +7,7 @@ describe('Ranges', function () {
     let id = '1';
 
     afterEach(function () {
-        iastnativemethods.endTransaction(id);
+        iastnativemethods.removeTransaction(id);
     });
 
     it('Get Ranges', function () {

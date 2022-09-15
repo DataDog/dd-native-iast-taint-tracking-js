@@ -17,15 +17,13 @@ TaintedObject::TaintedObject(uintptr_t transactionIdPointer) : _transactionId(tr
     this->_key = 0;
     this->_ranges = nullptr;
 }
-TaintedObject::TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges) {
+TaintedObject::TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges) : _ranges(ranges) {
     this->_key = pointerToV8String;
-    this->_ranges = ranges;
     this->_next = nullptr;
 }
 
-TaintedObject::TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges, TaintedObject* next) {
+TaintedObject::TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges, TaintedObject* next): _ranges(ranges) {
     this->_key = pointerToV8String;
-    this->_ranges = ranges;
     this->_next = next;
 }
 

@@ -1,3 +1,5 @@
+// Copyright 2022 Datadog, Inc.
+#include <string>
 #include <codecvt>
 #include <locale>
 #include "string_resource.h"
@@ -7,7 +9,8 @@ namespace tainted {
 
 void StringResource::CopyCharArrToUint16Arr(const char* charArr, uint16_t* result) {
     std::string originalString(charArr);
-    std::u16string utf16 = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(originalString.data());
+    std::u16string utf16 = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.
+        from_bytes(originalString.data());
     int i = 0;
     for (char16_t c : utf16) {
         result[i] = c;

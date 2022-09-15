@@ -1,3 +1,4 @@
+// Copyright 2022 Datadog, Inc.
 #ifndef SRC_TAINTED_STRING_RESOURCE_H_
 #define SRC_TAINTED_STRING_RESOURCE_H_
 #include <node.h>

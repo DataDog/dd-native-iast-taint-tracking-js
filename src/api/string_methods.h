@@ -1,11 +1,11 @@
 // Copyright 2022 Datadog, Inc.
-#ifndef SRC_TAINTED_STRING_METHODS_H_
-#define SRC_TAINTED_STRING_METHODS_H_
+#ifndef SRC_API_STRING_METHODS_H_
+#define SRC_API_STRING_METHODS_H_
 
 #include <node.h>
 
 namespace iast {
-namespace tainted {
+namespace api {
 using v8::Local;
 using v8::Object;
 
@@ -17,7 +17,7 @@ class StringMethods {
     StringMethods();
     ~StringMethods();
 };
-}    // namespace tainted
+}    // namespace api
 }    // namespace iast
 
-#endif  // SRC_TAINTED_STRING_METHODS_H_
+#endif  // SRC_API_STRING_METHODS_H_

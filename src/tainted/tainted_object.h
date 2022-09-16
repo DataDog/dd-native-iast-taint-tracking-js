@@ -7,9 +7,9 @@
 #include <vector>
 #include <memory>
 
+#include "range.h"
 #include "../weakiface.h"
 #include "../utils/string_utils.h"
-#include "range.h"
 #include "../container/pool.h"
 #include "../container/weakmap.h"
 #include "../container/shared_vector.h"
@@ -22,8 +22,11 @@ class TaintedObject: public iast::WeakObjIface<TaintedObject*> {
  public:
     TaintedObject();
     explicit TaintedObject(uintptr_t transactionIdPointer);
-    TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges, TaintedObject* next);
-    TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges);
+    TaintedObject(uintptr_t transactionId,
+            uintptr_t pointerToV8String,
+            SharedRanges* ranges,
+            v8::Local<v8::Value> jsString);
+    TaintedObject(const TaintedObject&) = delete;
     ~TaintedObject();
 
     bool IsEmpty() { return target.IsEmpty(); }

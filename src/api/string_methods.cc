@@ -6,16 +6,14 @@
 #include <locale>
 #include <codecvt>
 #include <list>
-#include <vector>
 #include <iterator>
-#include <iostream>
 #include <memory>
 
-#include "string_resource.h"
 #include "string_methods.h"
-#include "input_info.h"
-#include "tainted_object.h"
-#include "transaction.h"
+#include "../tainted/string_resource.h"
+#include "../tainted/input_info.h"
+#include "../tainted/tainted_object.h"
+#include "../tainted/transaction.h"
 #include "../gc/gc.h"
 #include "../iast.h"
 
@@ -29,19 +27,10 @@ using v8::String;
 using v8::Value;
 using v8::Array;
 
-namespace iast {
-namespace tainted {
+using iast::tainted::InputInfo;
 
-void SaveTaintedRanges(v8::Local<v8::Value> string, SharedRanges* taintedRanges, Transaction* transaction) {
-    auto stringPointer = utils::GetLocalStringPointer(string);
-    auto tainted = transaction->GetAvailableTaintedObject();
-    if (tainted != nullptr) {
-        tainted->_key = stringPointer;
-        tainted->setRanges(taintedRanges);
-        tainted->Reset(string);
-        transaction->AddTainted(stringPointer, tainted);
-    }
-}
+namespace iast {
+namespace api {
 
 void CreateTransaction(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
@@ -99,7 +88,8 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
                 if (range != nullptr) {
                     auto ranges = transaction->GetAvailableSharedVector();
                     ranges->push_back(range);
-                    SaveTaintedRanges(result, ranges, transaction);
+                    auto stringPointer = utils::GetLocalStringPointer(result);
+                    transaction->AddTainted(stringPointer, ranges, result);
                 }
             }
         }
@@ -186,5 +176,5 @@ void StringMethods::Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "getRanges", GetRanges);
     NODE_SET_METHOD(exports, "removeTransaction", DeleteTransaction);
 }
-}  // namespace tainted
+}  // namespace api
 }  // namespace iast

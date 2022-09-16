@@ -16,7 +16,7 @@
 using SharedRanges = iast::container::SharedVector<iast::tainted::Range*>;
 using WeakMap = iast::container::WeakMap<iast::tainted::TaintedObject*, iast::Limits::MAX_TAINTED_OBJECTS>;
 using TaintedPool = iast::container::Pool<iast::tainted::TaintedObject, iast::Limits::MAX_TAINTED_OBJECTS>;
-using RangePool = iast::container::Pool<iast::tainted::Range, iast::Limits::MAX_TAINTED_RANGES>;
+using RangePool = iast::container::Pool<iast::tainted::Range, iast::Limits::MAX_GLOBAL_TAINTED_RANGES>;
 
 namespace iast {
 namespace tainted {
@@ -89,6 +89,17 @@ class Transaction {
     }
     inline void AddTainted(uintptr_t key, TaintedObject* tainted) {
         taintedMap->insert(key, tainted);
+    }
+
+    inline void AddTainted(uintptr_t key, SharedRanges* ranges, v8::Local<v8::Value> jsString) {
+        // TODO(julio): trigger exception from the pool rather than a nullptr
+        auto tainted = taintedObjPool.pop(this->transactionId,
+                key,
+                ranges,
+                jsString);
+        if (tainted) {
+            taintedMap->insert(key, tainted);
+        }
     }
 
     inline void ReturnSharedVector(SharedRanges* ranges) {

@@ -1,5 +1,7 @@
 // Copyright 2022 Datadog, Inc.
 #include <node.h>
+#include <cstdint>
+#include <functional>
 
 #include "../utils/jsobject_utils.h"
 #include "tainted_object.h"
@@ -7,24 +9,27 @@
 
 namespace iast {
 namespace tainted {
+
 TaintedObject::TaintedObject() {
     this->_transactionId = 0;
     this->_key = 0;
     this->_ranges = nullptr;
     this->_next = nullptr;
 }
+
 TaintedObject::TaintedObject(uintptr_t transactionIdPointer) : _transactionId(transactionIdPointer) {
     this->_key = 0;
     this->_ranges = nullptr;
-}
-TaintedObject::TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges) : _ranges(ranges) {
-    this->_key = pointerToV8String;
     this->_next = nullptr;
 }
 
-TaintedObject::TaintedObject(uintptr_t pointerToV8String, SharedRanges* ranges, TaintedObject* next): _ranges(ranges) {
+TaintedObject::TaintedObject(uintptr_t transactionId,
+        uintptr_t pointerToV8String,
+        SharedRanges* ranges,
+        v8::Local<v8::Value> jsString): _transactionId(transactionId), _ranges(ranges) {
     this->_key = pointerToV8String;
-    this->_next = next;
+    this->_next = nullptr;
+    this->target.Reset(v8::Isolate::GetCurrent(), jsString);
 }
 
 TaintedObject::~TaintedObject() {

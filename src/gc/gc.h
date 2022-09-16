@@ -4,8 +4,6 @@
 
 #include <v8.h>
 
-#include "../tainted/tainted_object.h"
-
 namespace iast {
 namespace gc {
 void OnMarkSweepCompact(v8::Isolate *isolate, v8::GCType type, v8::GCCallbackFlags flags);

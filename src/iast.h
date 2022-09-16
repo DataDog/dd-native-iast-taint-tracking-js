@@ -9,7 +9,6 @@
 
 
 #include "transaction_manager.h"
-
 #include "tainted/transaction.h"
 
 using iast::tainted::Transaction;

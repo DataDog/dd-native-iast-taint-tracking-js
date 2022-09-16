@@ -10,7 +10,8 @@
                 "./src/tainted/tainted_object.cc",
                 "./src/tainted/transaction.cc",
                 "./src/tainted/string_resource.cc",
-                "./src/tainted/string_methods.cc",
+                "./src/api/string_methods.cc",
+                "./src/api/concat.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

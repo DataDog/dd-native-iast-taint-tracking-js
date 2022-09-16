@@ -34,7 +34,7 @@ namespace tainted {
 
 void SaveTaintedRanges(v8::Local<v8::Value> string, SharedRanges* taintedRanges, Transaction* transaction) {
     auto stringPointer = utils::GetLocalStringPointer(string);
-    auto tainted = transaction->getAvailableTaintedObject();
+    auto tainted = transaction->GetAvailableTaintedObject();
     if (tainted != nullptr) {
         tainted->_key = stringPointer;
         tainted->setRanges(taintedRanges);
@@ -93,11 +93,11 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
                     return;
                 }
 
-                auto range = transaction->getAvailableTaintedRange(0,
+                auto range = transaction->GetAvailableTaintedRange(0,
                         utils::GetLength(args.GetIsolate(), parameterValue),
                         inputInfo);
                 if (range != nullptr) {
-                    auto ranges = transaction->getAvailableSharedVector();
+                    auto ranges = transaction->GetAvailableSharedVector();
                     ranges->push_back(range);
                     SaveTaintedRanges(result, ranges, transaction);
                 }

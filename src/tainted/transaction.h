@@ -37,7 +37,7 @@ class Transaction {
     void cleanInputInfos(void);
     void cleanSharedVectors(void);
 
-    inline TaintedObject* getAvailableTaintedObject(void) {
+    inline TaintedObject* GetAvailableTaintedObject(void) {
         return taintedObjPool.pop(this->transactionId);
     }
 
@@ -49,11 +49,11 @@ class Transaction {
         taintedObjPool.push(taintedObject);
     }
 
-    inline Range* getAvailableTaintedRange(int start, int end, InputInfo *inputInfo) {
+    inline Range* GetAvailableTaintedRange(int start, int end, InputInfo *inputInfo) {
         return availableTaintedRanges.pop(start, end, inputInfo);
     }
 
-    inline SharedRanges* getAvailableSharedVector(void) {
+    inline SharedRanges* GetAvailableSharedVector(void) {
         SharedRanges* taintedRangeVector = nullptr;
         if (!this->availableSharedVectors->empty()) {
             taintedRangeVector = this->availableSharedVectors->front();

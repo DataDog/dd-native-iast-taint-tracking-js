@@ -3,7 +3,7 @@ project (cpptest)
 
 add_executable(native_test
                 main.cc
-                iast_manager.cc
+                transaction_manager.cc
                 container/pool.cc
                 container/queued_pool.cc
                 weakiface.cc

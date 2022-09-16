@@ -4,7 +4,13 @@ const path = require('path')
 const os = require('os')
 const tar = require('tar')
 const getLibc = require(path.join(__dirname, 'libc'))
-const archFolder = `${os.platform()}-${os.arch()}-${getLibc()}`
+
+let archFolder;
+if (os.platform() === 'linux') {
+    archFolder = `${os.platform()}-${os.arch()}-${getLibc()}`
+} else {
+    archFolder = `${os.platform()}-${os.arch()}`
+}
 
 fs.mkdirSync(path.join(__dirname, '..', 'dist', archFolder), { recursive: true })
 fs.renameSync(path.join(__dirname, '..', 'dist', 'iastnativemethods.node'), path.join(__dirname, '..', 'dist', archFolder, 'iastnativemethods.node'))

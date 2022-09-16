@@ -7,8 +7,9 @@
     "build": "node-gyp configure && node-gyp build",
     "postbuild": "node ./scripts/pack.js",
     "test": "./scripts/cpputest.sh",
+    "test-js": "mocha --recursive",
     "test-ci": "./scripts/cpputest.sh ci",
-    "test-docker":"./scripts/test_docker.sh"
+    "test-docker": "./scripts/test_docker.sh"
   },
   "author": "Datadog Inc. <info@datadoghq.com>",
   "license": "Apache-2.0",
@@ -21,6 +22,8 @@
     "segfault-handler": "^1.3.0"
   },
   "dependencies": {
-    "node-addon-api": "^4.3.0"
+    "mocha": "^10.0.0",
+    "node-addon-api": "^4.3.0",
+    "tar": "^6.1.11"
   }
 }

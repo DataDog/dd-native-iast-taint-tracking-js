@@ -10,4 +10,4 @@ COPY ./scripts /build/scripts
 RUN npm ci --ignore-scripts
 COPY . .
 ENTRYPOINT ["npm", "run"]
-CMD ["pack-all"]
+CMD ["build"]

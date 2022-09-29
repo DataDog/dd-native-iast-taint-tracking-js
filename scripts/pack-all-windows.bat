@@ -18,7 +18,7 @@ for /l %%i in (0,1,6) do (
     call %NPM_COMMAND% run node-gyp-configure -- --target=%%nodeVersions[%%i]%%
     call %NPM_COMMAND% run node-gyp-build
 
-    call %NODE_COMMAND% pre-pack-all.js %%nodeShortVersionNames[%%i]%%
+    call %NODE_COMMAND% .\\scripts\\pre-pack-all.js %%nodeShortVersionNames[%%i]%%
 
     cd dist
     call %NPM_COMMAND% pack

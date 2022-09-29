@@ -10,7 +10,8 @@ RUN apt-get update && apt-get -y install \
     cmake \
     g++ \
     cpputest \
-    libcpputest-dev
+    libcpputest-dev \
+    zip
 
 RUN npm ci --ignore-scripts
 COPY . .

@@ -9,4 +9,4 @@ COPY ./package-lock.json .
 RUN npm ci --ignore-scripts
 COPY . .
 ENTRYPOINT ["npm", "run"]
-CMD ["build"]
+CMD ["pack-all"]

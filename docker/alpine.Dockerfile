@@ -5,6 +5,7 @@ RUN apk add py3-pip make g++ cmake cpputest cpputest-static
 WORKDIR /build
 COPY ./package.json .
 COPY ./package-lock.json .
+COPY ./scripts/ /build/scripts/
 
 RUN npm ci --ignore-scripts
 COPY . .

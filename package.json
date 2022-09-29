@@ -13,7 +13,7 @@
     "node-gyp-configure": "node-gyp configure",
     "node-gyp-build": "node-gyp build",
     "pack-all": "npm install && ./scripts/pack-all.sh",
-    "pack-all-windows": "npm install && ./scripts/pack-all-windows.bat"
+    "pack-all-windows": "npm install && scripts/pack-all-windows.bat"
   },
   "author": "Datadog Inc. <info@datadoghq.com>",
   "license": "Apache-2.0",

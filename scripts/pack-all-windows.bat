@@ -26,3 +26,4 @@ for /l %%i in (0,1,6) do (
     copy dist\*.tgz .
 )
 
+powershell Compress-Archive *.tgz bundle-pack.zip

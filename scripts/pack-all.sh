@@ -13,3 +13,5 @@ do
     node ./scripts/pre-pack-all.js ${nodeShortVersionNames[$index]} && cd dist && npm pack && cd $initialPath
     cp ./dist/*.tgz .
 done
+
+zip -r bundle-pack.zip *.tgz

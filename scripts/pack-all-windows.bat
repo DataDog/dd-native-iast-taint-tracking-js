@@ -10,8 +10,10 @@ set nodeShortVersionNames[1]=v16
 
 set initialPath = %cd%
 
+call %NPM_COMMAND% config set script-shell "C:\\Program Files\\Git\\bin\\bash.exe"
+
 CMD /c %NPM_COMMAND% install
-for /l %%i in (0,1,6) do (
+for /l %%i in (0,1,2) do (
     cd %initialPath%
     del /s /q build
     del /s /q dist

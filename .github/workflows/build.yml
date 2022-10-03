@@ -73,7 +73,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: 'iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node'
-          path: **/dist/iastnativemethods.node
+          path: '**/dist/iastnativemethods.node'
 
   cpp-lint:
     runs-on: ubuntu-latest

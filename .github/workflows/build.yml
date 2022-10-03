@@ -10,6 +10,7 @@ jobs:
   build-native:
     strategy:
       matrix:
+        version: [14, 16, 18]
         target:
           - name: macos
             os: macos-latest
@@ -27,7 +28,7 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: ${{ matrix.version }}
           architecture: ${{ matrix.target.arch }}
       - uses: actions/setup-python@v2
         with:

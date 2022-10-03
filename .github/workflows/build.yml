@@ -91,5 +91,24 @@ jobs:
       - build-docker
       - cpp-lint
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [14, 16, 18]
+        target:
+          - name: macos
+            artifact: darwin-x64-unknown
+          - name: windows 64 bits
+            artifact: win32-x64-unknown
+          - name: linux
+            artifact: linux-x64-glibc
+          - name: alpine
+            artifact: linux-x64-musl
     steps:
-      - run: echo '🚀🚀🚀🚀🚀'
+      - uses: actions/download-artifact@v3
+        with:
+          name: 'iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node'
+      - run: tar cvf release.tar *.node
+      - uses: actions/upload-artifact@v2
+        with:
+          name: release-version.tar
+          path: release.tar

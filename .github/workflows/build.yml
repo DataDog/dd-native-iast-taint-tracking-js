@@ -63,7 +63,7 @@ jobs:
           LIBC: ${{ matrix.target.libc }}
       - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version }} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name builder build
-      - run: docker cp builder:/build/dist/iastnativemethods.node .
+      - run: docker cp builder:/build/dist/iastnativemethods.node ./iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node
       - run: docker run --name tester build test ci
       - run: docker cp tester:/build/test/cpputest/results/ .
       - uses: mikepenz/action-junit-report@v3
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: 'iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node'
-          path: 'iastnativemethods.node'
+          path: 'iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node'
 
   cpp-lint:
     runs-on: ubuntu-latest

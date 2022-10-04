@@ -15,12 +15,10 @@ jobs:
             os: macos-latest
             artifact: darwin-x64-unknown
             arch: x64
-            script: pack-all
           - name: windows 64 bits
             os: windows-2019
             artifact: win32-x64-unknown
             arch: x64
-            script: pack-all-windows
     
     runs-on: ${{ matrix.target.os }}
     steps:
@@ -36,11 +34,11 @@ jobs:
           python-version: '>3.6.0'
           architecture: ${{ matrix.target.arch }}
       - run: npm i --ignore-scripts
-      - run: npm run ${{ matrix.target.script }}
+      - run: npm run build
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target.artifact }}
-          path: bundle-pack.zip
+          path: ${{ matrix.target.artifact }}.tgz
 
   build-docker:
     runs-on: ubuntu-latest
@@ -50,11 +48,9 @@ jobs:
           - dockerfile: Dockerfile
             libc: libc
             artifact: linux-x64-glibc
-            artifactpath: bundle-pack.zip
           - dockerfile: alpine.Dockerfile
             libc: musl
             artifact: linux-x64-musl
-            artifactpath: linux-x64-musl.tgz
     steps:
       - uses: actions/checkout@v2
         with:
@@ -69,7 +65,7 @@ jobs:
       - run: docker build -t build -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name builder build
       - run: docker run --name tester build test ci
-      - run: docker cp builder:/build/${{ matrix.target.artifactpath }} .
+      - run: docker cp builder:/build/${{ matrix.target.artifact }}.tgz .
       - run: docker cp tester:/build/test/cpputest/results/ .
       - uses: mikepenz/action-junit-report@v3
         if: always()
@@ -79,7 +75,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target.artifact }}
-          path: ${{ matrix.target.artifactpath }}
+          path: ${{ matrix.target.artifact }}.tgz
 
   cpp-lint:
     runs-on: ubuntu-latest

@@ -63,7 +63,7 @@ jobs:
           LIBC: ${{ matrix.target.libc }}
       - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version }} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name builder build
-      - run: docker cp builder:/build/dist/iastnativemethods.node .
+      - run: docker cp builder:/build/dist/${{ matrix.artifact }}-${{ matrix.version }}/iastnativemethods.node .
       - run: docker run --name tester build test ci
       - run: docker cp tester:/build/test/cpputest/results/ .
       - uses: mikepenz/action-junit-report@v3

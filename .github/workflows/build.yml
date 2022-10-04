@@ -10,6 +10,7 @@ jobs:
   build-native:
     strategy:
       matrix:
+        version: [14, 16, 18]
         target:
           - name: macos
             os: macos-latest
@@ -29,7 +30,7 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: ${{ matrix.version }}
           architecture: ${{ matrix.target.arch }}
       - uses: actions/setup-python@v2
         with:
@@ -39,13 +40,14 @@ jobs:
       - run: npm run ${{ matrix.target.script }}
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.target.artifact }}
-          path: bundle-pack.zip
+          name: ${{ matrix.target.artifact }}-${{ matrix.version }}
+          path: dist/iastnativemethods.node
 
   build-docker:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        version: [14, 16, 18]
         target:
           - dockerfile: Dockerfile
             libc: libc
@@ -59,17 +61,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
       - run: npm i --ignore-scripts
         env:
           PLATFORM: 'linux'
           LIBC: ${{ matrix.target.libc }}
-      - run: docker build -t build -f ./docker/${{ matrix.target.dockerfile }} .
+      - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version }} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name builder build
+      - run: docker cp builder:/build/dist/iastnativemethods.node .
       - run: docker run --name tester build test ci
-      - run: docker cp builder:/build/${{ matrix.target.artifactpath }} .
       - run: docker cp tester:/build/test/cpputest/results/ .
       - uses: mikepenz/action-junit-report@v3
         if: always()
@@ -78,8 +77,8 @@ jobs:
           check_name: junit test report ${{ matrix.target.name }}
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.target.artifact }}
-          path: ${{ matrix.target.artifactpath }}
+          name: ${{ matrix.target.artifact }}-${{ matrix.version }}
+          path: iastnativemethods.node
 
   cpp-lint:
     runs-on: ubuntu-latest
@@ -89,7 +88,6 @@ jobs:
       - run: pip install cpplint
       - run: cpplint --filter=-build/include_subdir --linelength=120 --recursive ./src
 
-
   all-good:
     needs:
       - build-native
@@ -97,4 +95,12 @@ jobs:
       - cpp-lint
     runs-on: ubuntu-latest
     steps:
-      - run: echo '🚀🚀🚀🚀🚀'
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      - run: cd artifacts && tar cf release.tar *
+      - uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: artifacts/release.tar

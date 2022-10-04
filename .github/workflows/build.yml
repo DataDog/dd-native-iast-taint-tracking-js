@@ -95,7 +95,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           path: artifacts
-      - run: cp index.ts artifacts
+      - run: cp index.js artifacts
       - run: cd artifacts && tar cf release.tar *
       - uses: actions/upload-artifact@v2
         with:

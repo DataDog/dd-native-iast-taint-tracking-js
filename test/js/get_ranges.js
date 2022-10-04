@@ -1,33 +1,34 @@
 const path = require('path');
-const iastnativemethods = require(path.join(__dirname, '..', '..', 'lib', 'binding'));
+const TaintedUtils = require('../../index');
 const assert = require('assert');
 
 describe('Ranges', function () {
     let value = 'test';
-    let id = '1';
+    let param = 'p' + 'aram';
+    let id = '666';
 
     afterEach(function () {
-        iastnativemethods.removeTransaction(id);
+        TaintedUtils.removeTransaction(id);
     });
 
     it('Get Ranges', function () {
         let expected = [ { start: 0, end: value.length, iinfo : { parameterName: 'param', parameterValue: 'test', type: 'REQUEST' }} ];
-        iastnativemethods.newTaintedString(id, value, 'param', 'REQUEST');
+        TaintedUtils.newTaintedString(id, value, param, 'REQUEST');
 
-        let ranges = iastnativemethods.getRanges(id, value);
+        let ranges = TaintedUtils.getRanges(id, value);
         assert.deepEqual(ranges, expected, "Ranges expected to be equal");
     })
 
     it('Wrong number of arguments', function () {
-        assert.throws(function () { iastnativemethods.getRanges(id); }, Error);
+        assert.throws(function () { TaintedUtils.getRanges(id); }, Error);
     })
 
     it('Get ranges from non tainted string', function () {
         let expected;
         let nonTainted = 'value';
 
-        iastnativemethods.newTaintedString(id, value, 'param', 'REQUEST');
-        let ranges = iastnativemethods.getRanges(id, nonTainted);
+        TaintedUtils.newTaintedString(id, value, param, 'REQUEST');
+        let ranges = TaintedUtils.getRanges(id, nonTainted);
         assert.equal(ranges, undefined, "Ranges expected to be equal");
     })
 })

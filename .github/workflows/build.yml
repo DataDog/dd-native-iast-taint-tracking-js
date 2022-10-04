@@ -107,7 +107,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: 'iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node'
-      - run: tar cvf release.tar *.node
+      - run: tar rf release.tar iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node
       - uses: actions/upload-artifact@v2
         with:
           name: release-version.tar

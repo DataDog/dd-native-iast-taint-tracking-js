@@ -38,7 +38,7 @@ jobs:
       - run: npm run build
       - uses: actions/upload-artifact@v2
         with:
-          name: 'iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node'
+          name: ${{ matrix.target.artifact }}-${{ matrix.version }}
           path: dist/iastnativemethods.node
 
   build-docker:
@@ -63,7 +63,7 @@ jobs:
           LIBC: ${{ matrix.target.libc }}
       - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version }} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name builder build
-      - run: docker cp builder:/build/dist/iastnativemethods.node ./iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node
+      - run: docker cp builder:/build/dist/iastnativemethods.node .
       - run: docker run --name tester build test ci
       - run: docker cp tester:/build/test/cpputest/results/ .
       - uses: mikepenz/action-junit-report@v3
@@ -73,8 +73,8 @@ jobs:
           check_name: junit test report ${{ matrix.target.name }}
       - uses: actions/upload-artifact@v2
         with:
-          name: 'iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node'
-          path: 'iastnativemethods-${{ matrix.target.artifact }}-${{ matrix.version }}.node'
+          name: ${{ matrix.target.artifact }}-${{ matrix.version }}
+          path: iastnativemethods.node
 
   cpp-lint:
     runs-on: ubuntu-latest
@@ -94,8 +94,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v3
-      - run: tar cf release.tar iastnativemethods-*.node
+        with:
+          path: artifacts
+      - run: cd artifacts && tar cf release.tar *
       - uses: actions/upload-artifact@v2
         with:
           name: release-version.tar
-          path: release.tar
+          path: artifacts/release.tar

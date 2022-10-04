@@ -1,19 +1,15 @@
 {
-  "name": "native-iast-taint-tracking-js",
+  "name": "@datadog/native-iast-taint-tracking",
   "version": "0.1.0",
   "description": "C addon source code and build process",
-  "main": "iast-nativemethods.node",
+  "main": "index.js",
   "scripts": {
     "build": "node-gyp configure && node-gyp build",
     "postbuild": "node ./scripts/pack.js",
     "test": "./scripts/cpputest.sh",
     "test-js": "mocha --recursive",
     "test-ci": "./scripts/cpputest.sh ci",
-    "test-docker": "./scripts/test_docker.sh",
-    "node-gyp-configure": "node-gyp configure",
-    "node-gyp-build": "node-gyp build",
-    "pack-all": "./scripts/pack-all.sh",
-    "pack-all-windows": ".\\scripts\\pack-all-windows.bat"
+    "test-docker": "./scripts/test_docker.sh"
   },
   "author": "Datadog Inc. <info@datadoghq.com>",
   "license": "Apache-2.0",
@@ -28,6 +24,13 @@
   "dependencies": {
     "mocha": "^10.0.0",
     "node-addon-api": "^4.3.0",
+    "scripts": "^0.1.0",
     "tar": "^6.1.11"
-  }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "native",
+    "README.md"
+  ]
 }

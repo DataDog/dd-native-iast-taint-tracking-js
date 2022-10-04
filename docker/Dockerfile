@@ -4,18 +4,16 @@ FROM node:$NODE_VERSION
 WORKDIR /build
 COPY ./package.json .
 COPY ./package-lock.json .
-COPY ./scripts /build/scripts
 
 RUN apt-get update && apt-get -y install \
     make \
     cmake \
     g++ \
     cpputest \
-    libcpputest-dev \
-    zip
+    libcpputest-dev
 
 RUN npm ci --ignore-scripts
 COPY . .
 ENTRYPOINT ["npm", "run"]
-CMD ["pack-all"]
+CMD ["build"]
 

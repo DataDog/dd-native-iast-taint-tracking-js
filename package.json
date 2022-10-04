@@ -5,6 +5,7 @@
   "main": "iast-nativemethods.node",
   "scripts": {
     "build": "node-gyp configure && node-gyp build",
+    "postbuild": "node ./scripts/pack.js",
     "test": "./scripts/cpputest.sh",
     "test-js": "mocha --recursive",
     "test-ci": "./scripts/cpputest.sh ci",

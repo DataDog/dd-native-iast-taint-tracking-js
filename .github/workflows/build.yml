@@ -141,7 +141,9 @@ jobs:
 
   all-good:
     needs:
-      - pack
+      - test-native-js
       - cpp-lint
     runs-on: ubuntu-latest
+    steps:
+      - run: echo '🚀🚀🚀🚀🚀'
       

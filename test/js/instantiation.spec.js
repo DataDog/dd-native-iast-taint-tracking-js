@@ -1,6 +1,6 @@
 const path = require('path');
 const assert = require('assert');
-const TaintedUtils = require('../../index');
+const { TaintedUtils } = require('./util');
 
 describe('Addon loading', function () {
     it ('Check native methods', function () {

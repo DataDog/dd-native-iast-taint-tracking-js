@@ -1,6 +1,6 @@
 {
   "name": "@datadog/native-iast-taint-tracking",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.0",
   "description": "C addon source code and build process",
   "main": "index.js",
   "scripts": {
@@ -30,7 +30,7 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "native",
+    "dist",
     "README.md"
   ]
 }

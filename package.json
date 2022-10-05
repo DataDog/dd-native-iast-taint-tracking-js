@@ -33,6 +33,7 @@
     "index.js",
     "index.d.ts",
     "dist",
+    "scripts/libc.js",
     "README.md"
   ]
 }

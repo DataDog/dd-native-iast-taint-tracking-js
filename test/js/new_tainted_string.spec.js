@@ -2,11 +2,6 @@ const path = require('path');
 const { TaintedUtils } = require('./util');
 const assert = require('assert');
 
-var SegfaultHandler = require('segfault-handler');
-
-SegfaultHandler.registerHandler("crash.log");
-
-
 describe('Taint strings', function () {
     let value = 'test';
     let id = '1';

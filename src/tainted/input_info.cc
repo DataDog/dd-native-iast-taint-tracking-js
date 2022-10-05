@@ -18,7 +18,6 @@ InputInfo::InputInfo(v8::Local<v8::Value> parameterName,
     Isolate *isolate = v8::Isolate::GetCurrent();
     this->parameterName.Reset(isolate, parameterName);
     this->parameterValue.Reset(isolate, parameterValue);
-    this->parameterValue.SetWeak();
     this->type.Reset(isolate, type);
 }
 
@@ -33,7 +32,6 @@ InputInfo::InputInfo(const InputInfo& inputInfo) {
 
     if (!inputInfo.parameterValue.IsEmpty()) {
         this->parameterValue.Reset(isolate, inputInfo.parameterValue);
-        this->parameterValue.SetWeak();
     } else {
         this->parameterValue.Reset();
     }

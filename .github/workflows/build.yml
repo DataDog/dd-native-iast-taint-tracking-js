@@ -96,9 +96,11 @@ jobs:
           path: artifacts
       - run: mv artifacts dist          
       - run: npm pack
+      - uses: codex-team/action-nodejs-package-info@v1
+        id: package
       - uses: actions/upload-artifact@v2
         with:
-          name: release
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
           path: '*.tgz'
 
   test-native-js:
@@ -129,7 +131,7 @@ jobs:
         id: package
       - uses: actions/download-artifact@v2
         with:
-          name: release
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
       - run: npm i --verbose datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
       - run: npm run test-js:junit
       - name: Publish Test Report

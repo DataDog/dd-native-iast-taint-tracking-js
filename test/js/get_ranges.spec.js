@@ -1,5 +1,5 @@
 const path = require('path');
-const TaintedUtils = require('../../index');
+const { TaintedUtils } = require('./util');
 const assert = require('assert');
 
 describe('Ranges', function () {

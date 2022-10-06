@@ -16,10 +16,17 @@ jobs:
             os: macos-latest
             artifact: darwin-x64-unknown
             arch: x64
+            build: build
+          - name: macos arm64
+            os: macos-latest
+            artifact: darwin-arm64-unknown
+            arch: x64
+            build: buildArm         
           - name: windows 64 bits
             os: windows-2019
             artifact: win32-x64-unknown
             arch: x64
+            build: build
     
     runs-on: ${{ matrix.target.os }}
     steps:
@@ -35,7 +42,7 @@ jobs:
           python-version: '>3.6.0'
           architecture: ${{ matrix.target.arch }}
       - run: npm i --ignore-scripts
-      - run: npm run build
+      - run: npm run ${{ matrix.target.build }}
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target.artifact }}-${{ matrix.version }}

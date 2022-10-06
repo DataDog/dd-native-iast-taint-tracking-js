@@ -17,16 +17,19 @@ jobs:
             artifact: darwin-x64-unknown
             arch: x64
             build: build
+            cross-compile: false
           - name: macos arm64
             os: macos-latest
             artifact: darwin-arm64-unknown
             arch: x64
-            build: buildArm         
+            build: build:arm
+            cross-compile: true
           - name: windows 64 bits
             os: windows-2019
             artifact: win32-x64-unknown
             arch: x64
             build: build
+            cross-compile: false
     
     runs-on: ${{ matrix.target.os }}
     steps:
@@ -43,8 +46,8 @@ jobs:
           architecture: ${{ matrix.target.arch }}
       - run: npm i --ignore-scripts
       - run: npm run ${{ matrix.target.build }}
-      - if: ${{ matrix.target.artifact == 'darwin-arm64-unknown' }}
-        run: mkdir -p dist/darwin-arm64-unknown-${{matrix.version}}/ && cp dist/iastnativemethods.node dist/darwin-arm64-unknown-${{matrix.version}}/
+      - if: ${{ matrix.target.cross-compile }}
+        run: mkdir -p dist/${{ matrix.target.artifact }}-${{matrix.version}}/ && cp dist/iastnativemethods.node dist/${{ matrix.target.artifact }}-${{matrix.version}}/
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target.artifact }}-${{ matrix.version }}

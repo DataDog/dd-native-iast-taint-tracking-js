@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "node-gyp configure && node-gyp build",
+    "build:arm": "node-gyp configure -arch=arm64 && node-gyp build -arch=arm64",
     "postbuild": "node ./scripts/pack.js",
     "test": "./scripts/cpputest.sh",
     "test-js": "mocha --recursive",

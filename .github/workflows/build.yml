@@ -43,6 +43,8 @@ jobs:
           architecture: ${{ matrix.target.arch }}
       - run: npm i --ignore-scripts
       - run: npm run ${{ matrix.target.build }}
+      - if: ${{ matrix.target.artifact == 'darwin-arm64-unknown' }}
+        run: mkdir -p dist/darwin-arm64-unknown-${{matrix.version}}/ && cp dist/iastnativemethods.node dist/darwin-arm64-unknown-${{matrix.version}}/
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target.artifact }}-${{ matrix.version }}

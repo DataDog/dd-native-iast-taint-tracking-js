@@ -1,11 +1,9 @@
 #include <CppUTest/UtestMacros.h>
+#include <CppUTest/TestHarness.h>
 #include <cstdint>
 #include <iostream>
 #include <memory>
 #include <vector>
-#include <CppUTest/TestHarness.h>
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-#include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 
 #include <string>
 #include <iostream>
@@ -87,7 +85,7 @@ TEST(WeakObjIface, CheckInterface)
 {
     FalseNull falseObj{};
     TrueNotNull trueObj{};
-    
+
     auto ret = iface_is_empty_call(falseObj);
     CHECK_EQUAL(false, ret);
 

@@ -7,7 +7,42 @@ on:
   pull_request:
 
 jobs:
+  valgrind:
+    strategy:
+      matrix:
+        version: [14, 16, 18]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.version }}
+      - run: sudo apt-get update && sudo apt-get install valgrind
+      - run: npm i --ignore-scripts
+      - run: npm run test:js-valgrind
+
+  asan:
+    strategy:
+      matrix:
+        version: [14, 16, 18]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.version }}
+      - run: sudo apt-get update && sudo apt-get install libcpputest-dev cpputest
+      - run: npm i --ignore-scripts
+      - run: npm run test:asan
+      # Commented out due to a core dump issues when mocha is instantiated with LD_LPRELOAD.
+      - run: npm run test:js-asan
+
   build-native:
+    needs: ['asan', 'valgrind']
     strategy:
       matrix:
         version: [14, 16, 18]
@@ -33,14 +68,14 @@ jobs:
     
     runs-on: ${{ matrix.target.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.version }}
           architecture: ${{ matrix.target.arch }}
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v3
         with:
           python-version: '>3.6.0'
           architecture: ${{ matrix.target.arch }}
@@ -48,12 +83,13 @@ jobs:
       - run: npm run ${{ matrix.target.build }}
       - if: ${{ matrix.target.cross-compile }}
         run: mkdir -p dist/${{ matrix.target.artifact }}-${{matrix.version}}/ && cp dist/iastnativemethods.node dist/${{ matrix.target.artifact }}-${{matrix.version}}/
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target.artifact }}-${{ matrix.version }}
           path: dist/${{ matrix.target.artifact }}-${{ matrix.version }}/iastnativemethods.node
 
   build-docker:
+    needs: ['asan', 'valgrind']
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -66,7 +102,7 @@ jobs:
             libc: musl
             artifact: linux-x64-musl
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - run: npm i --ignore-scripts
@@ -75,7 +111,7 @@ jobs:
           LIBC: ${{ matrix.target.libc }}
       - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version }} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name builder build
-      - run: docker run --name tester build test ci
+      - run: docker run --name tester build test:junit
       - run: docker cp builder:/build/dist/${{ matrix.target.artifact }}-${{ matrix.version }}/iastnativemethods.node .
       - run: docker cp tester:/build/test/cpputest/results/ .
       - uses: mikepenz/action-junit-report@v3
@@ -83,7 +119,7 @@ jobs:
         with:
           report_paths: '**/results/cpputest_*.xml'
           check_name: junit test report ${{ matrix.target.name }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target.artifact }}-${{ matrix.version }}
           path: iastnativemethods.node
@@ -91,8 +127,8 @@ jobs:
   cpp-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-python@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
       - run: pip install cpplint
       - run: cpplint --filter=-build/include_subdir --linelength=120 --recursive ./src
 
@@ -102,7 +138,7 @@ jobs:
       - build-docker
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
           path: artifacts
@@ -110,7 +146,7 @@ jobs:
       - run: npm pack
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
           path: '*.tgz'
@@ -124,7 +160,7 @@ jobs:
             os: ubuntu-latest
             artifact: linux-x64-gnu
           - name: windows 64 bits
-            os: windows-latest
+            os: windows-2019
             artifact: win32-x64-msvc
           - name: macos 64 bits
             os: macos-latest
@@ -134,18 +170,18 @@ jobs:
     env:
       NPM_TAINTEDUTILS: true
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
       - run: npm ci --ignore-scripts
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
       - run: npm i --verbose datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
-      - run: npm run test-js:junit
+      - run: npm run test:js-junit
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always()

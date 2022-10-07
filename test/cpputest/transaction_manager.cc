@@ -44,8 +44,6 @@ TEST(TransactionManager, initialization)
     CHECK_EQUAL(0, elems);
 }
 
-
-
 TEST(TransactionManager, new_item)
 {
     TransactionManager<FakeTransaction> iastManager;
@@ -90,7 +88,6 @@ TEST(TransactionManager, item_reused)
     elems = iastManager.Size();
     CHECK_EQUAL(0, elems);
 }
-
 
 TEST(TransactionManager, insert_beyond_limit)
 {

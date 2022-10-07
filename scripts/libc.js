@@ -8,7 +8,7 @@ var getLibc = function () {
         } else if (out.includes('musl')) {
             return 'musl'
         } else {
-            return 'unknown'
+            return 'glibc'
         }
     }
     else {

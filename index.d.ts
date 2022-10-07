@@ -1,7 +1,7 @@
 declare module 'datadog-iast-taint-tracking' {
 
     export class TaintedUtils {
-        createTransaction(): string;
+        createTransaction(transactionId: string): string;
         newTaintedString(transactionId: string, original: string, paramName: string, type: string): string;
         isTainted(transactionId: string, ...args: string[]): boolean;
         getRanges(transactionId: string, original: string): NativeTaintedRange[];

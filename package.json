@@ -26,9 +26,7 @@
     "mocha-junit-reporter": "^2.0.2"
   },
   "dependencies": {
-    "node-addon-api": "^4.3.0",
-    "scripts": "^0.1.0",
-    "tar": "^6.1.11"
+    "node-addon-api": "^4.3.0"
   },
   "files": [
     "index.js",

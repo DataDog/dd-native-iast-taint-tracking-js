@@ -1,18 +1,16 @@
 const path = require('path');
-const iastnativemethods = require(path.join(__dirname, '..', '..', 'lib', 'binding'));
+const { TaintedUtils } = require('./util');
 const assert = require('assert');
 
 describe('Plus operator', function () {
     let id = '1';
 
     afterEach(function () {
-        iastnativemethods.removeTransaction(id);
+        TaintedUtils.removeTransaction(id);
     });
 
     it('Wrong arguments', function () {
-
-
-        assert.throws( function () { iastnativemethods.concat(id) ;}, Error);
+        assert.throws( function () { TaintedUtils.concat(id) ;}, Error);
     })
 
     it('Check result', function () {
@@ -20,18 +18,18 @@ describe('Plus operator', function () {
         let op1 = 'hello';
         let op2 = ' world'; 
 
-        op1 = iastnativemethods.newTaintedString(id, op1, 'param', 'REQUEST');
+        op1 = TaintedUtils.newTaintedString(id, op1, 'param', 'REQUEST');
         assert.strictEqual(op1, 'hello', "Unexpected value");
-        assert.equal(true, iastnativemethods.isTainted(id, op1), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, op1), "Unexpected value");
 
-        op2 = iastnativemethods.newTaintedString(id, op2, 'param', 'REQUEST');
+        op2 = TaintedUtils.newTaintedString(id, op2, 'param', 'REQUEST');
         assert.strictEqual(op2, ' world', "Unexpected value");
-        assert.equal(true, iastnativemethods.isTainted(id, op2), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, op2), "Unexpected value");
 
         let res = op1 + op2;
-        ret = iastnativemethods.concat(id, res, op1, op2);
+        ret = TaintedUtils.concat(id, res, op1, op2);
         assert.equal(res, ret, "Unexpected vale");
-        assert.equal(true, iastnativemethods.isTainted(id, ret), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, ret), "Unexpected value");
 
     })
 
@@ -56,19 +54,19 @@ describe('Plus operator', function () {
             },
         ];
 
-        op1 = iastnativemethods.newTaintedString(id, op1, 'param', 'REQUEST');
+        op1 = TaintedUtils.newTaintedString(id, op1, 'param', 'REQUEST');
         assert.strictEqual(op1, 'hello', "Unexpected value");
-        assert.equal(true, iastnativemethods.isTainted(id, op1), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, op1), "Unexpected value");
 
-        op2 = iastnativemethods.newTaintedString(id, op2, 'param', 'REQUEST');
+        op2 = TaintedUtils.newTaintedString(id, op2, 'param', 'REQUEST');
         assert.strictEqual(op2, ' world', "Unexpected value");
-        assert.equal(true, iastnativemethods.isTainted(id, op2), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, op2), "Unexpected value");
 
-        ret = iastnativemethods.concat(id, res, op1, op2);
+        ret = TaintedUtils.concat(id, res, op1, op2);
         assert.equal(res, ret, "Unexpected vale");
-        assert.equal(true, iastnativemethods.isTainted(id, ret), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, ret), "Unexpected value");
         
-        assert.deepEqual(expected, iastnativemethods.getRanges(id, ret), "Unexpected ranges");
+        assert.deepEqual(expected, TaintedUtils.getRanges(id, ret), "Unexpected ranges");
 
     })
 
@@ -87,15 +85,15 @@ describe('Plus operator', function () {
             }
         ];
 
-        op1 = iastnativemethods.newTaintedString(id, op1, 'param', 'REQUEST');
+        op1 = TaintedUtils.newTaintedString(id, op1, 'param', 'REQUEST');
         assert.strictEqual(op1, 'hello', "Unexpected value");
-        assert.equal(true, iastnativemethods.isTainted(id, op1), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, op1), "Unexpected value");
 
-        ret = iastnativemethods.concat(id, res, op1, op2);
+        ret = TaintedUtils.concat(id, res, op1, op2);
         assert.equal(res, ret, "Unexpected vale");
-        assert.equal(true, iastnativemethods.isTainted(id, ret), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, ret), "Unexpected value");
 
-        assert.deepEqual(expected, iastnativemethods.getRanges(id, ret));
+        assert.deepEqual(expected, TaintedUtils.getRanges(id, ret));
     })
 
     it('Check ranges just op2 tainted', function () {
@@ -113,14 +111,14 @@ describe('Plus operator', function () {
             }
         ];
 
-        op2 = iastnativemethods.newTaintedString(id, op2, 'param', 'REQUEST');
+        op2 = TaintedUtils.newTaintedString(id, op2, 'param', 'REQUEST');
         assert.strictEqual(op2, ' world', "Unexpected value");
-        assert.equal(true, iastnativemethods.isTainted(id, op2), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, op2), "Unexpected value");
 
-        ret = iastnativemethods.concat(id, res, op1, op2);
+        ret = TaintedUtils.concat(id, res, op1, op2);
         assert.equal(res, ret, "Unexpected vale");
-        assert.equal(true, iastnativemethods.isTainted(id, ret), "Unexpected value");
+        assert.equal(true, TaintedUtils.isTainted(id, ret), "Unexpected value");
 
-        assert.deepEqual(expected, iastnativemethods.getRanges(id, ret));
+        assert.deepEqual(expected, TaintedUtils.getRanges(id, ret));
     })
 })

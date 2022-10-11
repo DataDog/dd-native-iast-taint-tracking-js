@@ -38,7 +38,6 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install libcpputest-dev cpputest
       - run: npm i --ignore-scripts
       - run: npm run test:asan
-      # Commented out due to a core dump issues when mocha is instantiated with LD_LPRELOAD.
       - run: npm run test:js-asan
 
   build-native:

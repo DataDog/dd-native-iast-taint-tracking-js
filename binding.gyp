@@ -12,6 +12,7 @@
                 "./src/tainted/string_resource.cc",
                 "./src/api/string_methods.cc",
                 "./src/api/concat.cc",
+                "./src/api/substring.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

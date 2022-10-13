@@ -4,8 +4,6 @@
 **/
 #include <CppUTest/UtestMacros.h>
 #include <CppUTest/TestHarness.h>
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-#include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 #include <cstdint>
 
 #include "weakiface.h"
@@ -123,11 +121,12 @@ TEST(WeakMap, delete_root)
     WeakMap<FakeRef*, 2> wMap{};
 
     FakeRef *f = new FakeRef(100, 1);
-    ret = wMap.insert(f->Get(), f);
+    weak_key_t f_addr = f->Get();
+    ret = wMap.insert(f_addr, f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.del(f->Get());
-    FakeRef *found = wMap.find(f->Get());
+    wMap.del(f_addr);
+    FakeRef *found = wMap.find(f_addr);
     POINTERS_EQUAL(nullptr, found);
 }
 
@@ -138,20 +137,20 @@ TEST(WeakMap, delete_last)
 
     FakeRef *f = new FakeRef(100, 1);
     FakeRef *f2 = new FakeRef(101, 2);
-    ret = wMap.insert(f->Get(), f);
-    ret = wMap.insert(f2->Get(), f2);
+
+    weak_key_t f_addr = f->Get();
+    weak_key_t f2_addr = f2->Get();
+
+    ret = wMap.insert(f_addr, f);
+    ret = wMap.insert(f2_addr, f2);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.del(f->Get());
-    FakeRef *found = wMap.find(f->Get());
+    wMap.del(f_addr);
+    FakeRef *found = wMap.find(f_addr);
     POINTERS_EQUAL(nullptr, found);
 
-    found = wMap.find(f2->Get());
+    found = wMap.find(f2_addr);
     CHECK(found != nullptr);
-
-#ifdef IMPROVE_INSERT
-    delete f;
-#endif
 }
 
 TEST(WeakMap, delete_second)
@@ -163,21 +162,20 @@ TEST(WeakMap, delete_second)
     FakeRef *f2 = new FakeRef(101, 2);
     FakeRef *f3 = new FakeRef(102, 3);
 
-    ret = wMap.insert(f->Get(), f);
+    weak_key_t f_addr = f->Get();
+    weak_key_t f2_addr = f2->Get();
+    weak_key_t f3_addr = f3->Get();
+
+    ret = wMap.insert(f_addr, f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f2->Get(), f2);
+    ret = wMap.insert(f2_addr, f2);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f3->Get(), f3);
+    ret = wMap.insert(f3_addr, f3);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.del(f2->Get());
-    FakeRef *found = wMap.find(f2->Get());
+    wMap.del(f2_addr);
+    FakeRef *found = wMap.find(f2_addr);
     POINTERS_EQUAL(nullptr, found);
-
-#ifdef IMPROVE_INSERT
-    delete f;
-    delete f2;
-#endif
 
 }
 
@@ -191,24 +189,25 @@ TEST(WeakMap, delete_middle)
     FakeRef *f3 = new FakeRef(102, 3);
     FakeRef *f4 = new FakeRef(103, 4);
 
-    ret = wMap.insert(f->Get(), f);
+    weak_key_t f_addr = f->Get();
+    weak_key_t f2_addr = f2->Get();
+    weak_key_t f3_addr = f3->Get();
+    weak_key_t f4_addr = f4->Get();
+
+
+    ret = wMap.insert(f_addr, f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f2->Get(), f2);
+    ret = wMap.insert(f2_addr, f2);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f3->Get(), f3);
+    ret = wMap.insert(f3_addr, f3);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f4->Get(), f4);
+    ret = wMap.insert(f4_addr, f4);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.del(f2->Get());
-    FakeRef *found = wMap.find(f2->Get());
+    wMap.del(f2_addr);
+    FakeRef *found = wMap.find(f2_addr);
     POINTERS_EQUAL(nullptr, found);
 
-#ifdef IMPROVE_INSERT
-    delete f;
-    delete f2;
-    delete f3;
-#endif
 }
 
 TEST(WeakMap, rehash_move)

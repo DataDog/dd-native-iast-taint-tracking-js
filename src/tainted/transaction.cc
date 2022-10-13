@@ -35,6 +35,16 @@ Transaction::Transaction() {
 Transaction::~Transaction() {
   this->taintedMap->clean();
   this->cleanInputInfos();
+
+  delete taintedMap;
+
+  while (!this->availableSharedVectors->empty()) {
+      auto sv = availableSharedVectors->front();
+      availableSharedVectors->pop();
+      delete sv;
+  }
+
+  delete this->availableSharedVectors;
 }
 
 void Transaction::cleanInputInfos() {

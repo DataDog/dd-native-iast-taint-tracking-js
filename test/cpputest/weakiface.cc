@@ -3,13 +3,11 @@
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
 #include <CppUTest/UtestMacros.h>
+#include <CppUTest/TestHarness.h>
 #include <cstdint>
 #include <iostream>
 #include <memory>
 #include <vector>
-#include <CppUTest/TestHarness.h>
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-#include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 
 #include <string>
 #include <iostream>

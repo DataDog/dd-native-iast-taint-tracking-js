@@ -10,7 +10,8 @@
 using v8::Local;
 using v8::Object;
 
-namespace operations {
+namespace iast {
+namespace api {
 class Substring {
  public:
     static void Init(Local<Object> exports);
@@ -19,5 +20,6 @@ class Substring {
     explicit Substring();
     ~Substring();
 };
-}
+}   // namespace api
+}   // namespace iast
 #endif  // SRC_API_SUBSTRING_H_

@@ -102,7 +102,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
                 }
             }
 
-            if (newRanges) {
+            if (newRanges->size()) {
                 auto key = utils::GetLocalStringPointer(vResult);
                 transaction->AddTainted(key, newRanges, vResult);
             }

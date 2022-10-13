@@ -44,7 +44,6 @@ describe('Substring method', function () {
         assert.equal(false, TaintedUtils.isTainted(id, ret), "Unexpected value");
     })
 
-
     it('Check result', function () {
         let op1 = 'hello';
         let start = 1;

@@ -49,7 +49,7 @@ class WeakMap {
         _count = 0;
     }
 
-    inline T find(weak_key_t key) {
+    T find(weak_key_t key) {
         T ret = nullptr;
         auto index = GET_INDEX(key, MASK);
         auto obj = static_cast<T>(this->items[index]);
@@ -64,7 +64,7 @@ class WeakMap {
         return ret;
     }
 
-    inline int insert(weak_key_t key, T obj) {
+    int insert(weak_key_t key, T obj) {
         if (!obj) {
             return WEAK_MAP_INVALID_ARG;
         }
@@ -89,7 +89,7 @@ class WeakMap {
         return WEAK_MAP_SUCCESS;
     }
 
-    inline void del(weak_key_t key) {
+    void del(weak_key_t key) {
         auto index = GET_INDEX(key, MASK);
         auto root = this->items[index];
         auto prev = root;
@@ -141,14 +141,14 @@ class WeakMap {
         }
     }
 
-    inline int getCount(void) { return _count; }
+    int getCount(void) { return _count; }
 
  private:
     const int MASK = N - 1;
     size_t _count;
     WeakObjIface<T>* items[N] = {};
 
-    inline void remove(int index, T prev, T obj) {
+    void remove(int index, T prev, T obj) {
         auto next = obj->_next;
         if (prev == nullptr) {
             this->items[index] = next;

@@ -69,7 +69,7 @@ class Pool final {
     }
 
     template<class ...Args>
-        inline T* pop(Args&& ...args) noexcept {
+        T* pop(Args&& ...args) noexcept {
             auto element = _nextAvail;
             if (!element) {
                 return nullptr;
@@ -80,7 +80,7 @@ class Pool final {
             return new (reinterpret_cast<Element*>(&element->storage)) T(std::forward<Args>(args)...);
         }
 
-    inline void push(T* p) noexcept {
+    void push(T* p) noexcept {
         if (p == nullptr) {
             return;
         }

@@ -43,39 +43,39 @@ class SharedVector {
         return *this;
     }
 
-    inline size_t size() const {
+    size_t size() const {
         return this->elements->size();
     }
 
-    inline void push_back(T element) {
+    void push_back(T element) {
         this->elements->push_back(element);
     }
 
-    inline void add(SharedVector* taintedRangeVector) {
+    void add(SharedVector* taintedRangeVector) {
         elements->insert(elements->begin(), taintedRangeVector->begin(), taintedRangeVector->end());
     }
 
-    inline T at(int index) {
+    T at(int index) {
         return elements->at(index);
     }
 
-    inline void clear(void) {
+    void clear(void) {
         elements->resize(0);
     }
 
-    inline typename std::vector<T>::iterator begin() {
+    typename std::vector<T>::iterator begin() {
         return elements->begin();
     }
 
-    inline typename std::vector<T>::iterator end() {
+    typename std::vector<T>::iterator end() {
         return elements->end();
     }
 
-    inline int getId(void) {
+    int getId(void) {
         return id;
     }
 
-    inline unsigned int getRefs() {
+    unsigned int getRefs() {
         return *refs;
     }
 

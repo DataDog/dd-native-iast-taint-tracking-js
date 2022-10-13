@@ -33,18 +33,18 @@ class Transaction {
 
     void clean(void);
 
-    inline void setId(uintptr_t id) { transactionId = id;}
+    void setId(uintptr_t id) { transactionId = id;}
     InputInfo* createNewInputInfo(v8::Local<v8::Value> parameterName,
             v8::Local<v8::Value> parameterValue,
             v8::Local<v8::Value> type);
     void cleanInputInfos(void);
     void cleanSharedVectors(void);
 
-    inline TaintedObject* GetAvailableTaintedObject(void) {
+    TaintedObject* GetAvailableTaintedObject(void) {
         return taintedObjPool.pop(this->transactionId);
     }
 
-    inline void returnTaintedObject(TaintedObject* taintedObject) {
+    void returnTaintedObject(TaintedObject* taintedObject) {
         if (!taintedObject) {
             return;
         }
@@ -52,11 +52,11 @@ class Transaction {
         taintedObjPool.push(taintedObject);
     }
 
-    inline Range* GetAvailableTaintedRange(int start, int end, InputInfo *inputInfo) {
+    Range* GetAvailableTaintedRange(int start, int end, InputInfo *inputInfo) {
         return availableTaintedRanges.pop(start, end, inputInfo);
     }
 
-    inline SharedRanges* GetAvailableSharedVector(void) {
+    SharedRanges* GetAvailableSharedVector(void) {
         SharedRanges* taintedRangeVector = nullptr;
         if (!this->availableSharedVectors->empty()) {
             taintedRangeVector = this->availableSharedVectors->front();
@@ -72,7 +72,7 @@ class Transaction {
         throw NotAvailableRangeVectorsException();
     }
 
-    inline SharedRanges* GetRanges(uintptr_t stringPointer) {
+    SharedRanges* GetRanges(uintptr_t stringPointer) {
         auto taintedObject = taintedMap->find(stringPointer);
         if (taintedObject != nullptr) {
             return taintedObject->getRanges();
@@ -80,21 +80,21 @@ class Transaction {
         return nullptr;
     }
 
-    inline void UpdateRanges(uintptr_t stringPointer, SharedRanges* taintedRanges) {
+    void UpdateRanges(uintptr_t stringPointer, SharedRanges* taintedRanges) {
         auto taintedObject = taintedMap->find(stringPointer);
         if (taintedObject != nullptr) {
             taintedObject->setRanges(taintedRanges);
         }
     }
 
-    inline void RehashMap(void) {
+    void RehashMap(void) {
         taintedMap->rehash();
     }
-    inline void AddTainted(uintptr_t key, TaintedObject* tainted) {
+    void AddTainted(uintptr_t key, TaintedObject* tainted) {
         taintedMap->insert(key, tainted);
     }
 
-    inline void AddTainted(uintptr_t key, SharedRanges* ranges, v8::Local<v8::Value> jsString) {
+    void AddTainted(uintptr_t key, SharedRanges* ranges, v8::Local<v8::Value> jsString) {
         // TODO(julio): trigger exception from the pool rather than a nullptr
         auto tainted = taintedObjPool.pop(this->transactionId,
                 key,
@@ -105,7 +105,7 @@ class Transaction {
         }
     }
 
-    inline void ReturnSharedVector(SharedRanges* ranges) {
+    void ReturnSharedVector(SharedRanges* ranges) {
         availableSharedVectors->push(ranges);
         inUseSharedVectors[ranges->getId()] = nullptr;
     }

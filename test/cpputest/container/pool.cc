@@ -7,8 +7,6 @@
 #include <iostream>
 #include <vector>
 #include <CppUTest/TestHarness.h>
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-#include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 
 #include <string>
 

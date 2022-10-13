@@ -8,8 +8,6 @@
 #include <memory>
 #include <vector>
 #include <CppUTest/TestHarness.h>
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-#include <CppUTest/MemoryLeakDetectorMallocMacros.h>
 
 #include "container/queued_pool.h"
 

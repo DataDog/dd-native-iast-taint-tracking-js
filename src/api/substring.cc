@@ -61,20 +61,22 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         auto oRanges = transaction->GetRanges(subjectPointer);
 
         int substringStart = vSubstringStart->ToInteger(context).ToLocalChecked()->Value();
-        int substringEnd = argc > 4 ? vSubstringEnd->ToInteger(context).ToLocalChecked()->Value() : vSubject->ToString(context).ToLocalChecked()->Length();
+        int substringEnd = argc > 4 ?
+            vSubstringEnd->ToInteger(context).ToLocalChecked()->Value() :
+            vSubject->ToString(context).ToLocalChecked()->Length();
 
         Local<String> result = vResult->ToString(context).ToLocalChecked();
 
         if (oRanges != nullptr) {
             auto newRanges = transaction->GetAvailableSharedVector();
-            for(auto it = oRanges->begin(); it != oRanges->end(); ++it) {
+            for (auto it = oRanges->begin(); it != oRanges->end(); ++it) {
                 auto oRange = *it;
                 int rangeEnd = oRange->end - substringStart;
                 if (rangeEnd > result->Length()) {
                     rangeEnd = result->Length();
                 }
 
-                if (substringStart > oRange->start && substringStart < oRange->end ) {
+                if (substringStart > oRange->start && substringStart < oRange->end) {
                     if (substringStart != 0 || rangeEnd != oRange->end) {
                         auto newRange = transaction->GetAvailableTaintedRange(0, rangeEnd, oRange->inputInfo);
                         if (newRange) {
@@ -89,7 +91,9 @@ void substring(const FunctionCallbackInfo<Value>& args) {
                     if (substringEnd > oRange->start && substringStart < oRange->end) {
                         if (substringStart != 0 || rangeEnd != oRange->end) {
                             int rangeStart = oRange->start - substringStart;
-                            auto newRange = transaction->GetAvailableTaintedRange(rangeStart, rangeEnd, oRange->inputInfo);
+                            auto newRange = transaction->GetAvailableTaintedRange(rangeStart,
+                                    rangeEnd,
+                                    oRange->inputInfo);
                             if (newRange) {
                                 newRanges->push_back(newRange);
                             } else {

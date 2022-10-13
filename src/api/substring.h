@@ -17,7 +17,7 @@ class Substring {
     static void Init(Local<Object> exports);
 
  private:
-    explicit Substring();
+    Substring();
     ~Substring();
 };
 }   // namespace api

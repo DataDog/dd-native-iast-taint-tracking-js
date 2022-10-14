@@ -17,7 +17,7 @@ v8::Local<v8::Value> NewV8String(v8::Isolate* isolate, const char* keyName) {
 }
 
 char* GetCharsFromV8Value(v8::Isolate* isolate, v8::Local<v8::Value> value) {
-    const v8::String::Utf8Value UTF8_VALUE(isolate, value);
+    const v8::String::Utf8Value utf8Value(isolate, value);
     return strdup(*utf8Value);
 }
 

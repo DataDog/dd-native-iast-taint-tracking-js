@@ -148,7 +148,7 @@ void GetRanges(const FunctionCallbackInfo<Value>& args) {
             int length = ranges->size();
             for (int i = 0; i < length; i++) {
                 auto jsRange = ranges->at(i)->toJSObject(isolate);
-                jsRanges->Set(currentContext, i, jsRange).CHECK();
+                jsRanges->Set(currentContext, i, jsRange).Check();
             }
             args.GetReturnValue().Set(jsRanges);
             return;

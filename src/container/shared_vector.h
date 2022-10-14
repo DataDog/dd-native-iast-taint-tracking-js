@@ -85,7 +85,7 @@ class SharedVector {
     int id;
     void remove_elements() {
         if (std::is_pointer<T>::value) {
-            for (int i = 0; i < elements->size(); ++i) {
+            for (size_t i = 0; i < elements->size(); ++i) {
                 delete (*elements)[i];
             }
         }

@@ -31,7 +31,7 @@ class WeakMap {
     }
 
     ~WeakMap() {
-        for (int index = 0; index < N; index++) {
+        for (size_t index = 0; index < N; index++) {
             auto obj = this->items[index];
             while (obj != nullptr) {
                 auto next = obj->_next;

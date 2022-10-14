@@ -69,32 +69,36 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
     }
 
     args.GetReturnValue().Set(parameterValue);
+
+    uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
+    auto transaction = NewTransaction(transactionId);
+    if (!transaction) {
+        return;
+    }
+
+    auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(parameterValue));
+    if (taintedObj) {
+        // Object already exist, nothing to do
+        return;
+    }
+
     try {
-        uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
-        auto transaction = NewTransaction(transactionId);
-        if (transaction != nullptr) {
-            uintptr_t ptrToFind = utils::GetLocalStringPointer(parameterValue);
-            auto existingRanges = transaction->GetRanges(ptrToFind);
-            if (existingRanges == nullptr) {
-                auto result = parameterValue;
-                InputInfo* inputInfo =
-                    transaction->createNewInputInfo(
-                            parameterName, parameterValue, type);
+        InputInfo* inputInfo =
+            transaction->createNewInputInfo(
+                    parameterName, parameterValue, type);
 
-                if (inputInfo == nullptr) {
-                    return;
-                }
+        if (inputInfo == nullptr) {
+            return;
+        }
 
-                auto range = transaction->GetAvailableTaintedRange(0,
-                        utils::GetLength(args.GetIsolate(), parameterValue),
-                        inputInfo);
-                if (range != nullptr) {
-                    auto ranges = transaction->GetAvailableSharedVector();
-                    ranges->push_back(range);
-                    auto stringPointer = utils::GetLocalStringPointer(result);
-                    transaction->AddTainted(stringPointer, ranges, result);
-                }
-            }
+        auto range = transaction->GetRange(0,
+                utils::GetLength(args.GetIsolate(), parameterValue),
+                inputInfo);
+        if (range != nullptr) {
+            auto ranges = transaction->GetSharedVectorRange();
+            ranges->push_back(range);
+            auto stringPointer = utils::GetLocalStringPointer(parameterValue);
+            transaction->AddTainted(stringPointer, ranges, parameterValue);
         }
     } catch (const tainted::NotAvailableRangeVectorsException& err) {
         // TODO(julio): propagate exception to JS?
@@ -118,8 +122,8 @@ void IsTainted(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    uintptr_t ptr1 = utils::GetLocalStringPointer(args[1]);
-    if (transaction->GetRanges(ptr1)) {
+    auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[1]));
+    if (taintedObj && taintedObj->getRanges()) {
         args.GetReturnValue().Set(true);
     } else {
         args.GetReturnValue().Set(false);
@@ -140,8 +144,8 @@ void GetRanges(const FunctionCallbackInfo<Value>& args) {
     uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
     auto transaction = GetTransaction(transactionId);
     if (transaction != nullptr) {
-        auto ptr = utils::GetLocalStringPointer(args[1]);
-        auto ranges = transaction->GetRanges(ptr);
+        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[1]));
+        auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
         if (ranges != nullptr) {
             auto currentContext = isolate->GetCurrentContext();
             auto jsRanges = Array::New(isolate);

@@ -9,9 +9,10 @@
 #include <iostream>
 #include "container/queued_pool.h"
 
-using iast_key_t = uintptr_t;
 
 namespace iast {
+using transaction_key_t = uintptr_t;
+
 template <typename T>
 class TransactionManager {
  public:
@@ -19,7 +20,7 @@ class TransactionManager {
     TransactionManager(TransactionManager const&) = delete;
     void operator=(TransactionManager const&) = delete;
 
-    T* New(iast_key_t id) {
+    T* New(transaction_key_t id) {
         if (_map.size() >= _maxItems) {
             return nullptr;
         }
@@ -38,7 +39,7 @@ class TransactionManager {
         }
     }
 
-    T* Get(iast_key_t id) {
+    T* Get(transaction_key_t id) {
         auto found = _map.find(id);
         if (found == _map.end()) {
             return nullptr;
@@ -47,7 +48,7 @@ class TransactionManager {
         }
     }
 
-    void Remove(iast_key_t id) {
+    void Remove(transaction_key_t id) {
         auto found = _map.find(id);
         if (found != _map.end()) {
             T* item = found->second;
@@ -80,7 +81,7 @@ class TransactionManager {
  private:
     size_t _maxItems = 2;
     container::QueuedPool<T> _pool;
-    std::map<iast_key_t, T*> _map;
+    std::map<transaction_key_t, T*> _map;
 };
 
 }   // namespace iast

@@ -24,9 +24,7 @@ namespace tainted {
 class TaintedObject: public iast::WeakObjIface<TaintedObject*> {
  public:
     TaintedObject();
-    explicit TaintedObject(uintptr_t transactionIdPointer);
-    TaintedObject(uintptr_t transactionId,
-            uintptr_t pointerToV8String,
+    TaintedObject(weak_key_t pointerToV8String,
             SharedRanges* ranges,
             v8::Local<v8::Value> jsString);
     TaintedObject(const TaintedObject&) = delete;
@@ -34,7 +32,7 @@ class TaintedObject: public iast::WeakObjIface<TaintedObject*> {
 
     bool IsEmpty() { return target.IsEmpty(); }
 
-    uintptr_t Get() {
+    weak_key_t Get() {
         return utils::GetLocalStringPointer(target.Get(v8::Isolate::GetCurrent()));
     }
 
@@ -49,10 +47,8 @@ class TaintedObject: public iast::WeakObjIface<TaintedObject*> {
     v8::Local<v8::Object> toJSObject(v8::Isolate* isolate);
     SharedRanges* getRanges(void) { return _ranges; }
     void setRanges(SharedRanges* ranges) { _ranges = ranges; }
-    uintptr_t getId(void) { return _transactionId; }
 
  private:
-    uintptr_t _transactionId;
     SharedRanges* _ranges;
     v8::Persistent<v8::Value> target;
 };

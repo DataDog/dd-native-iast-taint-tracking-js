@@ -14,22 +14,15 @@ namespace iast {
 namespace tainted {
 
 TaintedObject::TaintedObject() {
-    this->_transactionId = 0;
+    //this->_transactionId = 0;
     this->_key = 0;
     this->_ranges = nullptr;
     this->_next = nullptr;
 }
 
-TaintedObject::TaintedObject(uintptr_t transactionIdPointer) : _transactionId(transactionIdPointer) {
-    this->_key = 0;
-    this->_ranges = nullptr;
-    this->_next = nullptr;
-}
-
-TaintedObject::TaintedObject(uintptr_t transactionId,
-        uintptr_t pointerToV8String,
+TaintedObject::TaintedObject(weak_key_t pointerToV8String,
         SharedRanges* ranges,
-        v8::Local<v8::Value> jsString): _transactionId(transactionId), _ranges(ranges) {
+        v8::Local<v8::Value> jsString): _ranges(ranges) {
     this->_key = pointerToV8String;
     this->_next = nullptr;
     this->target.Reset(v8::Isolate::GetCurrent(), jsString);

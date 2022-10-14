@@ -12,14 +12,14 @@ using namespace iast;
 using namespace iast::container;
 
 struct FakeTransaction final {
-    iast_key_t _id;
+    transaction_key_t _id;
     FakeTransaction() { _id = 0; }
-    FakeTransaction(iast_key_t id): _id(id) { };
+    FakeTransaction(transaction_key_t id): _id(id) { };
     FakeTransaction(const FakeTransaction& other) {
         _id = other._id;
     }
-    void setId(iast_key_t id) { _id = id; }
-    iast_key_t getId() { return _id; }
+    void setId(transaction_key_t id) { _id = id; }
+    transaction_key_t getId() { return _id; }
     void clean(void) { return; }
 };
 
@@ -53,7 +53,7 @@ TEST(TransactionManager, new_item)
     TransactionManager<FakeTransaction> iastManager;
     FakeTransaction* ptr = nullptr;
     size_t elems = 0;
-    iast_key_t key;
+    transaction_key_t key;
 
     key = 1;
     iastManager.New(key);
@@ -72,7 +72,7 @@ TEST(TransactionManager, item_reused)
     FakeTransaction* ptr = nullptr;
     FakeTransaction* ptr2 = nullptr;
     size_t elems = 0;
-    iast_key_t key;
+    transaction_key_t key;
 
     key = 2;
     iastManager.New(key);
@@ -100,7 +100,7 @@ TEST(TransactionManager, insert_beyond_limit)
     FakeTransaction* ptr2 = nullptr;
     FakeTransaction* ptr3 = nullptr;
     size_t elems = 0;
-    iast_key_t key1, key2, key3;
+    transaction_key_t key1, key2, key3;
 
     elems = iastManager.Size();
     CHECK_EQUAL(0, elems);

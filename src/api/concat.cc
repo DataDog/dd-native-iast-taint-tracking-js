@@ -33,34 +33,34 @@ void TaintConcatOperator(const FunctionCallbackInfo<Value>& args) {
     }
     try {
         if (args[1]->IsString()) {
-            uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
-            auto transaction = GetTransaction(transactionId);
+            auto transaction = GetTransaction(utils::GetLocalStringPointer(args[0]));
             if (transaction != nullptr) {
-                auto ptr1 = utils::GetLocalStringPointer(args[2]);
                 auto argsSize = args.Length();
 
-                auto ranges = transaction->GetRanges(ptr1);
+                auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[2]));
+                auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
                 bool usingFirstParamRanges = ranges != nullptr;
 
                 if (ranges == nullptr || ranges->size() < Limits::MAX_RANGES) {
                     int offset = utils::GetCoercedLength(isolate, args[2]);
                     for (int i = 3; i < argsSize; i++) {
-                        auto argPointer = utils::GetLocalStringPointer(args[i]);
-                        auto argRanges = transaction->GetRanges(argPointer);
+                        auto taintedObj = transaction->FindTaintedObject(
+                                utils::GetLocalStringPointer(args[i]));
+                        auto argRanges = taintedObj ? taintedObj->getRanges() : nullptr;
                         if (argRanges != nullptr) {
                             if (ranges == nullptr) {
-                                ranges = transaction->GetAvailableSharedVector();
+                                ranges = transaction->GetSharedVectorRange();
                             } else if (usingFirstParamRanges) {
                                 usingFirstParamRanges = false;
                                 auto tmpRanges = ranges;
-                                ranges = transaction->GetAvailableSharedVector();
+                                ranges = transaction->GetSharedVectorRange();
                                 ranges->add(tmpRanges);
                             }
                             auto end = argRanges->end();
                             if (offset != 0) {
                                 for (auto it = argRanges->begin(); it != end; it++) {
                                     auto argRange = *it;
-                                    auto newRange = transaction->GetAvailableTaintedRange(offset + argRange->start
+                                    auto newRange = transaction->GetRange(offset + argRange->start
                                             , offset + argRange->end,
                                             argRange->inputInfo);
                                     if (newRange) {

@@ -20,15 +20,15 @@ void RehashAllTransactions(void) {
     transactionManger::GetInstance().RehashAll();
 }
 
-void RemoveTransaction(iast_key_t id) {
+void RemoveTransaction(transaction_key_t id) {
     transactionManger::GetInstance().Remove(id);
 }
 
-Transaction* GetTransaction(iast_key_t id) {
+Transaction* GetTransaction(transaction_key_t id) {
     return transactionManger::GetInstance().Get(id);
 }
 
-Transaction* NewTransaction(iast_key_t id) {
+Transaction* NewTransaction(transaction_key_t id) {
     return transactionManger::GetInstance().New(id);
 }
 

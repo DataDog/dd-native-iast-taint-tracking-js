@@ -38,7 +38,7 @@ TEST(WeakMap, insert)
     WeakMap<FakeRef*, 1> wMap{};
 
     FakeRef *f = new FakeRef(100, 1);
-    ret = wMap.insert(f->Get(), f);
+    ret = wMap.Insert(f->Get(), f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 }
 
@@ -47,7 +47,7 @@ TEST(WeakMap, insert_nullptr)
     int ret = WEAK_MAP_SUCCESS;
     WeakMap<FakeRef*, 1> wMap{};
 
-    ret = wMap.insert(1, nullptr);
+    ret = wMap.Insert(1, nullptr);
     CHECK_EQUAL(WEAK_MAP_INVALID_ARG, ret);
 
 }
@@ -58,11 +58,11 @@ TEST(WeakMap, insert_beyond_limit)
     WeakMap<FakeRef*, 1> wMap{};
 
     FakeRef *f = new FakeRef(100, 1);
-    ret = wMap.insert(f->Get(), f);
+    ret = wMap.Insert(f->Get(), f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
     FakeRef *f2 = new FakeRef(101, 1);
-    ret = wMap.insert(f->Get(), f2);
+    ret = wMap.Insert(f->Get(), f2);
     CHECK_EQUAL(WEAK_MAP_MAX_ELEM, ret);
     delete f2;
 }
@@ -73,10 +73,10 @@ TEST(WeakMap, find)
     WeakMap<FakeRef*, 2> wMap{};
 
     FakeRef *f = new FakeRef(100, 1);
-    ret = wMap.insert(f->Get(), f);
+    ret = wMap.Insert(f->Get(), f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    FakeRef* found = wMap.find(1);
+    FakeRef* found = wMap.Find(1);
     CHECK(found != nullptr);
     CHECK_EQUAL(1, found->_key);
     CHECK_EQUAL(100, found->getId());
@@ -87,18 +87,18 @@ TEST(WeakMap, find_not_inserted)
     int ret;
     WeakMap<FakeRef*, 1> wMap{};
 
-    FakeRef *found = wMap.find(1);
+    FakeRef *found = wMap.Find(1);
     POINTERS_EQUAL(nullptr, found);
 
     FakeRef *f = new FakeRef(100, 2);
 
-    ret = wMap.insert(f->Get(), f);
+    ret = wMap.Insert(f->Get(), f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    found = wMap.find(1);
+    found = wMap.Find(1);
     POINTERS_EQUAL(nullptr, found);
 
-    wMap.del(f->Get());
-    found = wMap.find(2);
+    wMap.Del(f->Get());
+    found = wMap.Find(2);
     POINTERS_EQUAL(nullptr, found);
 }
 
@@ -108,10 +108,10 @@ TEST(WeakMap, find_deleted)
     WeakMap<FakeRef*, 2> wMap{};
 
     FakeRef *f = new FakeRef(100, 1);
-    ret = wMap.insert(f->Get(), f);
+    ret = wMap.Insert(f->Get(), f);
 
-    wMap.del(f->Get());
-    FakeRef* found = wMap.find(1);
+    wMap.Del(f->Get());
+    FakeRef* found = wMap.Find(1);
     POINTERS_EQUAL(nullptr, found);
 }
 
@@ -122,11 +122,11 @@ TEST(WeakMap, delete_root)
 
     FakeRef *f = new FakeRef(100, 1);
     weak_key_t f_addr = f->Get();
-    ret = wMap.insert(f_addr, f);
+    ret = wMap.Insert(f_addr, f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.del(f_addr);
-    FakeRef *found = wMap.find(f_addr);
+    wMap.Del(f_addr);
+    FakeRef *found = wMap.Find(f_addr);
     POINTERS_EQUAL(nullptr, found);
 }
 
@@ -141,15 +141,15 @@ TEST(WeakMap, delete_last)
     weak_key_t f_addr = f->Get();
     weak_key_t f2_addr = f2->Get();
 
-    ret = wMap.insert(f_addr, f);
-    ret = wMap.insert(f2_addr, f2);
+    ret = wMap.Insert(f_addr, f);
+    ret = wMap.Insert(f2_addr, f2);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.del(f_addr);
-    FakeRef *found = wMap.find(f_addr);
+    wMap.Del(f_addr);
+    FakeRef *found = wMap.Find(f_addr);
     POINTERS_EQUAL(nullptr, found);
 
-    found = wMap.find(f2_addr);
+    found = wMap.Find(f2_addr);
     CHECK(found != nullptr);
 }
 
@@ -166,15 +166,15 @@ TEST(WeakMap, delete_second)
     weak_key_t f2_addr = f2->Get();
     weak_key_t f3_addr = f3->Get();
 
-    ret = wMap.insert(f_addr, f);
+    ret = wMap.Insert(f_addr, f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f2_addr, f2);
+    ret = wMap.Insert(f2_addr, f2);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f3_addr, f3);
+    ret = wMap.Insert(f3_addr, f3);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.del(f2_addr);
-    FakeRef *found = wMap.find(f2_addr);
+    wMap.Del(f2_addr);
+    FakeRef *found = wMap.Find(f2_addr);
     POINTERS_EQUAL(nullptr, found);
 
 }
@@ -195,17 +195,17 @@ TEST(WeakMap, delete_middle)
     weak_key_t f4_addr = f4->Get();
 
 
-    ret = wMap.insert(f_addr, f);
+    ret = wMap.Insert(f_addr, f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f2_addr, f2);
+    ret = wMap.Insert(f2_addr, f2);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f3_addr, f3);
+    ret = wMap.Insert(f3_addr, f3);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
-    ret = wMap.insert(f4_addr, f4);
+    ret = wMap.Insert(f4_addr, f4);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.del(f2_addr);
-    FakeRef *found = wMap.find(f2_addr);
+    wMap.Del(f2_addr);
+    FakeRef *found = wMap.Find(f2_addr);
     POINTERS_EQUAL(nullptr, found);
 
 }
@@ -216,7 +216,7 @@ TEST(WeakMap, rehash_move)
     WeakMap<FakeRef*, 10> wMap{};
 
     FakeRef *f = new FakeRef(100, 1);
-    ret = wMap.insert(f->Get(), f);
+    ret = wMap.Insert(f->Get(), f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
     CHECK_EQUAL(f->_key, f->Get());
@@ -224,7 +224,7 @@ TEST(WeakMap, rehash_move)
     f->setNewInternal(3);
     CHECK(f->_key != f->Get());
 
-    wMap.rehash();
+    wMap.Rehash();
     CHECK(f->_key == f->Get());
 
 }
@@ -235,10 +235,10 @@ TEST(WeakMap, rehash_delete)
     WeakMap<FakeRef*, 10> wMap{};
     FakeRef *f = new FakeRef(100, 1);
 
-    ret = wMap.insert(f->Get(), f);
+    ret = wMap.Insert(f->Get(), f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    FakeRef *found = wMap.find(1);
+    FakeRef *found = wMap.Find(1);
     CHECK(found != nullptr);
 
     CHECK_EQUAL(f->_key, f->Get());
@@ -247,14 +247,14 @@ TEST(WeakMap, rehash_delete)
 
     //TODO: there is no other way to check that rehash method is working but to expose
     //getCount method. find returns nullptr for either Empty objects or no object at all.
-    ret = wMap.getCount();
+    ret = wMap.GetCount();
     CHECK_EQUAL(1, ret);
 
-    wMap.rehash();
-    found = wMap.find(1);
+    wMap.Rehash();
+    found = wMap.Find(1);
     CHECK(found == nullptr);
 
-    ret = wMap.getCount();
+    ret = wMap.GetCount();
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
     // Right now rehash only removes the reference from the map so the destruction needs to
@@ -267,12 +267,12 @@ TEST(WeakMap, clear_empty)
     int ret;
     WeakMap<FakeRef*, 1> wMap{};
 
-    ret = wMap.getCount();
+    ret = wMap.GetCount();
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    wMap.clean();
+    wMap.Clean();
 
-    ret = wMap.getCount();
+    ret = wMap.GetCount();
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 }
 
@@ -285,21 +285,21 @@ TEST(WeakMap, clear)
     FakeRef *f2 = new FakeRef(101, 2);
     FakeRef *f3 = new FakeRef(102, 3);
 
-    ret = wMap.insert(f->Get(), f);
+    ret = wMap.Insert(f->Get(), f);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    ret = wMap.insert(f2->Get(), f2);
+    ret = wMap.Insert(f2->Get(), f2);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    ret = wMap.insert(f3->Get(), f3);
+    ret = wMap.Insert(f3->Get(), f3);
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
-    ret = wMap.getCount();
+    ret = wMap.GetCount();
     CHECK_EQUAL(3, ret);
 
-    wMap.clean();
+    wMap.Clean();
 
-    ret = wMap.getCount();
+    ret = wMap.GetCount();
     CHECK_EQUAL(WEAK_MAP_SUCCESS, ret);
 
     // Right now clean only removes the reference from the map so the destruction needs to

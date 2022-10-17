@@ -14,19 +14,18 @@ namespace container {
 template <class T>
 class SharedVector {
  public:
-    explicit SharedVector(int id): id(id) {
+    SharedVector() {
         elements = new std::vector<T>();
         refs = new int(1);
     }
 
-    SharedVector(SharedVector& v) : elements(v.elements), refs(v.refs), id(v.id) {
+    SharedVector(SharedVector& v) : elements(v.elements), refs(v.refs) {
         (*refs)++;
     }
 
     ~SharedVector() {
         (*refs)--;
         if (!*refs) {
-            remove_elements();
             delete elements;
             delete refs;
         }
@@ -37,59 +36,46 @@ class SharedVector {
             (*refs)--;
             elements = v.elements;
             refs = v.refs;
-            id = v.id;
             (*refs)++;
         }
         return *this;
     }
 
-    inline size_t size() const {
+    size_t Size() const {
         return this->elements->size();
     }
 
-    inline void push_back(T element) {
+    void PushBack(T element) {
         this->elements->push_back(element);
     }
 
-    inline void add(SharedVector* taintedRangeVector) {
+    void Add(SharedVector* taintedRangeVector) {
         elements->insert(elements->begin(), taintedRangeVector->begin(), taintedRangeVector->end());
     }
 
-    inline T at(int index) {
+    T At(int index) {
         return elements->at(index);
     }
 
-    inline void clear(void) {
+    void Clear(void) {
         elements->resize(0);
     }
 
-    inline typename std::vector<T>::iterator begin() {
+    typename std::vector<T>::iterator begin() {
         return elements->begin();
     }
 
-    inline typename std::vector<T>::iterator end() {
+    typename std::vector<T>::iterator end() {
         return elements->end();
     }
 
-    inline int getId(void) {
-        return id;
-    }
-
-    inline unsigned int getRefs() {
+    unsigned int GetRefs() {
         return *refs;
     }
 
  private:
     std::vector<T>* elements;
     int *refs;
-    int id;
-    void remove_elements() {
-        if (std::is_pointer<T>::value) {
-            for (int i = 0; i < elements->size(); ++i) {
-                delete (*elements)[i];
-            }
-        }
-    }
 };
 }   // namespace container
 }   // namespace iast

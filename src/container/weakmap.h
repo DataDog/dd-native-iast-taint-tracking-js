@@ -31,7 +31,7 @@ class WeakMap {
     }
 
     ~WeakMap() {
-        for (int index = 0; index < N; index++) {
+        for (size_t index = 0; index < N; index++) {
             auto obj = this->items[index];
             while (obj != nullptr) {
                 auto next = obj->_next;
@@ -41,7 +41,7 @@ class WeakMap {
         }
     }
 
-    void clean() {
+    void Clean() {
         // TODO(julio): check memset std::fill for performance.
         for (size_t i = 0; i < N; i++) {
             this->items[i] = nullptr;
@@ -49,7 +49,7 @@ class WeakMap {
         _count = 0;
     }
 
-    inline T find(weak_key_t key) {
+    T Find(weak_key_t key) {
         T ret = nullptr;
         auto index = GET_INDEX(key, MASK);
         auto obj = static_cast<T>(this->items[index]);
@@ -64,7 +64,7 @@ class WeakMap {
         return ret;
     }
 
-    inline int insert(weak_key_t key, T obj) {
+    int Insert(weak_key_t key, T obj) {
         if (!obj) {
             return WEAK_MAP_INVALID_ARG;
         }
@@ -89,7 +89,7 @@ class WeakMap {
         return WEAK_MAP_SUCCESS;
     }
 
-    inline void del(weak_key_t key) {
+    void Del(weak_key_t key) {
         auto index = GET_INDEX(key, MASK);
         auto root = this->items[index];
         auto prev = root;
@@ -110,7 +110,7 @@ class WeakMap {
         }
     }
 
-    void rehash() {
+    void Rehash() {
         for (size_t index = 0; index < N; index++) {
             T prev = nullptr;
             auto obj = static_cast<T>(this->items[index]);
@@ -131,7 +131,7 @@ class WeakMap {
 
                         toInsert->_next = nullptr;
                         toInsert->_key = newPointer;
-                        insert(newPointer, toInsert);
+                        Insert(newPointer, toInsert);
                     } else {
                         prev = obj;
                         obj = static_cast<T>(obj->_next);
@@ -141,14 +141,14 @@ class WeakMap {
         }
     }
 
-    inline int getCount(void) { return _count; }
+    int GetCount(void) { return _count; }
 
  private:
     const int MASK = N - 1;
     size_t _count;
     WeakObjIface<T>* items[N] = {};
 
-    inline void remove(int index, T prev, T obj) {
+    void remove(int index, T prev, T obj) {
         auto next = obj->_next;
         if (prev == nullptr) {
             this->items[index] = next;

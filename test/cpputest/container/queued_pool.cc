@@ -23,13 +23,13 @@ TEST(QueuedPool, pop)
 {
     QueuedPool<std::string> strPool;
 
-    std::string* ptr = strPool.pop();
+    std::string* ptr = strPool.Pop();
     CHECK(ptr != nullptr);
-    CHECK_EQUAL(1, strPool.size());
+    CHECK_EQUAL(1, strPool.Size());
 
     std::string* ref = ptr;
-    strPool.push(ptr);
-    ptr = strPool.pop();
+    strPool.Push(ptr);
+    ptr = strPool.Pop();
     POINTERS_EQUAL(ref, ptr);
 
     delete ptr;
@@ -41,16 +41,16 @@ TEST(QueuedPool, destruction)
 
     std::vector<std::string*> v;
     for (int i = 0; i < 10; ++i) {
-        std::string* ptr = strPool.pop();
+        std::string* ptr = strPool.Pop();
         CHECK(ptr != nullptr);
         v.push_back(ptr);
     }
 
     for (std::string* i : v) {
-        strPool.push(i);
+        strPool.Push(i);
     }
 
-    CHECK_EQUAL(10, strPool.available());
+    CHECK_EQUAL(10, strPool.Available());
     // At this point no leak should be triggered.
 }
 
@@ -59,31 +59,31 @@ TEST(QueuedPool, clear)
     int max_items = 10;
     QueuedPool<std::string> strPool;
 
-    CHECK_EQUAL(0, strPool.size());
-    CHECK_EQUAL(0, strPool.available());
+    CHECK_EQUAL(0, strPool.Size());
+    CHECK_EQUAL(0, strPool.Available());
 
     std::vector<std::string*> v;
     for (int i = 0; i < max_items; ++i) {
-        std::string* ptr = strPool.pop();
+        std::string* ptr = strPool.Pop();
         CHECK(ptr != nullptr);
         v.push_back(ptr);
     }
 
-    CHECK_EQUAL(10, strPool.size());
-    CHECK_EQUAL(0, strPool.available());
+    CHECK_EQUAL(10, strPool.Size());
+    CHECK_EQUAL(0, strPool.Available());
 
     for (std::string* i : v) {
-        strPool.push(i);
+        strPool.Push(i);
     }
 
-    CHECK_EQUAL(10, strPool.size());
-    CHECK_EQUAL(10, strPool.available());
+    CHECK_EQUAL(10, strPool.Size());
+    CHECK_EQUAL(10, strPool.Available());
 
-    std::string* ptr = strPool.pop();
-    CHECK_EQUAL(10, strPool.size());
-    CHECK_EQUAL(9, strPool.available());
+    std::string* ptr = strPool.Pop();
+    CHECK_EQUAL(10, strPool.Size());
+    CHECK_EQUAL(9, strPool.Available());
 
-    strPool.push(ptr);
-    strPool.clear();
-    CHECK_EQUAL(0, strPool.available());
+    strPool.Push(ptr);
+    strPool.Clear();
+    CHECK_EQUAL(0, strPool.Available());
 }

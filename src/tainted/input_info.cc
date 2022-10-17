@@ -79,9 +79,9 @@ v8::Local<v8::Object> GetJsObjectFromInputInfo(Isolate* isolate, v8::Local<v8::C
         auto parameterName = v8::Local<v8::Value>::New(isolate, inputInfo->parameterName);
         auto parameterValue = v8::Local<v8::Value>::New(isolate, inputInfo->parameterValue);
         auto type = v8::Local<v8::Value>::New(isolate, inputInfo->type);
-        iinfo->Set(context, utils::NewV8String(isolate, "parameterName"), parameterName).CHECK();
-        iinfo->Set(context, utils::NewV8String(isolate, "parameterValue"), parameterValue).CHECK();
-        iinfo->Set(context, utils::NewV8String(isolate, "type"), type).CHECK();
+        iinfo->Set(context, utils::NewV8String(isolate, "parameterName"), parameterName).Check();
+        iinfo->Set(context, utils::NewV8String(isolate, "parameterValue"), parameterValue).Check();
+        iinfo->Set(context, utils::NewV8String(isolate, "type"), type).Check();
         inputInfo->inputInfoV8Container = new InputInfoV8Container();
         inputInfo->inputInfoV8Container->inputInfoV8.Reset(isolate, iinfo);
         return iinfo;

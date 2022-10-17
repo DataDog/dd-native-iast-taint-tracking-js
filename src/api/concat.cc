@@ -2,6 +2,7 @@
 * Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
+#include <new>
 #include <vector>
 #include <memory>
 
@@ -31,65 +32,67 @@ void TaintConcatOperator(const FunctionCallbackInfo<Value>& args) {
                         v8::NewStringType::kNormal).ToLocalChecked()));
         return;
     }
+    if (!args[1]->IsString()) {
+        args.GetReturnValue().Set(args[1]);
+        return;
+    }
+
+    auto transaction = GetTransaction(utils::GetLocalStringPointer(args[0]));
+    if (transaction == nullptr) {
+        args.GetReturnValue().Set(args[1]);
+        return;
+    }
+
     try {
-        if (args[1]->IsString()) {
-            uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
-            auto transaction = GetTransaction(transactionId);
-            if (transaction != nullptr) {
-                auto ptr1 = utils::GetLocalStringPointer(args[2]);
-                auto argsSize = args.Length();
+        auto argsSize = args.Length();
+        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[2]));
+        auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
+        bool usingFirstParamRanges = ranges != nullptr;
 
-                auto ranges = transaction->GetRanges(ptr1);
-                bool usingFirstParamRanges = ranges != nullptr;
-
-                if (ranges == nullptr || ranges->size() < Limits::MAX_RANGES) {
-                    int offset = utils::GetCoercedLength(isolate, args[2]);
-                    for (int i = 3; i < argsSize; i++) {
-                        auto argPointer = utils::GetLocalStringPointer(args[i]);
-                        auto argRanges = transaction->GetRanges(argPointer);
-                        if (argRanges != nullptr) {
-                            if (ranges == nullptr) {
-                                ranges = transaction->GetAvailableSharedVector();
-                            } else if (usingFirstParamRanges) {
-                                usingFirstParamRanges = false;
-                                auto tmpRanges = ranges;
-                                ranges = transaction->GetAvailableSharedVector();
-                                ranges->add(tmpRanges);
-                            }
-                            auto end = argRanges->end();
-                            if (offset != 0) {
-                                for (auto it = argRanges->begin(); it != end; it++) {
-                                    auto argRange = *it;
-                                    auto newRange = transaction->GetAvailableTaintedRange(offset + argRange->start
-                                            , offset + argRange->end,
-                                            argRange->inputInfo);
-                                    if (newRange) {
-                                        ranges->push_back(newRange);
-                                    } else {
-                                        break;
-                                    }
-                                }
-                            } else {
-                                for (auto it = argRanges->begin(); it != end; it++) {
-                                    auto argRange = *it;
-                                    ranges->push_back(argRange);
-                                }
-                            }
+        if (ranges == nullptr || ranges->Size() < Limits::MAX_RANGES) {
+            int offset = utils::GetCoercedLength(isolate, args[2]);
+            for (int i = 3; i < argsSize; i++) {
+                auto taintedObj = transaction->FindTaintedObject(
+                        utils::GetLocalStringPointer(args[i]));
+                auto argRanges = taintedObj ? taintedObj->getRanges() : nullptr;
+                if (argRanges != nullptr) {
+                    if (ranges == nullptr) {
+                        ranges = transaction->GetSharedVectorRange();
+                    } else if (usingFirstParamRanges) {
+                        usingFirstParamRanges = false;
+                        auto tmpRanges = ranges;
+                        ranges = transaction->GetSharedVectorRange();
+                        ranges->Add(tmpRanges);
+                    }
+                    auto end = argRanges->end();
+                    if (offset != 0) {
+                        for (auto it = argRanges->begin(); it != end; it++) {
+                            auto argRange = *it;
+                            auto newRange = transaction->GetRange(offset + argRange->start
+                                    , offset + argRange->end,
+                                    argRange->inputInfo);
+                            ranges->PushBack(newRange);
                         }
-                        offset += utils::GetCoercedLength(isolate, args[i]);
+                    } else {
+                        for (auto it = argRanges->begin(); it != end; it++) {
+                            auto argRange = *it;
+                            ranges->PushBack(argRange);
+                        }
                     }
                 }
-
-                if (ranges != nullptr) {
-                    auto key = utils::GetLocalStringPointer(args[1]);
-                    transaction->AddTainted(key, ranges, args[1]);
-                    args.GetReturnValue().Set(args[1]);
-                    return;
-                }
+                offset += utils::GetCoercedLength(isolate, args[i]);
             }
         }
-    } catch (const tainted::NotAvailableRangeVectorsException& err) {
-        // do nothing, just continue without taint
+
+        if (ranges != nullptr) {
+            auto key = utils::GetLocalStringPointer(args[1]);
+            transaction->AddTainted(key, ranges, args[1]);
+            args.GetReturnValue().Set(args[1]);
+            return;
+        }
+    } catch (const std::bad_alloc& err) {
+    } catch (const container::QueuedPoolBadAlloc& err) {
+    } catch (const container::PoolBadAlloc& err) {
     }
     args.GetReturnValue().Set(args[1]);
 }

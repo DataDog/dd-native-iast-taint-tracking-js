@@ -15,13 +15,14 @@
 #include "tainted/transaction.h"
 
 using iast::tainted::Transaction;
+using iast::tainted::transaction_key_t;
 
 namespace iast {
 
 void RehashAllTransactions(void);
-void RemoveTransaction(iast_key_t id);
-Transaction* GetTransaction(iast_key_t id);
-Transaction* NewTransaction(iast_key_t id);
+void RemoveTransaction(transaction_key_t id);
+Transaction* GetTransaction(transaction_key_t id);
+Transaction* NewTransaction(transaction_key_t id);
 
 }  // namespace iast
 

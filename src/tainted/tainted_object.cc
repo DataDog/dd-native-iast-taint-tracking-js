@@ -14,22 +14,14 @@ namespace iast {
 namespace tainted {
 
 TaintedObject::TaintedObject() {
-    this->_transactionId = 0;
     this->_key = 0;
     this->_ranges = nullptr;
     this->_next = nullptr;
 }
 
-TaintedObject::TaintedObject(uintptr_t transactionIdPointer) : _transactionId(transactionIdPointer) {
-    this->_key = 0;
-    this->_ranges = nullptr;
-    this->_next = nullptr;
-}
-
-TaintedObject::TaintedObject(uintptr_t transactionId,
-        uintptr_t pointerToV8String,
+TaintedObject::TaintedObject(weak_key_t pointerToV8String,
         SharedRanges* ranges,
-        v8::Local<v8::Value> jsString): _transactionId(transactionId), _ranges(ranges) {
+        v8::Local<v8::Value> jsString): _ranges(ranges) {
     this->_key = pointerToV8String;
     this->_next = nullptr;
     this->target.Reset(v8::Isolate::GetCurrent(), jsString);
@@ -51,9 +43,9 @@ v8::Local<v8::Object> TaintedObject::toJSObject(v8::Isolate* isolate) {
     taintedObjectv8Obj->Set(context, utils::NewV8String(isolate, "value"), local);
 
     auto jsRanges = v8::Array::New(isolate);
-    int length = this->_ranges->size();
+    int length = this->_ranges->Size();
     for (int i = 0; i < length; i++) {
-        auto range = this->_ranges->at(i);
+        auto range = this->_ranges->At(i);
         auto jsRange = range->toJSObject(isolate);
         jsRanges->Set(context, i, jsRange);
     }

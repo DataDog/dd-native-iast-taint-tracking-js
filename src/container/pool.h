@@ -6,6 +6,8 @@
 #define SRC_CONTAINER_POOL_H_
 
 #include <cstddef>
+#include <exception>
+#include <iostream>
 #include <memory>
 #include <utility>
 
@@ -13,6 +15,9 @@ using std::size_t;
 
 namespace iast {
 namespace container {
+
+class PoolBadAlloc : public std::exception {
+};
 
 template<class T, size_t N>
 class Pool final {
@@ -30,13 +35,13 @@ class Pool final {
         using pointer           = Element**;
         using reference         = Element&;
 
-        explicit iterator(pointer p) : _ptr(p) {}
+        iterator(pointer p, pointer end) : _ptr(p), _end(end) {}
         T* operator *() const { return reinterpret_cast<T*>(&(*_ptr)->storage); }
         T* operator ->() { return reinterpret_cast<T*>(&(*_ptr)->storage); }
         iterator& operator ++() {
             do {
                 _ptr++;
-            } while (!*_ptr && (_ptr != (_ptr + N)));
+            } while ((_ptr < _end) && !*_ptr);
             return *this;
         }
         friend bool operator ==(const iterator& a, const iterator& b) { return a._ptr == b._ptr; }
@@ -44,6 +49,7 @@ class Pool final {
 
      private:
         pointer _ptr;
+        pointer _end;
     };
 
     Pool() {
@@ -57,11 +63,13 @@ class Pool final {
     Pool(Pool&&) = delete;
     ~Pool() = default;
 
-    void clear() {
+    void Clear() {
         for (size_t i = 1; i < N; ++i) {
-            _used[i - 1] = nullptr;
-            auto p = reinterpret_cast<T*>(&_pool[i - 1].storage);
-            p->~T();
+            if (_used[i - 1]) {
+                _used[i - 1] = nullptr;
+                auto p = reinterpret_cast<T*>(&_pool[i - 1].storage);
+                p->~T();
+            }
             _pool[i - 1].next = &_pool[i];
         }
         _used[N - 1] = nullptr;
@@ -69,10 +77,10 @@ class Pool final {
     }
 
     template<class ...Args>
-        inline T* pop(Args&& ...args) noexcept {
+        T* Pop(Args&& ...args) {
             auto element = _nextAvail;
             if (!element) {
-                return nullptr;
+                throw PoolBadAlloc();
             }
 
             _nextAvail = element->next;
@@ -80,7 +88,7 @@ class Pool final {
             return new (reinterpret_cast<Element*>(&element->storage)) T(std::forward<Args>(args)...);
         }
 
-    inline void push(T* p) noexcept {
+    void Push(T* p) noexcept {
         if (p == nullptr) {
             return;
         }
@@ -98,13 +106,14 @@ class Pool final {
 
     iterator begin() {
         auto first = &_used[0];
-        while (!*first) {
+        while (first < &_used[N - 1] && !*first) {
             first++;
         }
-        return iterator(first);
+        return iterator(first, &_used[N - 1]);
     }
 
-    iterator end() { return iterator(&_used[N]); }
+    iterator end() {
+        return iterator(&_used[N - 1], &_used[N - 1]); }
 
     Pool& operator =(const Pool&) = delete;
 

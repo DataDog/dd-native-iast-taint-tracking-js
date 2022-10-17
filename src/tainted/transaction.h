@@ -5,6 +5,7 @@
 #ifndef SRC_TAINTED_TRANSACTION_H_
 #define SRC_TAINTED_TRANSACTION_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <queue>
@@ -20,107 +21,61 @@ using SharedRanges = iast::container::SharedVector<iast::tainted::Range*>;
 using WeakMap = iast::container::WeakMap<iast::tainted::TaintedObject*, iast::Limits::MAX_TAINTED_OBJECTS>;
 using TaintedPool = iast::container::Pool<iast::tainted::TaintedObject, iast::Limits::MAX_TAINTED_OBJECTS>;
 using RangePool = iast::container::Pool<iast::tainted::Range, iast::Limits::MAX_GLOBAL_TAINTED_RANGES>;
+using SharedRangesPool = iast::container::QueuedPool<SharedRanges, iast::Limits::MAX_TAINTED_OBJECTS>;
 
 namespace iast {
 namespace tainted {
-
-struct NotAvailableRangeVectorsException { };
+using transaction_key_t = uintptr_t;
 
 class Transaction {
  public:
-    Transaction();
-    ~Transaction();
+    Transaction() {}
+    explicit Transaction(transaction_key_t id) : _id(id) {}
+    ~Transaction() noexcept;
+    void Clean(void) noexcept;
 
-    void clean(void);
-
-    inline void setId(uintptr_t id) { transactionId = id;}
     InputInfo* createNewInputInfo(v8::Local<v8::Value> parameterName,
             v8::Local<v8::Value> parameterValue,
             v8::Local<v8::Value> type);
-    void cleanInputInfos(void);
-    void cleanSharedVectors(void);
 
-    inline TaintedObject* GetAvailableTaintedObject(void) {
-        return taintedObjPool.pop(this->transactionId);
+    Range* GetRange(int start, int end, InputInfo *inputInfo) {
+        return _rangesPool.Pop(start, end, inputInfo);
     }
 
-    inline void returnTaintedObject(TaintedObject* taintedObject) {
-        if (!taintedObject) {
-            return;
-        }
-
-        taintedObjPool.push(taintedObject);
+    SharedRanges* GetSharedVectorRange(void) {
+        auto sharedRanges = _sharedRangesPool.Pop();
+        _usedSharedRanges.push(sharedRanges);
+        return sharedRanges;
     }
 
-    inline Range* GetAvailableTaintedRange(int start, int end, InputInfo *inputInfo) {
-        return availableTaintedRanges.pop(start, end, inputInfo);
+    TaintedObject* FindTaintedObject(weak_key_t stringPointer) noexcept {
+        return _taintedMap.Find(stringPointer);
     }
 
-    inline SharedRanges* GetAvailableSharedVector(void) {
-        SharedRanges* taintedRangeVector = nullptr;
-        if (!this->availableSharedVectors->empty()) {
-            taintedRangeVector = this->availableSharedVectors->front();
-            taintedRangeVector->clear();
-            this->availableSharedVectors->pop();
-        } else if (this->createdSharedVectors < Limits::MAX_TAINTED_RANGE_VECTORS) {
-            taintedRangeVector = new SharedRanges(this->createdSharedVectors++);
-        }
-        if (taintedRangeVector != nullptr) {
-            inUseSharedVectors[taintedRangeVector->getId()] = taintedRangeVector;
-            return taintedRangeVector;
-        }
-        throw NotAvailableRangeVectorsException();
+    void RehashMap(void) noexcept {
+        _taintedMap.Rehash();
     }
 
-    inline SharedRanges* GetRanges(uintptr_t stringPointer) {
-        auto taintedObject = taintedMap->find(stringPointer);
-        if (taintedObject != nullptr) {
-            return taintedObject->getRanges();
-        }
-        return nullptr;
-    }
-
-    inline void UpdateRanges(uintptr_t stringPointer, SharedRanges* taintedRanges) {
-        auto taintedObject = taintedMap->find(stringPointer);
-        if (taintedObject != nullptr) {
-            taintedObject->setRanges(taintedRanges);
-        }
-    }
-
-    inline void RehashMap(void) {
-        taintedMap->rehash();
-    }
-    inline void AddTainted(uintptr_t key, TaintedObject* tainted) {
-        taintedMap->insert(key, tainted);
-    }
-
-    inline void AddTainted(uintptr_t key, SharedRanges* ranges, v8::Local<v8::Value> jsString) {
+    void AddTainted(weak_key_t key, SharedRanges* ranges, v8::Local<v8::Value> jsString) {
         // TODO(julio): trigger exception from the pool rather than a nullptr
-        auto tainted = taintedObjPool.pop(this->transactionId,
-                key,
+        auto tainted = _taintedObjPool.Pop(key,
                 ranges,
                 jsString);
         if (tainted) {
-            taintedMap->insert(key, tainted);
+            _taintedMap.Insert(key, tainted);
         }
     }
 
-    inline void ReturnSharedVector(SharedRanges* ranges) {
-        availableSharedVectors->push(ranges);
-        inUseSharedVectors[ranges->getId()] = nullptr;
-    }
-
-
-    TaintedPool taintedObjPool;
-
  private:
-    SharedRanges* inUseSharedVectors[Limits::MAX_TAINTED_OBJECTS] = {};
-    std::queue<SharedRanges*>* availableSharedVectors;
-    WeakMap* taintedMap;
-    int createdSharedVectors;
-    RangePool availableTaintedRanges;
-    std::vector<InputInfo*> inputInfoVector;
-    uintptr_t transactionId;
+    void cleanSharedVectors(void);
+    void cleanInputInfos(void) noexcept;
+    TaintedPool _taintedObjPool;
+    std::queue<SharedRanges*> _usedSharedRanges;
+    SharedRangesPool _sharedRangesPool;
+    WeakMap _taintedMap;
+    RangePool _rangesPool;
+    std::vector<InputInfo*> _usedInputInfo;
+    transaction_key_t _id;
 };
 
 }  // namespace tainted

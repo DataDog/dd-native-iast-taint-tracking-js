@@ -10,8 +10,6 @@
 #include <locale>
 #include <codecvt>
 
-#include "../iast_node.h"
-
 namespace iast {
 namespace utils {
 const int COERCED_NULL_LENGTH = 4;
@@ -38,7 +36,7 @@ inline int GetCoercedLength(v8::Isolate* isolate, v8::Local<v8::Value> val) {
 }
 
 inline std::string GetCString(v8::Isolate* isolate, v8::Local<v8::Value> val) {
-    v8::String::Utf8Value VAL_STR(isolate, val);
+    v8::String::Utf8Value valStr(isolate, val);
     return *valStr ? *valStr : nullptr;
 }
 

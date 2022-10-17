@@ -5,22 +5,21 @@
 #include "transaction_manager.h"
 #include <CppUTest/UtestMacros.h>
 #include <CppUTest/TestHarness.h>
-
-
+#include <cstdint>
 
 using namespace iast;
 using namespace iast::container;
+using transaction_key_t = uintptr_t;
 
 struct FakeTransaction final {
-    iast_key_t _id;
+    transaction_key_t _id;
     FakeTransaction() { _id = 0; }
-    FakeTransaction(iast_key_t id): _id(id) { };
+    FakeTransaction(transaction_key_t id): _id(id) { };
     FakeTransaction(const FakeTransaction& other) {
         _id = other._id;
     }
-    void setId(iast_key_t id) { _id = id; }
-    iast_key_t getId() { return _id; }
-    void clean(void) { return; }
+    transaction_key_t getId() { return _id; }
+    void Clean(void) { return; }
 };
 
 TEST_GROUP(TransactionManager)
@@ -35,7 +34,7 @@ TEST_GROUP(TransactionManager)
 TEST(TransactionManager, initialization)
 {
     int elems = 0;
-    TransactionManager<FakeTransaction> iastManager;
+    TransactionManager<FakeTransaction, transaction_key_t> iastManager;
     elems = iastManager.getMaxItems();
     CHECK_EQUAL(2, elems);
 
@@ -50,10 +49,10 @@ TEST(TransactionManager, initialization)
 
 TEST(TransactionManager, new_item)
 {
-    TransactionManager<FakeTransaction> iastManager;
+    TransactionManager<FakeTransaction, transaction_key_t> iastManager;
     FakeTransaction* ptr = nullptr;
     size_t elems = 0;
-    iast_key_t key;
+    transaction_key_t key;
 
     key = 1;
     iastManager.New(key);
@@ -68,11 +67,11 @@ TEST(TransactionManager, new_item)
 
 TEST(TransactionManager, item_reused)
 {
-    TransactionManager<FakeTransaction> iastManager;
+    TransactionManager<FakeTransaction, transaction_key_t> iastManager;
     FakeTransaction* ptr = nullptr;
     FakeTransaction* ptr2 = nullptr;
     size_t elems = 0;
-    iast_key_t key;
+    transaction_key_t key;
 
     key = 2;
     iastManager.New(key);
@@ -95,12 +94,12 @@ TEST(TransactionManager, item_reused)
 
 TEST(TransactionManager, insert_beyond_limit)
 {
-    TransactionManager<FakeTransaction> iastManager;
+    TransactionManager<FakeTransaction, transaction_key_t> iastManager;
     FakeTransaction* ptr = nullptr;
     FakeTransaction* ptr2 = nullptr;
     FakeTransaction* ptr3 = nullptr;
     size_t elems = 0;
-    iast_key_t key1, key2, key3;
+    transaction_key_t key1, key2, key3;
 
     elems = iastManager.Size();
     CHECK_EQUAL(0, elems);

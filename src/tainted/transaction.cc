@@ -18,52 +18,33 @@
 namespace iast {
 namespace tainted {
 
-void Transaction::clean() {
-    this->taintedMap->clean();
-    this->cleanInputInfos();
-    this->availableTaintedRanges.clear();
-    this->cleanSharedVectors();
-    this->taintedObjPool.clear();
+void Transaction::Clean() noexcept {
+    _taintedMap.Clean();
+    cleanInputInfos();
+    _rangesPool.Clear();
+    cleanSharedVectors();
+    _sharedRangesPool.Clear();
+    _taintedObjPool.Clear();
 }
 
-Transaction::Transaction() {
-    this->taintedMap = new WeakMap();
-    this->createdSharedVectors = 0;
-    this->availableSharedVectors = new std::queue<container::SharedVector<Range*>*>();
+Transaction::~Transaction() noexcept {
+    Clean();
 }
 
-Transaction::~Transaction() {
-  this->taintedMap->clean();
-  this->cleanInputInfos();
-
-  delete taintedMap;
-
-  while (!this->availableSharedVectors->empty()) {
-      auto sv = availableSharedVectors->front();
-      availableSharedVectors->pop();
-      delete sv;
-  }
-
-  delete this->availableSharedVectors;
-}
-
-void Transaction::cleanInputInfos() {
-    for (std::vector<InputInfo *>::iterator it = this->inputInfoVector.begin();
-         it != this->inputInfoVector.end(); ++it) {
+void Transaction::cleanInputInfos() noexcept {
+    for (std::vector<InputInfo *>::iterator it = _usedInputInfo.begin();
+         it != _usedInputInfo.end(); ++it) {
         if (*it) {
             delete *it;
         }
     }
-    this->inputInfoVector.resize(0);
+    _usedInputInfo.resize(0);
 }
 void Transaction::cleanSharedVectors() {
-    for (int i = 0; i < Limits::MAX_TAINTED_OBJECTS; i++) {
-        auto taintedRangeVectorInUse = this->inUseSharedVectors[i];
-        if (taintedRangeVectorInUse != nullptr) {
-            taintedRangeVectorInUse->clear();
-            this->inUseSharedVectors[i] = nullptr;
-            this->availableSharedVectors->push(taintedRangeVectorInUse);
-        }
+    while (!_usedSharedRanges.empty()) {
+        auto sr = _usedSharedRanges.front();
+        _sharedRangesPool.Push(sr);
+        _usedSharedRanges.pop();
     }
 }
 
@@ -72,7 +53,7 @@ InputInfo* Transaction::createNewInputInfo(v8::Local<v8::Value> parameterName,
         v8::Local<v8::Value> type) {
     InputInfo* newInputInfo = new InputInfo(parameterName, parameterValue, type);
     if (newInputInfo != nullptr) {
-      this->inputInfoVector.push_back(newInputInfo);
+      _usedInputInfo.push_back(newInputInfo);
     }
 
     return newInputInfo;

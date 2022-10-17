@@ -12,7 +12,8 @@
 #include "tainted/transaction.h"
 #include "api/concat.h"
 
-using transactionManger = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction>>;
+using transactionManger = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction,
+      iast::tainted::transaction_key_t>>;
 
 namespace iast {
 
@@ -20,15 +21,15 @@ void RehashAllTransactions(void) {
     transactionManger::GetInstance().RehashAll();
 }
 
-void RemoveTransaction(iast_key_t id) {
+void RemoveTransaction(transaction_key_t id) {
     transactionManger::GetInstance().Remove(id);
 }
 
-Transaction* GetTransaction(iast_key_t id) {
+Transaction* GetTransaction(transaction_key_t id) {
     return transactionManger::GetInstance().Get(id);
 }
 
-Transaction* NewTransaction(iast_key_t id) {
+Transaction* NewTransaction(transaction_key_t id) {
     return transactionManger::GetInstance().New(id);
 }
 

@@ -9,28 +9,25 @@
 #include <iostream>
 #include "container/queued_pool.h"
 
-using iast_key_t = uintptr_t;
 
 namespace iast {
-template <typename T>
+
+template <typename T, typename U>
 class TransactionManager {
  public:
     TransactionManager() = default;
     TransactionManager(TransactionManager const&) = delete;
     void operator=(TransactionManager const&) = delete;
 
-    T* New(iast_key_t id) {
+    T* New(U id) {
         if (_map.size() >= _maxItems) {
             return nullptr;
         }
 
         auto found = _map.find(id);
         if (found == _map.end()) {
-            T* item = _pool.pop();
-            if (item != nullptr) {
-                _map[id] = item;
-                item->setId(id);
-            }
+            T* item = _pool.Pop(id);
+            _map[id] = item;
             return item;
         } else {
             auto item = found->second;
@@ -38,7 +35,7 @@ class TransactionManager {
         }
     }
 
-    T* Get(iast_key_t id) {
+    T* Get(U id) {
         auto found = _map.find(id);
         if (found == _map.end()) {
             return nullptr;
@@ -47,17 +44,17 @@ class TransactionManager {
         }
     }
 
-    void Remove(iast_key_t id) {
+    void Remove(U id) noexcept {
         auto found = _map.find(id);
         if (found != _map.end()) {
             T* item = found->second;
             _map.erase(found);
-            item->clean();
-            _pool.push(item);
+            item->Clean();
+            _pool.Push(item);
         }
     }
 
-    void RehashAll(void) {
+    void RehashAll(void) noexcept {
         for (auto entry : _map) {
             if (entry.second) {
                 entry.second->RehashMap();
@@ -65,22 +62,22 @@ class TransactionManager {
         }
     }
 
-    void Clear(void) {
+    void Clear(void) noexcept {
         for (auto it = _map.begin(); it != _map.end(); ++it) {
-            _pool.push(it->second);
+            _pool.Push(it->second);
         }
         _map.clear();
-        _pool.clear();
+        _pool.Clear();
     }
 
-    size_t Size() { return _map.size(); }
-    void setMaxItems(size_t max) { _maxItems = max; }
-    int getMaxItems(void) { return _maxItems; }
+    size_t Size() noexcept { return _map.size(); }
+    void setMaxItems(size_t max) noexcept { _maxItems = max; }
+    int getMaxItems(void) noexcept { return _maxItems; }
 
  private:
     size_t _maxItems = 2;
     container::QueuedPool<T> _pool;
-    std::map<iast_key_t, T*> _map;
+    std::map<U, T*> _map;
 };
 
 }   // namespace iast

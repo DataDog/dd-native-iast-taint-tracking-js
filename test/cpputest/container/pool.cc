@@ -46,11 +46,11 @@ TEST(PoolInitialization, normal_behavior)
 
     std::vector<std::string *> stringVector;
     for (size_t i = 0; i < maxElements; ++i) {
-        stringVector.push_back(stringPool->pop());
+        stringVector.push_back(stringPool->Pop());
     }
 
     for (auto str : stringVector) {
-        stringPool->push(str);
+        stringPool->Push(str);
     }
 
     delete stringPool;
@@ -63,17 +63,17 @@ TEST(PoolInitialization, max_elements)
     std::vector<std::string *> stringVector;
 
     for (size_t i = 0; i < maxElements; ++i) {
-        stringVector.push_back(stringPool.pop());
+        stringVector.push_back(stringPool.Pop());
     }
 
-    CHECK_THROWS(PoolBadAlloc, stringPool.pop());
+    CHECK_THROWS(PoolBadAlloc, stringPool.Pop());
 
-    stringPool.push(stringVector.back());
-    auto stringPtr = stringPool.pop();
+    stringPool.Push(stringVector.back());
+    auto stringPtr = stringPool.Pop();
     CHECK(stringPtr != nullptr);
 
     for (auto str : stringVector) {
-        stringPool.push(str);
+        stringPool.Push(str);
     }
 }
 
@@ -92,18 +92,18 @@ TEST_GROUP(Pool)
 
 TEST(Pool, build_parameters)
 {
-    auto strPtr = stringPool->pop("foo");
+    auto strPtr = stringPool->Pop("foo");
     STRCMP_EQUAL("foo", strPtr->c_str());
-    stringPool->push(strPtr);
+    stringPool->Push(strPtr);
 
-    strPtr = stringPool->pop("bar");
+    strPtr = stringPool->Pop("bar");
     STRCMP_EQUAL("bar", strPtr->c_str());
-    stringPool->push(strPtr);
+    stringPool->Push(strPtr);
 
     std::string baz("baz");
-    strPtr = stringPool->pop(baz);
+    strPtr = stringPool->Pop(baz);
     STRCMP_EQUAL("baz", strPtr->c_str());
-    stringPool->push(strPtr);
+    stringPool->Push(strPtr);
 }
 
 TEST(Pool, iterate_zero_used_elements)
@@ -120,7 +120,7 @@ TEST(Pool, iterate)
     const size_t maxElements = 50;
     std::string* ptrs[maxElements] = {};
     for (size_t i = 0; i < maxElements; ++i) {
-        ptrs[i] = stringPool->pop();
+        ptrs[i] = stringPool->Pop();
     }
 
     auto nElements = 0;
@@ -129,7 +129,7 @@ TEST(Pool, iterate)
     }
 
     for (size_t i = 0; i < maxElements; ++i) {
-        stringPool->push(ptrs[i]);
+        stringPool->Push(ptrs[i]);
     }
 
     CHECK_EQUAL(maxElements, nElements);
@@ -137,17 +137,17 @@ TEST(Pool, iterate)
 
 TEST(Pool, iterate_no_sequential)
 {
-    auto str1 = stringPool->pop();
-    auto str2 = stringPool->pop();
-    auto str3 = stringPool->pop();
-    auto str4 = stringPool->pop();
-    auto str5 = stringPool->pop();
-    auto str6 = stringPool->pop();
-    auto str7 = stringPool->pop();
-    auto str8 = stringPool->pop();
+    auto str1 = stringPool->Pop();
+    auto str2 = stringPool->Pop();
+    auto str3 = stringPool->Pop();
+    auto str4 = stringPool->Pop();
+    auto str5 = stringPool->Pop();
+    auto str6 = stringPool->Pop();
+    auto str7 = stringPool->Pop();
+    auto str8 = stringPool->Pop();
 
-    stringPool->push(str3);
-    stringPool->push(str7);
+    stringPool->Push(str3);
+    stringPool->Push(str7);
 
     auto nElements = 0;
     for (auto it = stringPool->begin(); it != stringPool->end(); ++it) {
@@ -156,12 +156,12 @@ TEST(Pool, iterate_no_sequential)
 
     CHECK_EQUAL(6, nElements);
 
-    stringPool->push(str1);
-    stringPool->push(str2);
-    stringPool->push(str4);
-    stringPool->push(str5);
-    stringPool->push(str6);
-    stringPool->push(str8);
+    stringPool->Push(str1);
+    stringPool->Push(str2);
+    stringPool->Push(str4);
+    stringPool->Push(str5);
+    stringPool->Push(str6);
+    stringPool->Push(str8);
 
     nElements = 0;
     for (auto it = stringPool->begin(); it != stringPool->end(); ++it) {
@@ -174,12 +174,12 @@ TEST(Pool, iterate_no_sequential)
 
 TEST(Pool, iterate_operators)
 {
-    auto ptr = stringPool->pop("foo");
+    auto ptr = stringPool->Pop("foo");
     auto it = stringPool->begin();
 
     STRCMP_EQUAL("foo", it->c_str());
 
-    stringPool->push(ptr);
+    stringPool->Push(ptr);
 }
 
 TEST(Pool, empty)
@@ -192,17 +192,17 @@ TEST(Pool, empty)
 
 TEST(Pool, double_clear)
 {
-    auto ptr = stringPool->pop("foo");
+    auto ptr = stringPool->Pop("foo");
     auto it = stringPool->begin();
 
     STRCMP_EQUAL("foo", it->c_str());
 
-    stringPool->clear();
+    stringPool->Clear();
     it = stringPool->begin();
     POINTERS_EQUAL(nullptr, *it);
-    stringPool->clear();
+    stringPool->Clear();
 
-    ptr = stringPool->pop("bar");
+    ptr = stringPool->Pop("bar");
     it = stringPool->begin();
     STRCMP_EQUAL("bar", it->c_str());
 }

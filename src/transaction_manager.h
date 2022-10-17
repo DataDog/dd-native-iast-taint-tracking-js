@@ -26,7 +26,7 @@ class TransactionManager {
 
         auto found = _map.find(id);
         if (found == _map.end()) {
-            T* item = _pool.pop(id);
+            T* item = _pool.Pop(id);
             _map[id] = item;
             return item;
         } else {
@@ -50,7 +50,7 @@ class TransactionManager {
             T* item = found->second;
             _map.erase(found);
             item->Clean();
-            _pool.push(item);
+            _pool.Push(item);
         }
     }
 
@@ -64,10 +64,10 @@ class TransactionManager {
 
     void Clear(void) noexcept {
         for (auto it = _map.begin(); it != _map.end(); ++it) {
-            _pool.push(it->second);
+            _pool.Push(it->second);
         }
         _map.clear();
-        _pool.clear();
+        _pool.Clear();
     }
 
     size_t Size() noexcept { return _map.size(); }

@@ -19,12 +19,12 @@ namespace iast {
 namespace tainted {
 
 void Transaction::Clean() noexcept {
-    _taintedMap.clean();
+    _taintedMap.Clean();
     cleanInputInfos();
-    _rangesPool.clear();
+    _rangesPool.Clear();
     cleanSharedVectors();
-    _sharedRangesPool.clear();
-    _taintedObjPool.clear();
+    _sharedRangesPool.Clear();
+    _taintedObjPool.Clear();
 }
 
 Transaction::~Transaction() noexcept {
@@ -43,7 +43,7 @@ void Transaction::cleanInputInfos() noexcept {
 void Transaction::cleanSharedVectors() {
     while (!_usedSharedRanges.empty()) {
         auto sr = _usedSharedRanges.front();
-        _sharedRangesPool.push(sr);
+        _sharedRangesPool.Push(sr);
         _usedSharedRanges.pop();
     }
 }

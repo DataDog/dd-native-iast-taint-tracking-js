@@ -43,9 +43,9 @@ v8::Local<v8::Object> TaintedObject::toJSObject(v8::Isolate* isolate) {
     taintedObjectv8Obj->Set(context, utils::NewV8String(isolate, "value"), local);
 
     auto jsRanges = v8::Array::New(isolate);
-    int length = this->_ranges->size();
+    int length = this->_ranges->Size();
     for (int i = 0; i < length; i++) {
-        auto range = this->_ranges->at(i);
+        auto range = this->_ranges->At(i);
         auto jsRange = range->toJSObject(isolate);
         jsRanges->Set(context, i, jsRange);
     }

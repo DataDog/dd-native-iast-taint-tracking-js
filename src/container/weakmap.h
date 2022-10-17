@@ -41,7 +41,7 @@ class WeakMap {
         }
     }
 
-    void clean() {
+    void Clean() {
         // TODO(julio): check memset std::fill for performance.
         for (size_t i = 0; i < N; i++) {
             this->items[i] = nullptr;
@@ -49,7 +49,7 @@ class WeakMap {
         _count = 0;
     }
 
-    T find(weak_key_t key) {
+    T Find(weak_key_t key) {
         T ret = nullptr;
         auto index = GET_INDEX(key, MASK);
         auto obj = static_cast<T>(this->items[index]);
@@ -64,7 +64,7 @@ class WeakMap {
         return ret;
     }
 
-    int insert(weak_key_t key, T obj) {
+    int Insert(weak_key_t key, T obj) {
         if (!obj) {
             return WEAK_MAP_INVALID_ARG;
         }
@@ -89,7 +89,7 @@ class WeakMap {
         return WEAK_MAP_SUCCESS;
     }
 
-    void del(weak_key_t key) {
+    void Del(weak_key_t key) {
         auto index = GET_INDEX(key, MASK);
         auto root = this->items[index];
         auto prev = root;
@@ -110,7 +110,7 @@ class WeakMap {
         }
     }
 
-    void rehash() {
+    void Rehash() {
         for (size_t index = 0; index < N; index++) {
             T prev = nullptr;
             auto obj = static_cast<T>(this->items[index]);
@@ -131,7 +131,7 @@ class WeakMap {
 
                         toInsert->_next = nullptr;
                         toInsert->_key = newPointer;
-                        insert(newPointer, toInsert);
+                        Insert(newPointer, toInsert);
                     } else {
                         prev = obj;
                         obj = static_cast<T>(obj->_next);
@@ -141,7 +141,7 @@ class WeakMap {
         }
     }
 
-    int getCount(void) { return _count; }
+    int GetCount(void) { return _count; }
 
  private:
     const int MASK = N - 1;

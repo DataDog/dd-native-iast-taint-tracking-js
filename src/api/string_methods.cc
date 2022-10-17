@@ -87,7 +87,7 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
                 utils::GetLength(args.GetIsolate(), parameterValue),
                 inputInfo);
         auto ranges = transaction->GetSharedVectorRange();
-        ranges->push_back(range);
+        ranges->PushBack(range);
         auto stringPointer = utils::GetLocalStringPointer(parameterValue);
         transaction->AddTainted(stringPointer, ranges, parameterValue);
     } catch (const std::bad_alloc& err) {
@@ -143,9 +143,9 @@ void GetRanges(const FunctionCallbackInfo<Value>& args) {
         if (ranges != nullptr) {
             auto currentContext = isolate->GetCurrentContext();
             auto jsRanges = Array::New(isolate);
-            int length = ranges->size();
+            int length = ranges->Size();
             for (int i = 0; i < length; i++) {
-                auto jsRange = ranges->at(i)->toJSObject(isolate);
+                auto jsRange = ranges->At(i)->toJSObject(isolate);
                 jsRanges->Set(currentContext, i, jsRange).Check();
             }
             args.GetReturnValue().Set(jsRanges);

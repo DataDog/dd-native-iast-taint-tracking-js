@@ -49,7 +49,7 @@ void TaintConcatOperator(const FunctionCallbackInfo<Value>& args) {
         auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
         bool usingFirstParamRanges = ranges != nullptr;
 
-        if (ranges == nullptr || ranges->size() < Limits::MAX_RANGES) {
+        if (ranges == nullptr || ranges->Size() < Limits::MAX_RANGES) {
             int offset = utils::GetCoercedLength(isolate, args[2]);
             for (int i = 3; i < argsSize; i++) {
                 auto taintedObj = transaction->FindTaintedObject(
@@ -62,7 +62,7 @@ void TaintConcatOperator(const FunctionCallbackInfo<Value>& args) {
                         usingFirstParamRanges = false;
                         auto tmpRanges = ranges;
                         ranges = transaction->GetSharedVectorRange();
-                        ranges->add(tmpRanges);
+                        ranges->Add(tmpRanges);
                     }
                     auto end = argRanges->end();
                     if (offset != 0) {
@@ -71,12 +71,12 @@ void TaintConcatOperator(const FunctionCallbackInfo<Value>& args) {
                             auto newRange = transaction->GetRange(offset + argRange->start
                                     , offset + argRange->end,
                                     argRange->inputInfo);
-                            ranges->push_back(newRange);
+                            ranges->PushBack(newRange);
                         }
                     } else {
                         for (auto it = argRanges->begin(); it != end; it++) {
                             auto argRange = *it;
-                            ranges->push_back(argRange);
+                            ranges->PushBack(argRange);
                         }
                     }
                 }

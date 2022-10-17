@@ -21,14 +21,14 @@ class QueuedPool {
  public:
      QueuedPool() {}
     ~QueuedPool() {
-        clear();
+        Clear();
     }
     explicit QueuedPool(T const&) = delete;
     explicit QueuedPool(T&&) = delete;
 
 
     template<class ...Args>
-    T* pop(Args&&...args) {
+    T* Pop(Args&&...args) {
         if (_pool.empty()) {
             if (_count >= N) {
                 throw QueuedPoolBadAlloc();
@@ -42,14 +42,14 @@ class QueuedPool {
         return item;
     }
 
-    void push(T* item) noexcept {
+    void Push(T* item) noexcept {
         if (item) {
             _pool.push(item);
         }
     }
-    size_t size() noexcept { return _count; }
-    size_t available() noexcept { return _pool.size(); }
-    void clear(void) noexcept {
+    size_t Size() noexcept { return _count; }
+    size_t Available() noexcept { return _pool.size(); }
+    void Clear(void) noexcept {
         while (!_pool.empty()) {
             T* item = _pool.front();
             _pool.pop();

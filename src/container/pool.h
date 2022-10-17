@@ -63,7 +63,7 @@ class Pool final {
     Pool(Pool&&) = delete;
     ~Pool() = default;
 
-    void clear() {
+    void Clear() {
         for (size_t i = 1; i < N; ++i) {
             if (_used[i - 1]) {
                 _used[i - 1] = nullptr;
@@ -77,7 +77,7 @@ class Pool final {
     }
 
     template<class ...Args>
-        T* pop(Args&& ...args) {
+        T* Pop(Args&& ...args) {
             auto element = _nextAvail;
             if (!element) {
                 throw PoolBadAlloc();
@@ -88,7 +88,7 @@ class Pool final {
             return new (reinterpret_cast<Element*>(&element->storage)) T(std::forward<Args>(args)...);
         }
 
-    void push(T* p) noexcept {
+    void Push(T* p) noexcept {
         if (p == nullptr) {
             return;
         }

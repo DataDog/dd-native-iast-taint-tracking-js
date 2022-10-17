@@ -39,30 +39,30 @@ class Transaction {
             v8::Local<v8::Value> type);
 
     Range* GetRange(int start, int end, InputInfo *inputInfo) {
-        return _rangesPool.pop(start, end, inputInfo);
+        return _rangesPool.Pop(start, end, inputInfo);
     }
 
     SharedRanges* GetSharedVectorRange(void) {
-        auto sharedRanges = _sharedRangesPool.pop();
+        auto sharedRanges = _sharedRangesPool.Pop();
         _usedSharedRanges.push(sharedRanges);
         return sharedRanges;
     }
 
     TaintedObject* FindTaintedObject(weak_key_t stringPointer) noexcept {
-        return _taintedMap.find(stringPointer);
+        return _taintedMap.Find(stringPointer);
     }
 
     void RehashMap(void) noexcept {
-        _taintedMap.rehash();
+        _taintedMap.Rehash();
     }
 
     void AddTainted(weak_key_t key, SharedRanges* ranges, v8::Local<v8::Value> jsString) {
         // TODO(julio): trigger exception from the pool rather than a nullptr
-        auto tainted = _taintedObjPool.pop(key,
+        auto tainted = _taintedObjPool.Pop(key,
                 ranges,
                 jsString);
         if (tainted) {
-            _taintedMap.insert(key, tainted);
+            _taintedMap.Insert(key, tainted);
         }
     }
 

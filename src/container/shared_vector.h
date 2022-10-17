@@ -41,23 +41,23 @@ class SharedVector {
         return *this;
     }
 
-    size_t size() const {
+    size_t Size() const {
         return this->elements->size();
     }
 
-    void push_back(T element) {
+    void PushBack(T element) {
         this->elements->push_back(element);
     }
 
-    void add(SharedVector* taintedRangeVector) {
+    void Add(SharedVector* taintedRangeVector) {
         elements->insert(elements->begin(), taintedRangeVector->begin(), taintedRangeVector->end());
     }
 
-    T at(int index) {
+    T At(int index) {
         return elements->at(index);
     }
 
-    void clear(void) {
+    void Clear(void) {
         elements->resize(0);
     }
 
@@ -69,18 +69,13 @@ class SharedVector {
         return elements->end();
     }
 
-    int getId(void) {
-        return id;
-    }
-
-    unsigned int getRefs() {
+    unsigned int GetRefs() {
         return *refs;
     }
 
  private:
     std::vector<T>* elements;
     int *refs;
-    int id;
 };
 }   // namespace container
 }   // namespace iast

@@ -6,6 +6,7 @@
 #define SRC_CONTAINER_POOL_H_
 
 #include <cstddef>
+#include <exception>
 #include <memory>
 #include <utility>
 
@@ -13,6 +14,9 @@ using std::size_t;
 
 namespace iast {
 namespace container {
+
+class PoolBadAlloc : public std::exception {
+};
 
 template<class T, size_t N>
 class Pool final {
@@ -69,10 +73,10 @@ class Pool final {
     }
 
     template<class ...Args>
-        T* pop(Args&& ...args) noexcept {
+        T* pop(Args&& ...args) {
             auto element = _nextAvail;
             if (!element) {
-                return nullptr;
+                throw PoolBadAlloc();
             }
 
             _nextAvail = element->next;

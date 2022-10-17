@@ -5,6 +5,7 @@
 #ifndef SRC_TAINTED_TRANSACTION_H_
 #define SRC_TAINTED_TRANSACTION_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <queue>
@@ -20,11 +21,10 @@ using SharedRanges = iast::container::SharedVector<iast::tainted::Range*>;
 using WeakMap = iast::container::WeakMap<iast::tainted::TaintedObject*, iast::Limits::MAX_TAINTED_OBJECTS>;
 using TaintedPool = iast::container::Pool<iast::tainted::TaintedObject, iast::Limits::MAX_TAINTED_OBJECTS>;
 using RangePool = iast::container::Pool<iast::tainted::Range, iast::Limits::MAX_GLOBAL_TAINTED_RANGES>;
+using SharedRangesPool = iast::container::QueuedPool<SharedRanges, iast::Limits::MAX_TAINTED_OBJECTS>;
 
 namespace iast {
 namespace tainted {
-
-struct NotAvailableRangeVectorsException { };
 
 class Transaction {
  public:
@@ -41,7 +41,6 @@ class Transaction {
     void cleanSharedVectors(void);
 
     TaintedObject* GetTaintedObject(void) {
-        //return taintedObjPool.pop(this->transactionId);
         return taintedObjPool.pop();
     }
 
@@ -58,19 +57,9 @@ class Transaction {
     }
 
     SharedRanges* GetSharedVectorRange(void) {
-        SharedRanges* taintedRangeVector = nullptr;
-        if (!this->availableSharedVectors->empty()) {
-            taintedRangeVector = this->availableSharedVectors->front();
-            taintedRangeVector->clear();
-            this->availableSharedVectors->pop();
-        } else if (this->createdSharedVectors < Limits::MAX_TAINTED_RANGE_VECTORS) {
-            taintedRangeVector = new SharedRanges(this->createdSharedVectors++);
-        }
-        if (taintedRangeVector != nullptr) {
-            inUseSharedVectors[taintedRangeVector->getId()] = taintedRangeVector;
-            return taintedRangeVector;
-        }
-        throw NotAvailableRangeVectorsException();
+        auto sharedRanges = _sharedRangesPool.pop();
+        _usedSharedRanges.push(sharedRanges);
+        return sharedRanges;
     }
 
     TaintedObject* FindTaintedObject(weak_key_t stringPointer) {
@@ -101,19 +90,11 @@ class Transaction {
         }
     }
 
-    void ReturnSharedVector(SharedRanges* ranges) {
-        availableSharedVectors->push(ranges);
-        inUseSharedVectors[ranges->getId()] = nullptr;
-    }
-
-
-    TaintedPool taintedObjPool;
-
  private:
-    SharedRanges* inUseSharedVectors[Limits::MAX_TAINTED_OBJECTS] = {};
-    std::queue<SharedRanges*>* availableSharedVectors;
+    TaintedPool taintedObjPool;
+    std::queue<SharedRanges*> _usedSharedRanges;
+    SharedRangesPool _sharedRangesPool;
     WeakMap* taintedMap;
-    int createdSharedVectors;
     RangePool availableTaintedRanges;
     std::vector<InputInfo*> inputInfoVector;
     uintptr_t transactionId;

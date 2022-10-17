@@ -14,19 +14,18 @@ namespace container {
 template <class T>
 class SharedVector {
  public:
-    explicit SharedVector(int id): id(id) {
+    explicit SharedVector() {
         elements = new std::vector<T>();
         refs = new int(1);
     }
 
-    SharedVector(SharedVector& v) : elements(v.elements), refs(v.refs), id(v.id) {
+    SharedVector(SharedVector& v) : elements(v.elements), refs(v.refs) {
         (*refs)++;
     }
 
     ~SharedVector() {
         (*refs)--;
         if (!*refs) {
-            remove_elements();
             delete elements;
             delete refs;
         }
@@ -37,7 +36,6 @@ class SharedVector {
             (*refs)--;
             elements = v.elements;
             refs = v.refs;
-            id = v.id;
             (*refs)++;
         }
         return *this;
@@ -83,13 +81,6 @@ class SharedVector {
     std::vector<T>* elements;
     int *refs;
     int id;
-    void remove_elements() {
-        if (std::is_pointer<T>::value) {
-            for (size_t i = 0; i < elements->size(); ++i) {
-                delete (*elements)[i];
-            }
-        }
-    }
 };
 }   // namespace container
 }   // namespace iast

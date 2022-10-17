@@ -2,6 +2,7 @@
 * Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
+#include <new>
 #include <node.h>
 #include <cstddef>
 #include <string>
@@ -71,37 +72,31 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
     args.GetReturnValue().Set(parameterValue);
 
     uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
-    auto transaction = NewTransaction(transactionId);
-    if (!transaction) {
-        return;
-    }
-
-    auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(parameterValue));
-    if (taintedObj) {
-        // Object already exist, nothing to do
-        return;
-    }
 
     try {
-        InputInfo* inputInfo =
-            transaction->createNewInputInfo(
-                    parameterName, parameterValue, type);
-
-        if (inputInfo == nullptr) {
+        auto transaction = NewTransaction(transactionId);
+        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(parameterValue));
+        if (taintedObj) {
+            // Object already exist, nothing to do
             return;
         }
+
+        InputInfo* inputInfo = transaction->createNewInputInfo(
+                    parameterName, parameterValue, type);
 
         auto range = transaction->GetRange(0,
                 utils::GetLength(args.GetIsolate(), parameterValue),
                 inputInfo);
-        if (range != nullptr) {
-            auto ranges = transaction->GetSharedVectorRange();
-            ranges->push_back(range);
-            auto stringPointer = utils::GetLocalStringPointer(parameterValue);
-            transaction->AddTainted(stringPointer, ranges, parameterValue);
-        }
-    } catch (const tainted::NotAvailableRangeVectorsException& err) {
-        // TODO(julio): propagate exception to JS?
+        auto ranges = transaction->GetSharedVectorRange();
+        ranges->push_back(range);
+        auto stringPointer = utils::GetLocalStringPointer(parameterValue);
+        transaction->AddTainted(stringPointer, ranges, parameterValue);
+    } catch (const std::bad_alloc& err) {
+        // TODO(julio): log exception?
+    } catch (const container::QueuedPoolBadAlloc& err) {
+        // TODO(julio): log exception?
+    } catch (const container::PoolBadAlloc& err) {
+        // TODO(julio): log exception?
     }
 }
 

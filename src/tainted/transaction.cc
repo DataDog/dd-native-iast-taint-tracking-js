@@ -3,6 +3,7 @@
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
 #include <cstdint>
+#include <pthread.h>
 #include <string>
 #include <map>
 #include <list>
@@ -23,28 +24,20 @@ void Transaction::clean() {
     this->cleanInputInfos();
     this->availableTaintedRanges.clear();
     this->cleanSharedVectors();
+    this->_sharedRangesPool.clear();
     this->taintedObjPool.clear();
 }
 
 Transaction::Transaction() {
     this->taintedMap = new WeakMap();
-    this->createdSharedVectors = 0;
-    this->availableSharedVectors = new std::queue<container::SharedVector<Range*>*>();
 }
 
 Transaction::~Transaction() {
-  this->taintedMap->clean();
-  this->cleanInputInfos();
-
-  delete taintedMap;
-
-  while (!this->availableSharedVectors->empty()) {
-      auto sv = availableSharedVectors->front();
-      availableSharedVectors->pop();
-      delete sv;
-  }
-
-  delete this->availableSharedVectors;
+    this->taintedMap->clean();
+    this->cleanInputInfos();
+    this->cleanSharedVectors();
+    this->_sharedRangesPool.clear();
+    delete taintedMap;
 }
 
 void Transaction::cleanInputInfos() {
@@ -57,13 +50,10 @@ void Transaction::cleanInputInfos() {
     this->inputInfoVector.resize(0);
 }
 void Transaction::cleanSharedVectors() {
-    for (int i = 0; i < Limits::MAX_TAINTED_OBJECTS; i++) {
-        auto taintedRangeVectorInUse = this->inUseSharedVectors[i];
-        if (taintedRangeVectorInUse != nullptr) {
-            taintedRangeVectorInUse->clear();
-            this->inUseSharedVectors[i] = nullptr;
-            this->availableSharedVectors->push(taintedRangeVectorInUse);
-        }
+    while (!_usedSharedRanges.empty()) {
+        auto sr = _usedSharedRanges.front();
+        _sharedRangesPool.push(sr);
+        _usedSharedRanges.pop();
     }
 }
 

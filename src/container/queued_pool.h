@@ -2,30 +2,38 @@
 * Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
-#include <cstddef>
-#include <cstdint>
-#include <queue>
-#include <utility>
 #ifndef SRC_CONTAINER_QUEUED_POOL_H_
 #define SRC_CONTAINER_QUEUED_POOL_H_
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <pthread.h>
+#include <queue>
+#include <stdexcept>
+#include <utility>
 namespace iast {
 namespace container {
-using pool_id_t = uintptr_t;
 
-template<typename T>
+class QueuedPoolBadAlloc : public std::exception {
+};
+
+template<typename T, size_t N = SIZE_MAX>
 class QueuedPool {
  public:
      QueuedPool() {}
     ~QueuedPool() {
         clear();
     }
-    explicit QueuedPool(T const&) = delete;
-    explicit QueuedPool(T&&) = delete;
+    QueuedPool(T const&) = delete;
+    QueuedPool(T&&) = delete;
 
 
     template<class ...Args>
     T* pop(Args&&...args) {
         if (_pool.empty()) {
+            if (_count >= N) {
+                throw QueuedPoolBadAlloc();
+            }
             _count++;
             return new T(std::forward<Args>(args)...);
         }

@@ -4,11 +4,30 @@
 **/
 #include "container/pool.h"
 
+#include <CppUTest/TestFailure.h>
+#include <CppUTest/UtestMacros.h>
+#include <exception>
 #include <iostream>
 #include <vector>
 #include <CppUTest/TestHarness.h>
 
 #include <string>
+
+#ifndef CHECK_THROWS
+#define CHECK_THROWS(expected, expression) \
+do { \
+    std::string failure_msg("expected to throw "#expected "\nbut threw nothing"); \
+    bool caught_expected = false; \
+    try { \
+        (expression); \
+    } catch(const expected &) { \
+        caught_expected = true; \
+    } catch(...) { \
+        failure_msg = "expected to throw " #expected "\nbut threw a different type"; \
+    } \
+    CHECK_TEXT(caught_expected, failure_msg); \
+} while(0)
+#endif
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
@@ -47,11 +66,10 @@ TEST(PoolInitialization, max_elements)
         stringVector.push_back(stringPool.pop());
     }
 
-    auto stringPtr = stringPool.pop();
-    POINTERS_EQUAL(nullptr, stringPtr);
+    CHECK_THROWS(PoolBadAlloc, stringPool.pop());
 
     stringPool.push(stringVector.back());
-    stringPtr = stringPool.pop();
+    auto stringPtr = stringPool.pop();
     CHECK(stringPtr != nullptr);
 
     for (auto str : stringVector) {

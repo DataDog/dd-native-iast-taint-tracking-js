@@ -12,7 +12,8 @@
 #include "tainted/transaction.h"
 #include "api/concat.h"
 
-using transactionManger = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction>>;
+using transactionManger = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction,
+      iast::tainted::transaction_key_t>>;
 
 namespace iast {
 

@@ -3,7 +3,6 @@
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
 #include <cstdint>
-#include <pthread.h>
 #include <string>
 #include <map>
 #include <list>
@@ -19,35 +18,27 @@
 namespace iast {
 namespace tainted {
 
-void Transaction::clean() {
-    this->taintedMap->clean();
-    this->cleanInputInfos();
-    this->availableTaintedRanges.clear();
-    this->cleanSharedVectors();
-    this->_sharedRangesPool.clear();
-    this->taintedObjPool.clear();
+void Transaction::Clean() noexcept {
+    _taintedMap.clean();
+    cleanInputInfos();
+    _rangesPool.clear();
+    cleanSharedVectors();
+    _sharedRangesPool.clear();
+    _taintedObjPool.clear();
 }
 
-Transaction::Transaction() {
-    this->taintedMap = new WeakMap();
+Transaction::~Transaction() noexcept {
+    Clean();
 }
 
-Transaction::~Transaction() {
-    this->taintedMap->clean();
-    this->cleanInputInfos();
-    this->cleanSharedVectors();
-    this->_sharedRangesPool.clear();
-    delete taintedMap;
-}
-
-void Transaction::cleanInputInfos() {
-    for (std::vector<InputInfo *>::iterator it = this->inputInfoVector.begin();
-         it != this->inputInfoVector.end(); ++it) {
+void Transaction::cleanInputInfos() noexcept {
+    for (std::vector<InputInfo *>::iterator it = _usedInputInfo.begin();
+         it != _usedInputInfo.end(); ++it) {
         if (*it) {
             delete *it;
         }
     }
-    this->inputInfoVector.resize(0);
+    _usedInputInfo.resize(0);
 }
 void Transaction::cleanSharedVectors() {
     while (!_usedSharedRanges.empty()) {
@@ -62,7 +53,7 @@ InputInfo* Transaction::createNewInputInfo(v8::Local<v8::Value> parameterName,
         v8::Local<v8::Value> type) {
     InputInfo* newInputInfo = new InputInfo(parameterName, parameterValue, type);
     if (newInputInfo != nullptr) {
-      this->inputInfoVector.push_back(newInputInfo);
+      _usedInputInfo.push_back(newInputInfo);
     }
 
     return newInputInfo;

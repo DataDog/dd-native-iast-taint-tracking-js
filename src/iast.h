@@ -15,6 +15,7 @@
 #include "tainted/transaction.h"
 
 using iast::tainted::Transaction;
+using iast::tainted::transaction_key_t;
 
 namespace iast {
 

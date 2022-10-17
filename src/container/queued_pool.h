@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <pthread.h>
 #include <queue>
 #include <stdexcept>
 #include <utility>
@@ -24,8 +23,8 @@ class QueuedPool {
     ~QueuedPool() {
         clear();
     }
-    QueuedPool(T const&) = delete;
-    QueuedPool(T&&) = delete;
+    explicit QueuedPool(T const&) = delete;
+    explicit QueuedPool(T&&) = delete;
 
 
     template<class ...Args>
@@ -43,14 +42,14 @@ class QueuedPool {
         return item;
     }
 
-    void push(T* item) {
+    void push(T* item) noexcept {
         if (item) {
             _pool.push(item);
         }
     }
-    size_t size() { return _count; }
-    size_t available() { return _pool.size(); }
-    void clear(void) {
+    size_t size() noexcept { return _count; }
+    size_t available() noexcept { return _pool.size(); }
+    void clear(void) noexcept {
         while (!_pool.empty()) {
             T* item = _pool.front();
             _pool.pop();

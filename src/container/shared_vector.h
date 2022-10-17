@@ -14,7 +14,7 @@ namespace container {
 template <class T>
 class SharedVector {
  public:
-    explicit SharedVector() {
+    SharedVector() {
         elements = new std::vector<T>();
         refs = new int(1);
     }

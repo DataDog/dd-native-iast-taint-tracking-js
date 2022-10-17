@@ -14,7 +14,6 @@ namespace iast {
 namespace tainted {
 
 TaintedObject::TaintedObject() {
-    //this->_transactionId = 0;
     this->_key = 0;
     this->_ranges = nullptr;
     this->_next = nullptr;

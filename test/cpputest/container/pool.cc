@@ -181,3 +181,28 @@ TEST(Pool, iterate_operators)
 
     stringPool->push(ptr);
 }
+
+TEST(Pool, empty)
+{
+    auto begin = stringPool->begin();
+    auto end = stringPool->end();
+
+    CHECK(begin == end);
+}
+
+TEST(Pool, double_clear)
+{
+    auto ptr = stringPool->pop("foo");
+    auto it = stringPool->begin();
+
+    STRCMP_EQUAL("foo", it->c_str());
+
+    stringPool->clear();
+    it = stringPool->begin();
+    POINTERS_EQUAL(nullptr, *it);
+    stringPool->clear();
+
+    ptr = stringPool->pop("bar");
+    it = stringPool->begin();
+    STRCMP_EQUAL("bar", it->c_str());
+}

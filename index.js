@@ -12,7 +12,8 @@ let iastNativeMethods = {
     getRanges : addon.getRanges,
     createTransaction : addon.createTransaction,
     removeTransaction : addon.removeTransaction,
-    concat : addon.concat
+    concat : addon.concat,
+    substring : addon.substring
 }
 
 module.exports = iastNativeMethods

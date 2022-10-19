@@ -20,6 +20,6 @@ declare module 'datadog-iast-taint-tracking' {
         isTainted(transactionId: string, ...args: string[]): boolean;
         getRanges(transactionId: string, original: string): NativeTaintedRange[];
         removeTransaction(transactionId: string): void;
-        concat(transactionId: string, op1: string, op2: string): string;
+        concat(transactionId: string, result: string, op1: string, op2: string): string;
     }
 }

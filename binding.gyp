@@ -15,6 +15,7 @@
                 "./src/api/concat.cc",
                 "./src/api/trim.cc",
                 "./src/api/slice.cc",
+                "./src/api/substring.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

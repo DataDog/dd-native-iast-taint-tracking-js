@@ -13,6 +13,7 @@
 #include "api/concat.h"
 #include "api/trim.h"
 #include "api/slice.h"
+#include "api/substring.h"
 
 using transactionManger = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction,
       iast::tainted::transaction_key_t>>;
@@ -40,6 +41,7 @@ void Init(v8::Local<v8::Object> exports) {
     api::ConcatOperations::Init(exports);
     api::TrimOperations::Init(exports);
     api::SliceOperations::Init(exports);
+    api::Substring::Init(exports);
     exports->GetIsolate()->AddGCEpilogueCallback(iast::gc::OnScavenge, v8::GCType::kGCTypeScavenge);
     exports->GetIsolate()->AddGCEpilogueCallback(iast::gc::OnMarkSweepCompact, v8::GCType::kGCTypeMarkSweepCompact);
 }

@@ -17,6 +17,7 @@
     "test:native": "./scripts/cpputest.sh",
     "test:junit": "./scripts/cpputest.sh --ci",
     "pretest:asan": "npm run build:asan",
+    "pretest:js": "npm run build",
     "pretest:js-junit": "npm run build",
     "pretest:js-valgrind": "npm run build",
     "pretest:js-asan": "npm run build:asan",

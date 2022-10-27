@@ -30,3 +30,17 @@
 *.exe
 *.out
 *.app
+
+# Ctags
+tags
+
+#node-gyp
+build/
+dist/
+
+#npm
+node_modules/
+yarn.lock
+
+#cpputest results
+test/cpputest/results/

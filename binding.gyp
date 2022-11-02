@@ -28,7 +28,11 @@
                         "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
                         "GCC_ENABLE_CPP_RTTI": "YES"
                     }
+                }],
+                ['OS=="win"', {
+                    "win_delay_load_hook": 'false'
                 }]
+                
             ],
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').gyp\")"

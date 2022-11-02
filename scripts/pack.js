@@ -2,7 +2,6 @@
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
-const tar = require('tar')
 const getLibc = require(path.join(__dirname, 'libc'))
 
 let archFolder = `${os.platform()}-${os.arch()}-${getLibc()}`

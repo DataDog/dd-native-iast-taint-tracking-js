@@ -40,17 +40,17 @@ v8::Local<v8::Object> TaintedObject::toJSObject(v8::Isolate* isolate) {
     auto context = isolate->GetCurrentContext();
     auto taintedObjectv8Obj = v8::Object::New(isolate);
     auto local = v8::Local<v8::Value>::New(isolate, this->target);
-    taintedObjectv8Obj->Set(context, utils::NewV8String(isolate, "value"), local);
+    taintedObjectv8Obj->Set(context, utils::NewV8String(isolate, "value"), local).Check();
 
     auto jsRanges = v8::Array::New(isolate);
     int length = this->_ranges->Size();
     for (int i = 0; i < length; i++) {
         auto range = this->_ranges->At(i);
         auto jsRange = range->toJSObject(isolate);
-        jsRanges->Set(context, i, jsRange);
+        jsRanges->Set(context, i, jsRange).Check();
     }
 
-    taintedObjectv8Obj->Set(context, utils::NewV8String(isolate, "ranges"), jsRanges);
+    taintedObjectv8Obj->Set(context, utils::NewV8String(isolate, "ranges"), jsRanges).Check();
     return taintedObjectv8Obj;
 }
 }   // namespace tainted

@@ -64,7 +64,7 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
     if (v8::Local<v8::String>::Cast(args[1])->Length() == 1) {
         v8::String::Utf8Value param1(isolate, args[1]);
         std::string cppStr(*param1);
-        v8::Local<v8::String> newStr = v8::String::NewFromUtf8(isolate, cppStr.c_str()).ToLocalChecked();
+        auto newStr = v8::String::NewFromUtf8(isolate, cppStr.c_str(), v8::NewStringType::kNormal).ToLocalChecked();
         parameterValue = newStr;
     }
 

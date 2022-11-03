@@ -13,17 +13,13 @@ RUN apt-get update && apt-get -y upgrade && apt-get -y install \
     cpputest \
     libcpputest-dev
 
-RUN if [ "${NODE_ARG_VERSION}" = "15" ] ; then \
-        curl https://pyenv.run | bash ; \
-        echo 'export PYENV_ROOT="$HOME/.pyenv"' >> /root/.bashrc ; \
-        echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> /root/.bashrc ; \
-        echo 'eval "$(pyenv init -)"' >> /root/.bashrc ; \
-        export PYENV_ROOT="$HOME/.pyenv" ; \
-        command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH" ; \
-        eval "$(pyenv init -)" ; \
-        pyenv install -v 3.6.15 ; \
-        pyenv global 3.6.15 ; \
-    fi
+RUN apt-get -y install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev ; \
+        curl -O https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz ; \
+        tar -xf Python-3.7.3.tar.xz ; \
+        cd Python-3.7.3 ; \
+        ./configure ; \
+        make -j $(nproc) ; \
+        make install
 
 RUN npm ci --ignore-scripts
 COPY . .

@@ -20,10 +20,6 @@
 #include "../gc/gc.h"
 #include "../iast.h"
 
-/* #if NODE_MAJOR_VERSION == 12 */
-/* #define ToLocalChecked Check */
-/* #endif */
-
 using v8::Exception;
 using v8::FunctionCallbackInfo;
 using v8::Isolate;

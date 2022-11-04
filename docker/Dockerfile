@@ -13,13 +13,15 @@ RUN apt-get update && apt-get -y upgrade && apt-get -y install \
     cpputest \
     libcpputest-dev
 
-RUN apt-get -y install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev ; \
+RUN if [ "$(echo $NODE_VERSION | cut -d'.' -f1)" = "15" ] ; then \
+        apt-get -y install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev ; \
         curl -O https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz ; \
         tar -xf Python-3.7.3.tar.xz ; \
         cd Python-3.7.3 ; \
         ./configure ; \
         make -j $(nproc) ; \
-        make install
+        make install ; \
+    fi
 
 RUN npm ci --ignore-scripts
 COPY . .

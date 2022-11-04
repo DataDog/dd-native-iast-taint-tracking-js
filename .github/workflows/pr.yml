@@ -1,0 +1,176 @@
+name: PR
+on:
+  push:
+    pull_request:
+
+jobs:
+  valgrind:
+    strategy:
+      matrix:
+        version: [12, 14, 16, 18, 19]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.version }}
+      - run: sudo apt-get update && sudo apt-get install valgrind
+      - run: npm i --ignore-scripts
+      - run: npm run test:js-valgrind
+
+  asan:
+    strategy:
+      matrix:
+        version: [12, 14, 16, 18, 19]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.version }}
+      - run: sudo apt-get update && sudo apt-get install libcpputest-dev cpputest
+      - run: npm i --ignore-scripts
+      - run: npm run test:asan
+      - run: npm run test:js-asan
+
+  build-native:
+    needs: ['asan', 'valgrind']
+    strategy:
+      matrix:
+        version: [ 16 ]
+        target:
+          - name: macos
+            os: macos-latest
+            artifact: darwin-x64-unknown
+            arch: x64
+            build: build
+            cross-compile: false
+          - name: macos arm64
+            os: macos-latest
+            artifact: darwin-arm64-unknown
+            arch: x64
+            build: build:arm
+            cross-compile: true
+          - name: windows 64 bits
+            os: windows-2019
+            artifact: win32-x64-unknown
+            arch: x64
+            build: build
+            cross-compile: false
+    
+    runs-on: ${{ matrix.target.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.version }}
+          architecture: ${{ matrix.target.arch }}
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.10.6'
+          architecture: ${{ matrix.target.arch }}
+      - run: npm i --ignore-scripts
+      - run: npm run ${{ matrix.target.build }}
+      - if: ${{ matrix.target.cross-compile }}
+        run: mkdir -p dist/${{ matrix.target.artifact }}-${{matrix.version}}/ && cp dist/iastnativemethods.node dist/${{ matrix.target.artifact }}-${{matrix.version}}/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.target.artifact }}-${{ matrix.version }}
+          path: dist/${{ matrix.target.artifact }}-${{ matrix.version }}/iastnativemethods.node
+
+  build-docker:
+    needs: ['asan', 'valgrind']
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [ 16 ]
+        target:
+          - dockerfile: Dockerfile
+            libc: libc
+            artifact: linux-x64-glibc
+          - dockerfile: alpine.Dockerfile
+            libc: musl
+            artifact: linux-x64-musl
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - run: npm i --ignore-scripts
+        env:
+          PLATFORM: 'linux'
+          LIBC: ${{ matrix.target.libc }}
+      - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version }} -f ./docker/${{ matrix.target.dockerfile }} .
+      - run: docker run --name builder build
+      - run: docker run --name tester build test:junit
+      - run: docker cp builder:/build/dist/${{ matrix.target.artifact }}-${{ matrix.version }}/iastnativemethods.node .
+      - run: docker cp tester:/build/test/cpputest/results/ .
+      - uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/results/cpputest_*.xml'
+          check_name: junit test report ${{ matrix.target.name }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.target.artifact }}-${{ matrix.version }}
+          path: iastnativemethods.node
+
+  cpp-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - run: pip install cpplint
+      - run: cpplint --filter=-build/include_subdir --linelength=120 --recursive ./src
+
+  test-native-js:
+    needs: ['pack']
+    strategy:
+      matrix:
+        target:
+          - name: linux 64 bits
+            os: ubuntu-latest
+            artifact: linux-x64-gnu
+          - name: windows 64 bits
+            os: windows-2019
+            artifact: win32-x64-msvc
+          - name: macos 64 bits
+            os: macos-latest
+            artifact: darwin-x64
+
+    runs-on: ${{ matrix.target.os }}
+    env:
+      NPM_TAINTEDUTILS: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - run: npm ci --ignore-scripts
+      - uses: codex-team/action-nodejs-package-info@v1
+        id: package
+      - uses: actions/download-artifact@v3
+        with:
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+      - run: npm i --verbose datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
+      - run: npm run test:js-junit
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/build/junit.xml'
+          check_name: junit test report ${{ matrix.target.name }}
+
+  all-good:
+    needs:
+      - test-native-js
+      - cpp-lint
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo '🚀🚀🚀🚀🚀'
+      

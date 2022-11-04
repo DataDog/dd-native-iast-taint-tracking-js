@@ -64,7 +64,7 @@ jobs:
             arch: x64
             build: build
             cross-compile: false
-    
+
     runs-on: ${{ matrix.target.os }}
     steps:
       - uses: actions/checkout@v3
@@ -131,6 +131,16 @@ jobs:
       - run: pip install cpplint
       - run: cpplint --filter=-build/include_subdir --linelength=120 --recursive ./src
 
+  js-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '19'
+      - run: npm i --ignore-scripts
+      - run: npm run lint
+
   pack:
     needs:
       - build-native
@@ -141,7 +151,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           path: artifacts
-      - run: mv artifacts dist          
+      - run: mv artifacts dist
       - run: npm pack
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
@@ -195,4 +205,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo '🚀🚀🚀🚀🚀'
-      
+

@@ -18,7 +18,7 @@ declare module 'datadog-iast-taint-tracking' {
         readonly ref?: string;
     }
 
-    export class TaintedUtils {
+    export interface TaintedUtils {
         createTransaction(transactionId: string): string;
         newTaintedString(transactionId: string, original: string, paramName: string, type: string): string;
         isTainted(transactionId: string, ...args: string[]): boolean;

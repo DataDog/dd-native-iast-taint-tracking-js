@@ -6,38 +6,38 @@
 const os = require('os')
 let addon
 try {
-    const getLibc = require('./scripts/libc')
-    const archFolder = `${os.platform()}-${os.arch()}-${getLibc()}` + '-' + process.versions.node.split('.')[0]
-    addon = require(`./dist/${archFolder}/iastnativemethods.node`)
+  const getLibc = require('./scripts/libc')
+  const archFolder = `${os.platform()}-${os.arch()}-${getLibc()}` + '-' + process.versions.node.split('.')[0]
+  addon = require(`./dist/${archFolder}/iastnativemethods.node`)
 } catch (e) {
-    addon = {
-        createTransaction(transactionId) {
-            return transactionId
-        },
-        newTaintedString(transactionId, original) {
-            return original
-        },
-        isTainted() {
-            return false
-        },
-        getRanges() {
-            return undefined
-        },
-        removeTransaction() {
-        },
-        concat(transactionId, result) {
-            return result
-        }
+  addon = {
+    createTransaction (transactionId) {
+      return transactionId
+    },
+    newTaintedString (transactionId, original) {
+      return original
+    },
+    isTainted () {
+      return false
+    },
+    getRanges () {
+      return undefined
+    },
+    removeTransaction () {
+    },
+    concat (transactionId, result) {
+      return result
     }
+  }
 }
 
 const iastNativeMethods = {
-    newTaintedString: addon.newTaintedString,
-    isTainted: addon.isTainted,
-    getRanges: addon.getRanges,
-    createTransaction: addon.createTransaction,
-    removeTransaction: addon.removeTransaction,
-    concat: addon.concat
+  newTaintedString: addon.newTaintedString,
+  isTainted: addon.isTainted,
+  getRanges: addon.getRanges,
+  createTransaction: addon.createTransaction,
+  removeTransaction: addon.removeTransaction,
+  concat: addon.concat
 }
 
 module.exports = iastNativeMethods

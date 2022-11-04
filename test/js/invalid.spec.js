@@ -6,20 +6,20 @@
 const proxyquire = require('proxyquire')
 const assert = require('assert')
 describe('Invalid arch require', function () {
-    it('should return an object', () => {
-        const TaintedUtils = proxyquire('../../', {
-            'os': {
-                arch() {
-                    return 'invented-arch-does-not-exist'
-                }
-            }
-        })
-        assert(TaintedUtils)
-        assert(TaintedUtils.createTransaction)
-        assert(TaintedUtils.newTaintedString)
-        assert(TaintedUtils.isTainted)
-        assert(TaintedUtils.getRanges)
-        assert(TaintedUtils.removeTransaction)
-        assert(TaintedUtils.concat)
+  it('should return an object', () => {
+    const TaintedUtils = proxyquire('../../', {
+      os: {
+        arch () {
+          return 'invented-arch-does-not-exist'
+        }
+      }
     })
+    assert(TaintedUtils)
+    assert(TaintedUtils.createTransaction)
+    assert(TaintedUtils.newTaintedString)
+    assert(TaintedUtils.isTainted)
+    assert(TaintedUtils.getRanges)
+    assert(TaintedUtils.removeTransaction)
+    assert(TaintedUtils.concat)
+  })
 })

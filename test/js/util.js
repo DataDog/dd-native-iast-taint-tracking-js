@@ -3,6 +3,6 @@
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
 const taintedUtilsPkg = process.env.NPM_TAINTEDUTILS === 'true' ? '@datadog/native-iast-taint-tracking' : '../../index'
-const TaintedUtils = require(taintedUtilsPkg);
+const TaintedUtils = require(taintedUtilsPkg)
 
 module.exports.TaintedUtils = TaintedUtils

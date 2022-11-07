@@ -1,15 +1,13 @@
-name: Build
-
+name: Pull-Request
 on:
-  push:
-    branches:
-    - main
+  pull_request:
 
 jobs:
   valgrind:
+    needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [12, 13, 14, 15, 16, 17, 18, 19]
+        version: [12, 14, 16, 18, 19]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,9 +21,10 @@ jobs:
       - run: npm run test:js-valgrind
 
   asan:
+    needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [12, 13, 14, 15, 16, 17, 18, 19]
+        version: [12, 14, 16, 18, 19]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -40,10 +39,10 @@ jobs:
       - run: npm run test:js-asan
 
   build-native:
-    needs: ['asan', 'valgrind']
+    needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [12, 13, 14, 15, 16, 17, 18, 19]
+        version: [ 18 ]
         target:
           - name: macos
             os: macos-latest
@@ -63,7 +62,7 @@ jobs:
             arch: x64
             build: build
             cross-compile: false
-
+    
     runs-on: ${{ matrix.target.os }}
     steps:
       - uses: actions/checkout@v3
@@ -87,11 +86,10 @@ jobs:
           path: dist/${{ matrix.target.artifact }}-${{ matrix.version }}/iastnativemethods.node
 
   build-docker:
-    needs: ['asan', 'valgrind']
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [12, 13, 14, 15, 16, 17, 18, 19]
+        version: [ 18 ]
         target:
           - dockerfile: Dockerfile
             libc: libc
@@ -122,6 +120,23 @@ jobs:
           name: ${{ matrix.target.artifact }}-${{ matrix.version }}
           path: iastnativemethods.node
 
+  cpp-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - run: pip install cpplint
+      - run: cpplint --filter=-build/include_subdir --linelength=120 --recursive ./src
+
+  js-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '19'
+      - run: npm i --ignore-scripts
+      - run: npm run lint
   pack:
     needs:
       - build-native
@@ -185,4 +200,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo '🚀🚀🚀🚀🚀'
-
+      

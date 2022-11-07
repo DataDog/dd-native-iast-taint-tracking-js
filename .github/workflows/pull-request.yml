@@ -39,7 +39,7 @@ jobs:
       - run: npm run test:js-asan
 
   build-native:
-    needs: ['asan', 'valgrind']
+    #needs: ['asan', 'valgrind']
     strategy:
       matrix:
         version: [ 18 ]
@@ -86,7 +86,7 @@ jobs:
           path: dist/${{ matrix.target.artifact }}-${{ matrix.version }}/iastnativemethods.node
 
   build-docker:
-    needs: ['asan', 'valgrind']
+    #needs: ['asan', 'valgrind']
     runs-on: ubuntu-latest
     strategy:
       matrix:

@@ -1,10 +1,11 @@
-name: PR
+name: Pull-Request
 on:
   push:
     pull_request:
 
 jobs:
   valgrind:
+    needs: ['cpplint', 'js-lint']
     strategy:
       matrix:
         version: [12, 14, 16, 18, 19]
@@ -21,6 +22,7 @@ jobs:
       - run: npm run test:js-valgrind
 
   asan:
+    needs: ['cpplint', 'js-lint']
     strategy:
       matrix:
         version: [12, 14, 16, 18, 19]
@@ -41,7 +43,7 @@ jobs:
     needs: ['asan', 'valgrind']
     strategy:
       matrix:
-        version: [ 16 ]
+        version: [ 18 ]
         target:
           - name: macos
             os: macos-latest
@@ -89,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [ 16 ]
+        version: [ 18 ]
         target:
           - dockerfile: Dockerfile
             libc: libc
@@ -128,6 +130,16 @@ jobs:
       - run: pip install cpplint
       - run: cpplint --filter=-build/include_subdir --linelength=120 --recursive ./src
 
+  js-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '19'
+      - run: npm i --ignore-scripts
+      - run: npm run lint
+
   test-native-js:
     needs: ['pack']
     strategy:
@@ -150,7 +162,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
       - run: npm ci --ignore-scripts
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
@@ -169,7 +181,6 @@ jobs:
   all-good:
     needs:
       - test-native-js
-      - cpp-lint
     runs-on: ubuntu-latest
     steps:
       - run: echo '🚀🚀🚀🚀🚀'

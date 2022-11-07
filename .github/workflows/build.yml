@@ -122,24 +122,6 @@ jobs:
           name: ${{ matrix.target.artifact }}-${{ matrix.version }}
           path: iastnativemethods.node
 
-  cpp-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-      - run: pip install cpplint
-      - run: cpplint --filter=-build/include_subdir --linelength=120 --recursive ./src
-
-  js-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '19'
-      - run: npm i --ignore-scripts
-      - run: npm run lint
-
   pack:
     needs:
       - build-native
@@ -181,7 +163,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
       - run: npm ci --ignore-scripts
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
@@ -200,7 +182,6 @@ jobs:
   all-good:
     needs:
       - test-native-js
-      - cpp-lint
     runs-on: ubuntu-latest
     steps:
       - run: echo '🚀🚀🚀🚀🚀'

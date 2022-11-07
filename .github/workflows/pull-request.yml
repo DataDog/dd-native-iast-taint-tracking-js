@@ -39,6 +39,7 @@ jobs:
       - run: npm run test:js-asan
 
   build-native:
+    needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
         version: [ 18 ]

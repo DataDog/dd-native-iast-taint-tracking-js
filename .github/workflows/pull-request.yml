@@ -4,7 +4,7 @@ on:
 
 jobs:
   valgrind:
-    needs: ['cpplint', 'js-lint']
+    needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
         version: [12, 14, 16, 18, 19]
@@ -21,7 +21,7 @@ jobs:
       - run: npm run test:js-valgrind
 
   asan:
-    needs: ['cpplint', 'js-lint']
+    needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
         version: [12, 14, 16, 18, 19]

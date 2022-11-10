@@ -3,12 +3,9 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
  **/
 'use strict'
-const os = require('os')
 let addon
 try {
-  const getLibc = require('./scripts/libc')
-  const archFolder = `${os.platform()}-${os.arch()}-${getLibc()}` + '-' + process.versions.node.split('.')[0]
-  addon = require(`./dist/${archFolder}/iastnativemethods.node`)
+  addon = require('node-gyp-build')(__dirname)
 } catch (e) {
   addon = {
     createTransaction (transactionId) {

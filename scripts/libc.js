@@ -11,7 +11,7 @@ const getLibc = function () {
       return 'glibc'
     }
   } else {
-    return 'unknown'
+    return undefined
   }
 }
 

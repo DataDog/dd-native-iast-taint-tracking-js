@@ -1,13 +1,16 @@
 'use strict'
 const fs = require('fs')
-const path = require('path')
 const os = require('os')
-const getLibc = require(path.join(__dirname, 'libc'))
+const path = require('path')
+const getLibc = require('./libc')
+const getAbiVersion = require('./abi')
 
-let archFolder = `${os.platform()}-${os.arch()}-${getLibc()}`
+const TARGET_NAME = 'iastnativemethods'
+const platform = os.platform()
+const arch = process.env.ARCH || os.arch()
+const libc = getLibc() === 'musl' ? 'musl' : ''
 
-archFolder += '-' + process.versions.node.split('.')[0]
-
-fs.mkdirSync(path.join(__dirname, '..', 'dist', archFolder), { recursive: true })
-fs.renameSync(path.join(__dirname, '..', 'dist', 'iastnativemethods.node'),
-  path.join(__dirname, '..', 'dist', archFolder, 'iastnativemethods.node'))
+const outputdir = path.join('prebuilds', `${platform}${libc}-${arch}`)
+const output = path.join(outputdir, `/node-${getAbiVersion()}.node`)
+fs.mkdirSync(`prebuilds/${platform}${libc}-${arch}`, { recursive: true })
+fs.copyFileSync(`build/Release/${TARGET_NAME}.node`, output)

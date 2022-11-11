@@ -5,6 +5,7 @@
 #include <new>
 #include <vector>
 #include <memory>
+#include <string>
 
 #include "trim.h"
 #include "../tainted/range.h"

@@ -259,7 +259,7 @@ describe('Trim operator', function () {
   }
 
   function testTrimNoTaintedResult (trimFn, taintedTrimFn) {
-    let testString = '   ABC   '
+    const testString = '   ABC   '
     const res = trimFn.call(testString)
     const ret = taintedTrimFn(id, res, testString)
     assert.equal(res, ret, 'Unexpected vale')
@@ -278,7 +278,7 @@ describe('Trim operator', function () {
     assert.equal(formattedResult, expectedResult, 'Unexpected ranges')
   }
 
-  function testTrimNoTaintedWhenAllRangesTrimmed(trimFn, taintedTrimFn, formattedTestString) {
+  function testTrimNoTaintedWhenAllRangesTrimmed (trimFn, taintedTrimFn, formattedTestString) {
     const testString = taintFormattedString(id, formattedTestString)
     const res = trimFn.call(testString)
     assert.equal(TaintedUtils.isTainted(id, testString), true, 'Test string not tainted')

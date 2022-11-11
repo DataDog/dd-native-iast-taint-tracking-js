@@ -256,9 +256,15 @@ describe('Trim operator', function () {
     TaintedUtils.removeTransaction(id)
   })
 
-  it('Wrong arguments', function () {
+  it('Wrong arguments trim', function () {
     assert.throws(function () {
-      TaintedUtils.concat(id)
+      TaintedUtils.trim(id)
+    }, Error)
+  })
+
+  it('Wrong arguments trimEnd', function () {
+    assert.throws(function () {
+      TaintedUtils.trimEnd(id)
     }, Error)
   })
 

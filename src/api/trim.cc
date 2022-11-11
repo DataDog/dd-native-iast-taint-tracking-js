@@ -53,19 +53,16 @@ void TaintTrimOperator(const FunctionCallbackInfo<Value>& args) {
             return;
         }
 
-        v8::String::Utf8Value selfStr(isolate, args[2]);
-        std::string cSelf(*selfStr);
-        int selfLength = cSelf.length();
-
         int left = 0;
-        while (left < selfLength) {
-            auto c = cSelf.at(left);
-            if (isspace(c)) {
-                left++;
-            } else {
+        v8::String::Utf8Value selfStr(isolate, args[2]);
+
+        char * selfCh = *selfStr;
+        do {
+            if (!isspace(*selfCh)) {
                 break;
             }
-        }
+            left++;
+        } while (*selfCh++);
 
         v8::String::Utf8Value resultStr(isolate, args[1]);
         std::string cResultStr(*resultStr);

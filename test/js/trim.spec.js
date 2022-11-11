@@ -8,7 +8,25 @@ const assert = require('assert')
 describe('Trim operator', function () {
   const id = '1'
 
-  const testCases = [
+  const noTaintTestCases = {
+    trim: [
+      ':+-    -+:ABC:+-    -+:',
+      ' :+-    -+:ABC:+-    -+: ',
+      ' :+-    -+: ABC :+-    -+: '
+    ],
+    trimStart: [
+      ':+-    -+:ABC',
+      ' :+-    -+: ABC ',
+      ' :+-    -+: :+-    -+: ABC'
+    ],
+    trimEnd: [
+      'ABC:+-    -+:',
+      'ABC :+-    -+: ',
+      'ABC :+-    -+: :+-    -+: '
+    ]
+  }
+
+  const rangesTestCases = [
     {
       testString: ':+-ABC-+:',
       trimResult: ':+-ABC-+:',
@@ -252,6 +270,15 @@ describe('Trim operator', function () {
     assert.equal(formattedResult, expectedResult, 'Unexpected ranges')
   }
 
+  function testTrimNoTaintedWhenAllRangesTrimmed(trimFn, taintedTrimFn, formattedTestString) {
+    const testString = taintFormattedString(id, formattedTestString)
+    const res = trimFn.call(testString)
+    assert.equal(TaintedUtils.isTainted(id, testString), true, 'Test string not tainted')
+    const ret = taintedTrimFn(id, res, testString)
+    assert.equal(res, ret, 'Unexpected vale')
+    assert.equal(TaintedUtils.isTainted(id, ret), false, 'Trim returned value is tainted')
+  }
+
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
   })
@@ -267,8 +294,16 @@ describe('Trim operator', function () {
       testTrimResult(String.prototype.trim, TaintedUtils.trim)
     })
 
+    describe('Check result not tainted when no ranges left', function () {
+      noTaintTestCases.trim.forEach((testString) => {
+        it(`Test ${testString}`, () => {
+          testTrimNoTaintedWhenAllRangesTrimmed(String.prototype.trim, TaintedUtils.trim, testString)
+        })
+      })
+    })
+
     describe('Check ranges', function () {
-      testCases.forEach(({ testString, trimResult }) => {
+      rangesTestCases.forEach(({ testString, trimResult }) => {
         it(`Test ${testString}`, () => {
           testTrimCheckRanges(String.prototype.trim, TaintedUtils.trim, testString, trimResult)
         })
@@ -281,8 +316,16 @@ describe('Trim operator', function () {
       testTrimResult(String.prototype.trimStart, TaintedUtils.trim)
     })
 
+    describe('Check result not tainted when no ranges left', function () {
+      noTaintTestCases.trimStart.forEach((testString) => {
+        it(`Test ${testString}`, () => {
+          testTrimNoTaintedWhenAllRangesTrimmed(String.prototype.trimStart, TaintedUtils.trim, testString)
+        })
+      })
+    })
+
     describe('Check ranges', function () {
-      testCases.forEach(({ testString, trimStartResult }) => {
+      rangesTestCases.forEach(({ testString, trimStartResult }) => {
         it(`Test ${testString}`, () => {
           testTrimCheckRanges(String.prototype.trimStart, TaintedUtils.trim, testString, trimStartResult)
         })
@@ -301,8 +344,16 @@ describe('Trim operator', function () {
       testTrimResult(String.prototype.trimEnd, TaintedUtils.trimEnd)
     })
 
+    describe('Check result not tainted when no ranges left', function () {
+      noTaintTestCases.trimEnd.forEach((testString) => {
+        it(`Test ${testString}`, () => {
+          testTrimNoTaintedWhenAllRangesTrimmed(String.prototype.trimEnd, TaintedUtils.trimEnd, testString)
+        })
+      })
+    })
+
     describe('Check ranges', function () {
-      testCases.forEach(({ testString, trimEndResult }) => {
+      rangesTestCases.forEach(({ testString, trimEndResult }) => {
         it(`Test ${testString}`, () => {
           testTrimCheckRanges(String.prototype.trimEnd, TaintedUtils.trimEnd, testString, trimEndResult)
         })

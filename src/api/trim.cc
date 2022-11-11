@@ -92,7 +92,7 @@ void TaintTrimOperator(const FunctionCallbackInfo<Value>& args) {
             }
         }
 
-        if (resultRanges != nullptr) {
+        if (resultRanges->Size() > 0) {
             auto key = utils::GetLocalStringPointer(args[1]);
             transaction->AddTainted(key, resultRanges, args[1]);
             args.GetReturnValue().Set(args[1]);
@@ -155,7 +155,7 @@ void TaintTrimEndOperator(const FunctionCallbackInfo<Value>& args) {
             }
         }
 
-        if (resultRanges != nullptr) {
+        if (resultRanges->Size() > 0) {
             auto key = utils::GetLocalStringPointer(args[1]);
             transaction->AddTainted(key, resultRanges, args[1]);
             args.GetReturnValue().Set(args[1]);

@@ -27,6 +27,12 @@ try {
     },
     concat (transactionId, result) {
       return result
+    },
+    trim (transaction, result) {
+      return result
+    },
+    trimEnd (transaction, result) {
+      return result
     }
   }
 }
@@ -37,7 +43,9 @@ const iastNativeMethods = {
   getRanges: addon.getRanges,
   createTransaction: addon.createTransaction,
   removeTransaction: addon.removeTransaction,
-  concat: addon.concat
+  concat: addon.concat,
+  trim: addon.trim,
+  trimEnd: addon.trimEnd
 }
 
 module.exports = iastNativeMethods

@@ -47,11 +47,6 @@ void TaintTrimOperator(const FunctionCallbackInfo<Value>& args) {
 
     try {
         auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[2]));
-        if (taintedObj == nullptr) {
-            args.GetReturnValue().Set(args[1]);
-            return;
-        }
-
         auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
         if (ranges == nullptr) {
             args.GetReturnValue().Set(args[1]);
@@ -133,11 +128,6 @@ void TaintTrimEndOperator(const FunctionCallbackInfo<Value>& args) {
 
     try {
         auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[2]));
-        if (taintedObj == nullptr) {
-            args.GetReturnValue().Set(args[1]);
-            return;
-        }
-
         auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
         if (ranges == nullptr) {
             args.GetReturnValue().Set(args[1]);

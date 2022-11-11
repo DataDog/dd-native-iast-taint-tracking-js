@@ -10,16 +10,22 @@ describe('Trim operator', function () {
 
   const noTaintTestCases = {
     trim: [
+      ':+-    -+:',
+      ':+- \n\r\t -+:',
       ':+-    -+:ABC:+-    -+:',
       ' :+-    -+:ABC:+-    -+: ',
       ' :+-    -+: ABC :+-    -+: '
     ],
     trimStart: [
+      ':+-    -+:',
+      ':+- \n\r\t -+:',
       ':+-    -+:ABC',
       ' :+-    -+: ABC ',
       ' :+-    -+: :+-    -+: ABC'
     ],
     trimEnd: [
+      ':+-    -+:',
+      ':+- \n\r\t -+:',
       'ABC:+-    -+:',
       'ABC :+-    -+: ',
       'ABC :+-    -+: :+-    -+: '

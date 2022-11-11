@@ -256,19 +256,13 @@ describe('Trim operator', function () {
     TaintedUtils.removeTransaction(id)
   })
 
-  it('Wrong arguments trim', function () {
-    assert.throws(function () {
-      TaintedUtils.trim(id)
-    }, Error)
-  })
-
-  it('Wrong arguments trimEnd', function () {
-    assert.throws(function () {
-      TaintedUtils.trimEnd(id)
-    }, Error)
-  })
-
   describe('trim', function () {
+    it('Wrong arguments trim', function () {
+      assert.throws(function () {
+        TaintedUtils.trim(id)
+      }, Error)
+    })
+
     it('Check result', function () {
       testTrimResult(String.prototype.trim, TaintedUtils.trim)
     })
@@ -297,6 +291,12 @@ describe('Trim operator', function () {
   })
 
   describe('trimEnd', function () {
+    it('Wrong arguments trimEnd', function () {
+      assert.throws(function () {
+        TaintedUtils.trimEnd(id)
+      }, Error)
+    })
+
     it('Check result', function () {
       testTrimResult(String.prototype.trimEnd, TaintedUtils.trimEnd)
     })

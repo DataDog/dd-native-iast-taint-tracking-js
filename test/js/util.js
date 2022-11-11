@@ -11,7 +11,7 @@ const RANGE_CLOSING_MARK = '-+:'
 const PARAM_NAME = 'param'
 const PARAM_TYPE = 'REQUEST'
 
-function taintFormattedString(transactionId, formattedString) {
+function taintFormattedString (transactionId, formattedString) {
   return formattedString.split(RANGE_OPEN_MARK).reduce((previousValue, currentValue) => {
     if (currentValue.length === 0) {
       return previousValue
@@ -29,7 +29,7 @@ function taintFormattedString(transactionId, formattedString) {
   }, '')
 }
 
-function formatTaintedValue(transactionId, taintedValue) {
+function formatTaintedValue (transactionId, taintedValue) {
   let offset = 0
   return TaintedUtils.getRanges(transactionId, taintedValue).reduce((formattedString, range) => {
     formattedString =

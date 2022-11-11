@@ -2,7 +2,7 @@
  * Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
  * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
  **/
-const { TaintedUtils, taintFormattedString, formatTaintedValue} = require('./util')
+const { TaintedUtils, taintFormattedString, formatTaintedValue } = require('./util')
 const assert = require('assert')
 
 describe('Trim operator', function () {
@@ -224,10 +224,10 @@ describe('Trim operator', function () {
       trimResult: ':+-佫-+: :+-😂😂😂-+: :+-𝒳-+:',
       trimStartResult: ':+-佫-+: :+-😂😂😂-+: :+-𝒳  -+: ',
       trimEndResult: ' :+-  佫-+: :+-😂😂😂-+: :+-𝒳-+:'
-    },
+    }
   ]
 
-  function testTrimResult(trimFn, taintedTrimFn) {
+  function testTrimResult (trimFn, taintedTrimFn) {
     let testString = '   ABC   '
 
     testString = TaintedUtils.newTaintedString(id, testString, 'PARAM_NAME', 'PARAM_TYPE')
@@ -240,7 +240,7 @@ describe('Trim operator', function () {
     assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   }
 
-  function testTrimCheckRanges(trimFn, taintedTrimFn, formattedTestString, expectedResult) {
+  function testTrimCheckRanges (trimFn, taintedTrimFn, formattedTestString, expectedResult) {
     const testString = taintFormattedString(id, formattedTestString)
     const res = trimFn.call(testString)
     assert.equal(TaintedUtils.isTainted(id, testString), true, 'Test string not tainted')
@@ -262,14 +262,13 @@ describe('Trim operator', function () {
     }, Error)
   })
 
-
   describe('trim', function () {
     it('Check result', function () {
       testTrimResult(String.prototype.trim, TaintedUtils.trim)
     })
 
     describe('Check ranges', function () {
-      testCases.forEach(({testString, trimResult}) => {
+      testCases.forEach(({ testString, trimResult }) => {
         it(`Test ${testString}`, () => {
           testTrimCheckRanges(String.prototype.trim, TaintedUtils.trim, testString, trimResult)
         })
@@ -283,7 +282,7 @@ describe('Trim operator', function () {
     })
 
     describe('Check ranges', function () {
-      testCases.forEach(({testString, trimStartResult}) => {
+      testCases.forEach(({ testString, trimStartResult }) => {
         it(`Test ${testString}`, () => {
           testTrimCheckRanges(String.prototype.trimStart, TaintedUtils.trim, testString, trimStartResult)
         })
@@ -297,13 +296,11 @@ describe('Trim operator', function () {
     })
 
     describe('Check ranges', function () {
-      testCases.forEach(({testString, trimEndResult}) => {
+      testCases.forEach(({ testString, trimEndResult }) => {
         it(`Test ${testString}`, () => {
           testTrimCheckRanges(String.prototype.trimEnd, TaintedUtils.trimEnd, testString, trimEndResult)
         })
       })
     })
   })
-
-
 })

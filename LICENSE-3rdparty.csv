@@ -1,4 +1,5 @@
 Component,Origin,License,Copyright
+require,node-gyp-build,MIT,Copyright 2017 Mathias Buus
 dev,node-addon-api,MIT,Copyright (c) 2017 Node.js API collaborators
 dev,nan,MIT,Copyright (c) 2018 NAN contributors
 dev,node-gyp,MIT,Copyright (c) 2012 Nathan Rajlich
@@ -9,3 +10,4 @@ dev,cpputest,BSD-3-Clause,"Copyright (c) 2007, Michael Feathers, James Grenning 
 dev,proxyquire,MIT,Copyright 2013 Thorsten Lorenz
 dev,eslint,MIT,Copyright JS Foundation and other contributors https://js.foundation
 dev,eslint-config-standard,MIT,Copyright Feross Aboukhadijeh
+dev,semver,ISC,Copyright Isaac Z. Schlueter and Contributors

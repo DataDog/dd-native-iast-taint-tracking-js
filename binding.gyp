@@ -12,6 +12,7 @@
                 "./src/tainted/string_resource.cc",
                 "./src/api/string_methods.cc",
                 "./src/api/concat.cc",
+                "./src/api/trim.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [
@@ -32,7 +33,7 @@
                 ['OS=="win"', {
                     "win_delay_load_hook": 'false'
                 }]
-                
+
             ],
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').gyp\")"

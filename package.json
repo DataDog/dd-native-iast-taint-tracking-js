@@ -2,7 +2,7 @@
   "name": "@datadog/native-iast-taint-tracking",
   "home": "https://github.com/DataDog/dd-native-iast-taint-tracking-js/blob/main/README.md",
   "repository": "git@github.com:DataDog/dd-native-iast-taint-tracking-js.git",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "Datadog IAST tant tracking support for NodeJS",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "postbuild": "node ./scripts/pack.js",
     "postbuild:asan": "npm run postbuild",
     "postbuild:valgrind": "npm run postbuild",
-    "test": "./scripts/cpputest.sh",
+    "test:native": "./scripts/cpputest.sh",
     "test:junit": "./scripts/cpputest.sh --ci",
     "pretest:asan": "npm run build:asan",
     "pretest:js-junit": "npm run build",
@@ -23,6 +23,7 @@
     "test:asan": "./scripts/cpputest.sh --asan",
     "test:js-asan": "LD_PRELOAD=`gcc -print-file-name=libasan.so` mocha --recursive",
     "test:js-valgrind": "valgrind mocha --recursive",
+    "test": "mocha --recursive",
     "test:js-junit": "mocha --recursive --reporter mocha-junit-reporter --reporter-options mochaFile=./build/junit.xml",
     "test:docker": "./scripts/test_docker.sh"
   },
@@ -40,15 +41,19 @@
     "node-addon-api": "^4.3.0",
     "node-gyp": ">=7.1.2",
     "proxyquire": "^2.1.3",
-    "segfault-handler": "^1.3.0"
+    "segfault-handler": "^1.3.0",
+    "semver": "^7.3.8"
   },
   "files": [
     "index.js",
     "index.d.ts",
-    "dist",
+    "prebuilds/**/*",
     "scripts/libc.js",
     "LICENSE",
     "LICENSE-3rdparty.csv",
     "README.md"
-  ]
+  ],
+  "dependencies": {
+    "node-gyp-build": "^3.9.0"
+  }
 }

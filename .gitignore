@@ -44,3 +44,6 @@ yarn.lock
 
 #cpputest results
 test/cpputest/results/
+
+#prebuilded native images
+prebuilds/

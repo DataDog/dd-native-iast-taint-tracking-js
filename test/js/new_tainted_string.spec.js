@@ -7,10 +7,20 @@ const assert = require('assert')
 
 describe('Taint strings', function () {
   const value = 'test'
-  const id = '1'
+  const id = TaintedUtils.createTransaction('1')
 
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
+  })
+
+  it('Taint new string with undefined transaction', function () {
+    const ret = TaintedUtils.newTaintedString(undefined, value, 'param', 'REQUEST')
+    assert.strictEqual(ret, 'test', 'Unexpected value')
+  })
+
+  it('Taint new string with empty transaction', function () {
+    const ret = TaintedUtils.newTaintedString('', value, 'param', 'REQUEST')
+    assert.strictEqual(ret, 'test', 'Unexpected value')
   })
 
   it('Taint new string', function () {

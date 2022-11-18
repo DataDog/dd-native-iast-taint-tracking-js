@@ -293,6 +293,17 @@ describe('Trim operator', function () {
     assert.equal(TaintedUtils.isTainted(id, ret), false, 'Trim returned value is tainted')
   }
 
+  function testTrimOneCharResultIsDifferentInstance (trimFn, taintedTrimFn, testString) {
+    const paramValue = TaintedUtils.newTaintedString(id, testString, 'PARAM_NAME', 'PARAM_TYPE')
+    assert.equal(true, TaintedUtils.isTainted(id, paramValue))
+    assert.equal(false, TaintedUtils.isTainted(id, testString))
+    const originalTrim = trimFn.call(testString)
+    let res = trimFn.call(paramValue)
+    res = taintedTrimFn(id, res, paramValue)
+    assert.equal(true, TaintedUtils.isTainted(id, res))
+    assert.equal(false, TaintedUtils.isTainted(id, originalTrim))
+  }
+
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
   })
@@ -306,6 +317,10 @@ describe('Trim operator', function () {
 
     it('Check result', function () {
       testTrimResult(String.prototype.trim, TaintedUtils.trim)
+    })
+
+    it('One char length results, different instance', function () {
+      testTrimOneCharResultIsDifferentInstance(String.prototype.trim, TaintedUtils.trim, ' a ')
     })
 
     it('Check result from not tainted value', function () {
@@ -338,6 +353,10 @@ describe('Trim operator', function () {
       testTrimNoTaintedResult(String.prototype.trimStart, TaintedUtils.trim)
     })
 
+    it('One char length results, different instance', function () {
+      testTrimOneCharResultIsDifferentInstance(String.prototype.trimStart, TaintedUtils.trim, ' a')
+    })
+
     describe('Check result not tainted when no ranges left', function () {
       noTaintTestCases.trimStart.forEach((testString) => {
         it(`Test ${testString}`, () => {
@@ -368,6 +387,10 @@ describe('Trim operator', function () {
 
     it('Check result from not tainted value', function () {
       testTrimNoTaintedResult(String.prototype.trimEnd, TaintedUtils.trimEnd)
+    })
+
+    it('One char length results, different instance', function () {
+      testTrimOneCharResultIsDifferentInstance(String.prototype.trimEnd, TaintedUtils.trimEnd, 'a  ')
     })
 
     describe('Check result not tainted when no ranges left', function () {

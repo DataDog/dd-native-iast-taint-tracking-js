@@ -24,9 +24,9 @@ describe('Ranges', function () {
         type: 'REQUEST'
       }
     }]
-    TaintedUtils.newTaintedString(id, value, param, 'REQUEST')
+    const taintedValue = TaintedUtils.newTaintedString(id, value, param, 'REQUEST')
 
-    const ranges = TaintedUtils.getRanges(id, value)
+    const ranges = TaintedUtils.getRanges(id, taintedValue)
     assert.deepEqual(ranges, expected, 'Ranges expected to be equal')
   })
 

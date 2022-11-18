@@ -50,15 +50,20 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transactionIdArgument = args[0];
-    auto parameterValue = args[1];
-    auto parameterName = args[2];
-    auto type = args[3];
+    if (!(args[0]->IsString()) || !Local<String>::Cast(args[0])->Length()) {
+        args.GetReturnValue().Set(args[1]);
+        return;
+    }
 
     if (!(args[1]->IsString())) {
         args.GetReturnValue().Set(args[1]);
         return;
     }
+
+    auto transactionIdArgument = args[0];
+    auto parameterValue = args[1];
+    auto parameterName = args[2];
+    auto type = args[3];
 
     // if string length == 1 then make a new one in order to avoid chache issues.
     if (v8::Local<v8::String>::Cast(args[1])->Length() == 1) {

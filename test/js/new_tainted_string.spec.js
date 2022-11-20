@@ -129,4 +129,11 @@ describe('Taint strings', function () {
     ret = TaintedUtils.isTainted(id, ret)
     assert.strictEqual(ret, false, 'Unexpected value')
   })
+
+  it('One char tainted string must have different instance', function () {
+    const oneChar = 'a'
+    const taintedOneChar = TaintedUtils.newTaintedString(id, oneChar, 'param', 'request')
+    assert.strictEqual(true, TaintedUtils.isTainted(id, taintedOneChar), 'Must be tainted')
+    assert.strictEqual(false, TaintedUtils.isTainted(id, oneChar), 'Can not be tainted')
+  })
 })

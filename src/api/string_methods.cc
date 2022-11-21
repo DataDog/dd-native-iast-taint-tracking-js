@@ -66,9 +66,10 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
     auto type = args[3];
 
     // if string length < 10 then make a new one in order to avoid cache issues.
-    if (v8::Local<v8::String>::Cast(args[1])->Length() == 1) {
+    int len =  v8::Local<v8::String>::Cast(args[1])->Length();
+    if (len == 1) {
         parameterValue = tainted::NewExternalString(isolate, args[1]);
-    } else if (v8::Local<v8::String>::Cast(args[1])->Length() < 10) {
+    } else if (len < 10) {
         v8::String::Utf8Value param1(isolate, args[1]);
         std::string cppStr(*param1);
         auto newStr = v8::String::NewFromUtf8(isolate, cppStr.c_str(), v8::NewStringType::kNormal).ToLocalChecked();

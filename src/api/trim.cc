@@ -9,6 +9,7 @@
 
 #include "trim.h"
 #include "../tainted/range.h"
+#include "../tainted/string_resource.h"
 #include "../tainted/transaction.h"
 #include "../iast.h"
 
@@ -90,9 +91,13 @@ void TaintTrimOperator(const FunctionCallbackInfo<Value>& args) {
         }
 
         if (resultRanges->Size() > 0) {
-            auto key = utils::GetLocalStringPointer(args[1]);
-            transaction->AddTainted(key, resultRanges, args[1]);
-            args.GetReturnValue().Set(args[1]);
+            auto res = args[1];
+            if (resultLength == 1) {
+                res = tainted::NewExternalString(isolate, res);
+            }
+            auto key = utils::GetLocalStringPointer(res);
+            transaction->AddTainted(key, resultRanges, res);
+            args.GetReturnValue().Set(res);
             return;
         }
     } catch (const std::bad_alloc& err) {
@@ -153,9 +158,13 @@ void TaintTrimEndOperator(const FunctionCallbackInfo<Value>& args) {
         }
 
         if (resultRanges->Size() > 0) {
-            auto key = utils::GetLocalStringPointer(args[1]);
-            transaction->AddTainted(key, resultRanges, args[1]);
-            args.GetReturnValue().Set(args[1]);
+            auto res = args[1];
+            if (resultLength == 1) {
+                res = tainted::NewExternalString(isolate, res);
+            }
+            auto key = utils::GetLocalStringPointer(res);
+            transaction->AddTainted(key, resultRanges, res);
+            args.GetReturnValue().Set(res);
             return;
         }
     } catch (const std::bad_alloc& err) {

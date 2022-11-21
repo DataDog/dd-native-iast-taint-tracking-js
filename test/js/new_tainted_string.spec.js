@@ -39,16 +39,22 @@ describe('Taint strings', function () {
   })
 
   it('Check tainted string', function () {
-    TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
-    const ret = TaintedUtils.isTainted(id, value)
+    const taintedValue = TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
+    const ret = TaintedUtils.isTainted(id, taintedValue)
     assert.strictEqual(ret, true, 'Unexpected value')
+  })
+
+  it('Forces new string', function () {
+    const taintedValue = TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
+    assert.strictEqual(TaintedUtils.isTainted(id, taintedValue), true, 'Unexpected value')
+    assert.strictEqual(TaintedUtils.isTainted(id, value), false, 'Unexpected value')
   })
 
   it('Check tainted string with unknown id', function () {
     const wrongId = '2'
 
-    TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
-    const ret = TaintedUtils.isTainted(wrongId, value)
+    const taintedValue = TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
+    const ret = TaintedUtils.isTainted(wrongId, taintedValue)
     assert.strictEqual(ret, false, 'Unexpected value')
   })
 
@@ -58,7 +64,7 @@ describe('Taint strings', function () {
 
     ret = TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
     assert.strictEqual(ret, 123, 'Unexpected value')
-    ret = TaintedUtils.isTainted(id, value)
+    ret = TaintedUtils.isTainted(id, ret)
     assert.strictEqual(ret, false, 'Unexpected value')
   })
 
@@ -68,7 +74,7 @@ describe('Taint strings', function () {
 
     ret = TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
     assert.strictEqual(ret, value, 'Unexpected value')
-    ret = TaintedUtils.isTainted(id, value)
+    ret = TaintedUtils.isTainted(id, ret)
     assert.strictEqual(ret, false, 'Unexpected value')
   })
 
@@ -78,7 +84,7 @@ describe('Taint strings', function () {
 
     ret = TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
     assert.strictEqual(ret, undefined, 'Unexpected value')
-    ret = TaintedUtils.isTainted(id, value)
+    ret = TaintedUtils.isTainted(id, ret)
     assert.strictEqual(ret, false, 'Unexpected value')
   })
 
@@ -88,7 +94,7 @@ describe('Taint strings', function () {
 
     ret = TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
     assert.strictEqual(ret, null, 'Unexpected value')
-    ret = TaintedUtils.isTainted(id, value)
+    ret = TaintedUtils.isTainted(id, ret)
     assert.strictEqual(ret, false, 'Unexpected value')
   })
 
@@ -99,7 +105,7 @@ describe('Taint strings', function () {
     values.forEach((val, index, array) => {
       ret = TaintedUtils.newTaintedString(id, val, 'param', 'REQUEST')
       assert.strictEqual(ret, 'value', 'Unexpected value')
-      ret = TaintedUtils.isTainted(id, val)
+      ret = TaintedUtils.isTainted(id, ret)
       assert.strictEqual(ret, true, 'Unexpected value')
     })
   })
@@ -120,7 +126,14 @@ describe('Taint strings', function () {
     const beyondLimit = 'beyond'
     ret = TaintedUtils.newTaintedString(id, beyondLimit, 'param', 'REQUEST')
     assert.strictEqual(ret, 'beyond', 'Unexpected value')
-    ret = TaintedUtils.isTainted(id, beyondLimit)
+    ret = TaintedUtils.isTainted(id, ret)
     assert.strictEqual(ret, false, 'Unexpected value')
+  })
+
+  it('One char tainted string must have different instance', function () {
+    const oneChar = 'a'
+    const taintedOneChar = TaintedUtils.newTaintedString(id, oneChar, 'param', 'request')
+    assert.strictEqual(true, TaintedUtils.isTainted(id, taintedOneChar), 'Must be tainted')
+    assert.strictEqual(false, TaintedUtils.isTainted(id, oneChar), 'Can not be tainted')
   })
 })

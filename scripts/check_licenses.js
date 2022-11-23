@@ -22,12 +22,17 @@ const licenses = {
   file: new Set()
 }
 
+/* eslint-disable no-console */
 for (let i = 0; i < csvLines.length; i++) {
   const line = csvLines[i]
   if (index !== 0) {
     const columns = line.split(',')
     const type = columns[0]
     const license = columns[1]
+    if (columns.length > 4) {
+      console.log(`Too many columns in line: ${line}`)
+      process.exit(1)
+    }	  
     if (type && license) {
       licenses[type].add(license)
     }
@@ -42,8 +47,6 @@ if (!requiresOk || !devOk) {
 }
 
 function checkLicenses (typeDeps, type) {
-  /* eslint-disable no-console */
-
   const missing = []
   const extraneous = []
 

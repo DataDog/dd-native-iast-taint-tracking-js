@@ -85,6 +85,7 @@ jobs:
           check_name: junit test report ${{ matrix.target.name }}
 
   cpp-lint:
+    needs: ['check-licenses']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -93,6 +94,7 @@ jobs:
       - run: cpplint --filter=-build/include_subdir --linelength=120 --recursive ./src
 
   js-lint:
+    needs: ['check-licenses']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -101,6 +103,16 @@ jobs:
           node-version: '19'
       - run: npm i --ignore-scripts
       - run: npm run lint
+
+  check-licenses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '19'
+      - run: npm i --ignore-scripts
+      - run: node scripts/check_licenses.js
 
   pack:
     needs:

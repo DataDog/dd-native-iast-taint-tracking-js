@@ -58,7 +58,8 @@ void substring(const FunctionCallbackInfo<Value>& args) {
 
     try {
         uintptr_t subjectPointer = utils::GetLocalStringPointer(vSubject);
-        auto oRanges = transaction->GetRanges(subjectPointer);
+        auto taintedObj = transaction->FindTaintedObject(subjectPointer);
+        auto oRanges = taintedObj ? taintedObj->getRanges() : nullptr;
 
         int substringStart = vSubstringStart->ToInteger(context).ToLocalChecked()->Value();
         int substringEnd = argc > 4 ?
@@ -68,7 +69,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         Local<String> result = vResult->ToString(context).ToLocalChecked();
 
         if (oRanges != nullptr) {
-            auto newRanges = transaction->GetAvailableSharedVector();
+            auto newRanges = transaction->GetSharedVectorRange();
             for (auto it = oRanges->begin(); it != oRanges->end(); ++it) {
                 auto oRange = *it;
                 int rangeEnd = oRange->end - substringStart;
@@ -78,41 +79,42 @@ void substring(const FunctionCallbackInfo<Value>& args) {
 
                 if (substringStart > oRange->start && substringStart < oRange->end) {
                     if (substringStart != 0 || rangeEnd != oRange->end) {
-                        auto newRange = transaction->GetAvailableTaintedRange(0, rangeEnd, oRange->inputInfo);
+                        auto newRange = transaction->GetRange(0, rangeEnd, oRange->inputInfo);
                         if (newRange) {
-                            newRanges->push_back(newRange);
+                            newRanges->PushBack(newRange);
                         } else {
                             break;
                         }
                     } else {
-                        newRanges->push_back(oRange);
+                        newRanges->PushBack(oRange);
                     }
                 } else {
                     if (substringEnd > oRange->start && substringStart < oRange->end) {
                         if (substringStart != 0 || rangeEnd != oRange->end) {
                             int rangeStart = oRange->start - substringStart;
-                            auto newRange = transaction->GetAvailableTaintedRange(rangeStart,
+                            auto newRange = transaction->GetRange(rangeStart,
                                     rangeEnd,
                                     oRange->inputInfo);
                             if (newRange) {
-                                newRanges->push_back(newRange);
+                                newRanges->PushBack(newRange);
                             } else {
                                 break;
                             }
                         } else {
-                            newRanges->push_back(oRange);
+                            newRanges->PushBack(oRange);
                         }
                     }
                 }
             }
 
-            if (newRanges->size()) {
+            if (newRanges->Size()) {
                 auto key = utils::GetLocalStringPointer(vResult);
                 transaction->AddTainted(key, newRanges, vResult);
             }
         }
-    } catch (const tainted::NotAvailableRangeVectorsException& err) {
-        // do nothing, just continue without taint
+    } catch (const std::bad_alloc& err) {
+    } catch (const container::QueuedPoolBadAlloc& err) {
+    } catch (const container::PoolBadAlloc& err) {
     }
 
     args.GetReturnValue().Set(vResult);

@@ -29,6 +29,16 @@ function taintFormattedString (transactionId, formattedString) {
   }, '')
 }
 
+function checkRangesOrder (ranges) {
+  let lastStart = -1
+  ranges.forEach(range => {
+    if (range.start < lastStart) {
+      throw new Error('Ranges must be ordered')
+    }
+    lastStart = range.start
+  })
+}
+
 function formatTaintedValue (transactionId, taintedValue) {
   let offset = 0
   if (!TaintedUtils.isTainted(transactionId, taintedValue)) {
@@ -38,6 +48,7 @@ function formatTaintedValue (transactionId, taintedValue) {
   if (!ranges || ranges.length === 0) {
     return taintedValue
   }
+  checkRangesOrder(ranges)
   return ranges.reduce((formattedString, range) => {
     formattedString =
       formattedString.slice(0, range.start + offset) +

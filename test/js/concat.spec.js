@@ -137,3 +137,59 @@ describe('Plus operator', function () {
     assert.deepEqual(expected, TaintedUtils.getRanges(id, ret))
   })
 })
+
+describe('concat method', () => {
+  const id = '1'
+
+  afterEach(function () {
+    TaintedUtils.removeTransaction(id)
+  })
+  
+  it('taints multiple operands', function () {
+    const op1 = 'hello'
+    const op2 = ' '
+    const op3 = 'world'
+    const op4 = TaintedUtils.newTaintedString(id, ' :)', 'param', 'REQUEST')
+    const res = op1.concat(op2, op3, op4)
+    const ret = TaintedUtils.concat(id, res, op1, op2, op3, op4)
+
+    assert.equal(res, ret, 'Unexpected vale')
+    assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
+  })
+
+  it('does not taint multiple operands if any is tainted', function () {
+    const op1 = 'hello'
+    const op2 = ' '
+    const op3 = 'world'
+    const op4 = ' :)'
+    const res = op1.concat(op2, op3, op4)
+    const ret = TaintedUtils.concat(id, res, op1, op2, op3, op4)
+
+    assert.equal(res, ret, 'Unexpected vale')
+    assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
+  })
+
+  it('taints multiple operands with one them undefined', function () {
+    const op1 = 'hello'
+    const op2 = undefined
+    const op3 = 'world'
+    const op4 = TaintedUtils.newTaintedString(id, ' :)', 'param', 'REQUEST')
+    const res = op1.concat(op2, op3, op4)
+    const ret = TaintedUtils.concat(id, res, op1, op2, op3, op4)
+
+    assert.equal(res, ret, 'Unexpected vale')
+    assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
+  })
+
+  it('taints multiple operands with one them null', function () {
+    const op1 = 'hello'
+    const op2 = null
+    const op3 = 'world'
+    const op4 = TaintedUtils.newTaintedString(id, ' :)', 'param', 'REQUEST')
+    const res = op1.concat(op2, op3, op4)
+    const ret = TaintedUtils.concat(id, res, op1, op2, op3, op4)
+
+    assert.equal(res, ret, 'Unexpected vale')
+    assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
+  })
+})

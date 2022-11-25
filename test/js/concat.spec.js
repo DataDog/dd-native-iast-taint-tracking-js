@@ -144,7 +144,7 @@ describe('concat method', () => {
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
   })
-  
+
   it('taints multiple operands', function () {
     const op1 = 'hello'
     const op2 = ' '

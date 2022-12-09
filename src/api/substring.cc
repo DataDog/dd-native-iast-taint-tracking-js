@@ -12,6 +12,7 @@
 #include "../iastlimits.h"
 #include "../tainted/range.h"
 #include "../tainted/transaction.h"
+#include "../tainted/string_resource.h"
 #include "../iast.h"
 
 
@@ -26,14 +27,16 @@ using v8::String;
 using v8::Value;
 
 using iast::tainted::Range;
+using iast::utils::GetLocalStringPointer;
 
 namespace iast {
 namespace api {
 void substring(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
     auto context = isolate->GetCurrentContext();
+    int argc = args.Length();
 
-    if (args.Length() < 4) {
+    if (argc < 4) {
         isolate->ThrowException(v8::Exception::TypeError(
                         v8::String::NewFromUtf8(isolate,
                         "Wrong number of arguments",
@@ -41,40 +44,49 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
+    auto result = args[1];
+    auto subject = args[2];
+    auto start = args[3];
+    auto end = args[4];
 
-    int argc = args.Length();
-
-    auto transactionId = utils::GetLocalStringPointer(args[0]);
-    auto vSubject = args[1];
-    auto vResult = args[2];
-    auto vSubstringStart = args[3];
-    auto vSubstringEnd = args[4];
-
-    auto transaction = GetTransaction(transactionId);
+    auto transaction = GetTransaction(GetLocalStringPointer(args[0]));
     if (transaction == nullptr) {
-        args.GetReturnValue().Set(vResult);
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
+    if (Local<String>::Cast(subject)->Length() <= 1) {
+        args.GetReturnValue().Set(result);
         return;
     }
 
     try {
-        uintptr_t subjectPointer = utils::GetLocalStringPointer(vSubject);
+        uintptr_t subjectPointer = GetLocalStringPointer(subject);
         auto taintedObj = transaction->FindTaintedObject(subjectPointer);
         auto oRanges = taintedObj ? taintedObj->getRanges() : nullptr;
 
-        int substringStart = vSubstringStart->ToInteger(context).ToLocalChecked()->Value();
+        int substringStart = start->ToInteger(context).ToLocalChecked()->Value();
         int substringEnd = argc > 4 ?
-            vSubstringEnd->ToInteger(context).ToLocalChecked()->Value() :
-            vSubject->ToString(context).ToLocalChecked()->Length();
+            end->ToInteger(context).ToLocalChecked()->Value() :
+            subject->ToString(context).ToLocalChecked()->Length();
 
-        Local<String> result = vResult->ToString(context).ToLocalChecked();
+        Local<String> stringResult = result->ToString(context).ToLocalChecked();
 
         if (oRanges != nullptr) {
             auto newRanges = transaction->GetSharedVectorRange();
             for (auto it = oRanges->begin(); it != oRanges->end(); ++it) {
                 auto oRange = *it;
+                if (oRange->start >= substringEnd) {
+                    break;
+                }
+
+                if (oRange->end <= substringStart) {
+                    continue;
+                }
+
                 int rangeEnd = oRange->end - substringStart;
-                if (rangeEnd > result->Length()) {
-                    rangeEnd = result->Length();
+                if (rangeEnd > stringResult->Length()) {
+                    rangeEnd = stringResult->Length();
                 }
 
                 if (substringStart > oRange->start && substringStart < oRange->end) {
@@ -108,8 +120,12 @@ void substring(const FunctionCallbackInfo<Value>& args) {
             }
 
             if (newRanges->Size()) {
-                auto key = utils::GetLocalStringPointer(vResult);
-                transaction->AddTainted(key, newRanges, vResult);
+                // Uninternalize string
+                if (Local<String>::Cast(result)->Length() == 1) {
+                   result = tainted::NewExternalString(isolate, result);
+                }
+                auto key = GetLocalStringPointer(result);
+                transaction->AddTainted(key, newRanges, result);
             }
         }
     } catch (const std::bad_alloc& err) {
@@ -117,7 +133,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
     } catch (const container::PoolBadAlloc& err) {
     }
 
-    args.GetReturnValue().Set(vResult);
+    args.GetReturnValue().Set(result);
 }
 
 

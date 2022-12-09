@@ -23,7 +23,7 @@ describe('Substring method', function () {
     const end = op1.length
 
     const res = op1.substring(start, end)
-    const ret = TaintedUtils.substring(id, op1, res, start, end)
+    const ret = TaintedUtils.substring(id, res, op1, start, end)
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   })
@@ -39,7 +39,7 @@ describe('Substring method', function () {
 
     let ret = res.substring(start, start)
 
-    ret = TaintedUtils.substring(id, op1, ret, start, res.length)
+    ret = TaintedUtils.substring(id, ret, op1, start, res.length)
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   })
 
@@ -53,7 +53,7 @@ describe('Substring method', function () {
     assert.equal(true, TaintedUtils.isTainted(id, op1), 'Unexpected value')
 
     const res = op1.substring(start, end)
-    const ret = TaintedUtils.substring(id, op1, res, start, end)
+    const ret = TaintedUtils.substring(id, res, op1, start, end)
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   })
@@ -82,7 +82,7 @@ describe('Substring method', function () {
     assert.strictEqual(op1, 'hello', 'Unexpected value')
     assert.equal(true, TaintedUtils.isTainted(id, op1), 'Unexpected value')
 
-    const ret = TaintedUtils.substring(id, op1, res, start, end)
+    const ret = TaintedUtils.substring(id, res, op1, start, end)
 
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
@@ -100,7 +100,7 @@ describe('Substring method', function () {
     assert.strictEqual(op1, 'hello', 'Unexpected value')
     assert.equal(true, TaintedUtils.isTainted(id, op1), 'Unexpected value')
 
-    const ret = TaintedUtils.substring(id, op1, res, start, end)
+    const ret = TaintedUtils.substring(id, res, op1, start, end)
 
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')

@@ -31,7 +31,7 @@ for (let i = 0; i < csvLines.length; i++) {
     const license = columns[1]
     if (columns.length > 4) {
       console.log(`Too many columns in line: ${line}`)
-    }	  
+    }
     if (type && license) {
       licenses[type].add(license)
     }

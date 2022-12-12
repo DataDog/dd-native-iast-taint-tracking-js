@@ -3,8 +3,54 @@
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
 
-const { TaintedUtils } = require('./util')
+const { TaintedUtils, taintFormattedString, formatTaintedValue } = require('./util')
 const assert = require('assert')
+
+const rangesTestCases = [
+  {
+    string: ':+-foobar-+:',
+    start: 0,
+    end: 3,
+    result: ':+-foo-+:'
+  },
+  {
+    string: ':+-foo-+:bar',
+    start: 3,
+    end: 6,
+    result: 'bar'
+  },
+  {
+    string: ':+-foo-+:bar',
+    start: 0,
+    end: 2,
+    result: ':+-fo-+:'
+  },
+  {
+    string: ':+-foo-+:bar',
+    start: 1,
+    end: 4,
+    result: ':+-oo-+:b'
+  },
+  {
+    string: ':+-foo-+:bar:+-baz-+:',
+    start: 3,
+    end: 8,
+    result: 'bar:+-ba-+:'
+  }
+]
+
+function substringCheckRanges (id, testString, start, end, expected) {
+  const inputString = taintFormattedString(id, testString)
+  assert.equal(TaintedUtils.isTainted(id, inputString), true, 'Not tainted')
+  const res = inputString.substring(start, end)
+
+  assert.equal(TaintedUtils.isTainted(id, inputString), true, 'Not tainted')
+  const ret = TaintedUtils.substring(id, res, inputString, start, end)
+  assert.equal(res, ret, 'Unexpected value')
+
+  const formattedResult = formatTaintedValue(id, ret)
+  assert.equal(formattedResult, expected, 'Unexpected ranges')
+}
 
 describe('Substring method', function () {
   const id = '1'
@@ -104,5 +150,14 @@ describe('Substring method', function () {
 
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
+  })
+})
+
+describe('Check Ranges format', function () {
+  const id = '1'
+  rangesTestCases.forEach(({ string, start, end, result }) => {
+    it(`Test ${string}`, function () {
+      substringCheckRanges(id, string, start, end, result)
+    })
   })
 })

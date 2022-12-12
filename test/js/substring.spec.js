@@ -44,7 +44,6 @@ function substringCheckRanges (id, testString, start, end, expected) {
   assert.equal(TaintedUtils.isTainted(id, inputString), true, 'Not tainted')
   const res = inputString.substring(start, end)
 
-  assert.equal(TaintedUtils.isTainted(id, inputString), true, 'Not tainted')
   const ret = TaintedUtils.substring(id, res, inputString, start, end)
   assert.equal(res, ret, 'Unexpected value')
 

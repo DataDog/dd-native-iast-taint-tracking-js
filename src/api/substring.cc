@@ -85,8 +85,9 @@ void substring(const FunctionCallbackInfo<Value>& args) {
                 }
 
                 int rangeEnd = oRange->end - substringStart;
-                if (rangeEnd > stringResult->Length()) {
-                    rangeEnd = stringResult->Length();
+                auto stringLen = stringResult->Length();
+                if (rangeEnd > stringLen) {
+                    rangeEnd = stringLen;
                 }
 
                 if (substringStart > oRange->start && substringStart < oRange->end) {

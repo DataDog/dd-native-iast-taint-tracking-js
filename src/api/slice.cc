@@ -20,7 +20,6 @@ using v8::Isolate;
 using v8::String;
 using v8::NewStringType;
 using v8::Exception;
-
 using utils::GetLocalStringPointer;
 
 SharedRanges* getRangesInSlice(Transaction* transaction, SharedRanges* oRanges, int sliceStart, int sliceEnd) {
@@ -81,7 +80,6 @@ void slice(const FunctionCallbackInfo<Value>& args) {
     auto vResult = args[1];
     auto vSubject = args[2];
     int sliceStart = args[3]->IntegerValue(context).FromJust();
-
 
     Transaction* transaction = GetTransaction(GetLocalStringPointer(args[0]));
     if (transaction == nullptr) {

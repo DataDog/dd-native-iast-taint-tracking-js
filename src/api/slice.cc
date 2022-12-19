@@ -9,7 +9,6 @@
 #include "../iast.h"
 #include "v8.h"
 
-
 namespace iast {
 namespace api {
 
@@ -18,6 +17,9 @@ using v8::Object;
 using v8::Local;
 using v8::Value;
 using v8::Isolate;
+using v8::String;
+using v8::NewStringType;
+using v8::Exception;
 
 using utils::GetLocalStringPointer;
 
@@ -68,10 +70,10 @@ void slice(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
     if (args.Length() < 4) {
-        isolate->ThrowException(v8::Exception::TypeError(
-                        v8::String::NewFromUtf8(isolate,
+        isolate->ThrowException(Exception::TypeError(
+                        String::NewFromUtf8(isolate,
                         "Wrong number of arguments",
-                        v8::NewStringType::kNormal).ToLocalChecked()));
+                        NewStringType::kNormal).ToLocalChecked()));
         return;
     }
 
@@ -80,10 +82,10 @@ void slice(const FunctionCallbackInfo<Value>& args) {
     auto vSubject = args[2];
     int sliceStart = args[3]->IntegerValue(context).FromJust();
 
-    args.GetReturnValue().Set(vResult);
 
     Transaction* transaction = GetTransaction(GetLocalStringPointer(args[0]));
     if (transaction == nullptr) {
+        args.GetReturnValue().Set(vResult);
         return;
     }
 
@@ -91,12 +93,13 @@ void slice(const FunctionCallbackInfo<Value>& args) {
     auto oRanges = taintedObj ? taintedObj->getRanges() : nullptr;
 
     if (!oRanges) {
+        args.GetReturnValue().Set(vResult);
         return;
     }
 
     try {
-        int subjectLength = v8::Local<v8::String>::Cast(vSubject)->Length();
-        int resultLength = v8::Local<v8::String>::Cast(vResult)->Length();
+        int subjectLength = Local<String>::Cast(vSubject)->Length();
+        int resultLength = Local<String>::Cast(vResult)->Length();
         int sliceEnd = args.Length() > 4 ? args[4]->IntegerValue(context).FromJust() : subjectLength;
         sliceStart = sliceStart < 0 ? subjectLength + sliceStart : sliceStart;
         sliceEnd = sliceEnd < 0 ? subjectLength + sliceEnd : sliceEnd;
@@ -104,7 +107,6 @@ void slice(const FunctionCallbackInfo<Value>& args) {
         if (newRanges && newRanges->Size() > 0) {
             if (resultLength == 1) {
                 vResult = tainted::NewExternalString(isolate, args[1]);
-                args.GetReturnValue().Set(vResult);
             }
             transaction->AddTainted(GetLocalStringPointer(vResult), newRanges, vResult);
         }
@@ -112,6 +114,8 @@ void slice(const FunctionCallbackInfo<Value>& args) {
     } catch (const container::QueuedPoolBadAlloc& err) {
     } catch (const container::PoolBadAlloc& err) {
     }
+
+    args.GetReturnValue().Set(vResult);
 }
 
 

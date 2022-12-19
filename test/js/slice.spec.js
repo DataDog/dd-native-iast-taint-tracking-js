@@ -17,6 +17,12 @@ describe('Slice', function () {
     },
     {
       source: ':+-foobarbaz-+:',
+      result: ':+-bar-+:',
+      start: -6,
+      end: -3
+    },
+    {
+      source: ':+-foobarbaz-+:',
       result: ':+-foo-+:',
       start: -9,
       end: 3
@@ -75,10 +81,28 @@ describe('Slice', function () {
       end: 9
     },
     {
+      source: 'foo:+-bar-+:b:+-a-+:z',
+      result: 'b:+-a-+:z',
+      start: 6,
+      end: 15
+    },
+    {
       source: 'foo:+-bar-+:b:+-a-+:z:+-z-+::+-z-+:',
       result: 'b:+-a-+:z',
       start: 6,
       end: 9
+    },
+    {
+      source: 'foo:+-bar-+:b:+-a-+:z:+-z-+::+-z-+:',
+      result: 'b:+-a-+:z:+-z-+:',
+      start: 6,
+      end: 10
+    },
+    {
+      source: 'foo:+-bar-+:b:+-a-+:z:+-z-+::+-z-+:',
+      result: 'b:+-a-+:z:+-z-+::+-z-+:',
+      start: 6,
+      end: 20
     }
   ]
 
@@ -109,6 +133,17 @@ describe('Slice', function () {
     const ret = TaintedUtils.slice(id, res, str, 0, 3)
     assert.strictEqual(ret, res, 'Unexpected value')
     assert.strictEqual(TaintedUtils.isTainted(id, ret), true, 'Unexpected value')
+  })
+
+  it('1 character long', function () {
+    let str = 'foobar'
+    str = TaintedUtils.newTaintedString(id, str, 'param', 'REQUEST')
+    const res = str.slice(0, 1)
+    const ret = TaintedUtils.slice(id, res, str, 0, 1)
+
+    assert.strictEqual(ret, res, 'Unexpected value')
+    assert.strictEqual(TaintedUtils.isTainted(id, ret), true, 'Unexpected value')
+    assert.strictEqual(TaintedUtils.isTainted(id, res), false, 'Unexpected value')
   })
 
   describe('Range test cases', function () {

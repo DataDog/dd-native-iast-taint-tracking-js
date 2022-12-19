@@ -5,6 +5,7 @@
             "sources": [
                 "./src/gc/gc.cc",
                 "./src/utils/jsobject_utils.cc",
+                "./src/utils/propagation.cc",
                 "./src/tainted/input_info.cc",
                 "./src/tainted/range.cc",
                 "./src/tainted/tainted_object.cc",

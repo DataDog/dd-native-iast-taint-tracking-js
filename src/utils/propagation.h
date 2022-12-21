@@ -8,6 +8,9 @@
 #include "../tainted/tainted_object.h"
 #include "../tainted/transaction.h"
 
+#define MAX(x,y) ((x > y) ? x : y)
+#define MIN(x,y) ((x < y) ? x : y)
+
 namespace iast {
 namespace utils {
 using tainted::Transaction;

@@ -36,6 +36,9 @@ try {
     },
     substring (transaction, result) {
       return result
+    },
+    substr (transaction, result) {
+      return result
     }
   }
 }
@@ -50,7 +53,8 @@ const iastNativeMethods = {
   trim: addon.trim,
   trimEnd: addon.trimEnd,
   slice: addon.slice,
-  substring: addon.substring
+  substring: addon.substring,
+  substr: addon.substr
 }
 
 module.exports = iastNativeMethods

@@ -9,7 +9,7 @@ const assert = require('assert')
 const rangesTestCases = [
   {
     source: ':+-foobarbaz-+:',
-    result: ':+-foo-+:',
+    result: '',
     start: 3,
     end: 0
   },
@@ -27,7 +27,7 @@ const rangesTestCases = [
   },
   {
     source: ':+-foobarbaz-+:',
-    result: ':+-foo-+:',
+    result: ':+-bar-+:',
     start: -6,
     end: 3
   },
@@ -39,7 +39,7 @@ const rangesTestCases = [
   },
   {
     source: ':+-foobarbaz-+:',
-    result: ':+-bar-+:',
+    result: ':+-barbaz-+:',
     start: 3,
     end: 6
   },
@@ -62,7 +62,7 @@ const rangesTestCases = [
   },
   {
     source: 'foo:+-bar-+:baz',
-    result: 'oo:+-ba-+:',
+    result: 'oo:+-bar-+:',
     start: 1,
     end: 5
   },
@@ -98,13 +98,13 @@ const rangesTestCases = [
   },
   {
     source: 'foo:+-bar-+:b:+-a-+:z:+-z-+::+-z-+:',
-    result: 'b:+-a-+:z',
+    result: 'b:+-a-+:z:+-z-+::+-z-+:',
     start: 6,
     end: 9
   },
   {
     source: 'foo:+-bar-+:b:+-a-+:z:+-z-+::+-z-+:',
-    result: 'b:+-a-+:z:+-z-+:',
+    result: 'b:+-a-+:z:+-z-+::+-z-+:',
     start: 6,
     end: 10
   },
@@ -119,9 +119,9 @@ const rangesTestCases = [
 function substringCheckRanges (id, testString, start, end, expected) {
   const inputString = taintFormattedString(id, testString)
   assert.equal(TaintedUtils.isTainted(id, inputString), true, 'Not tainted')
-  const res = inputString.substring(start, end)
+  const res = inputString.substr(start, end)
 
-  const ret = TaintedUtils.substring(id, res, inputString, start, end)
+  const ret = TaintedUtils.substr(id, res, inputString, start, end)
   assert.equal(res, ret, 'Unexpected value')
 
   const formattedResult = formatTaintedValue(id, ret)
@@ -136,7 +136,7 @@ describe('Substring method', function () {
   })
 
   it('Wrong arguments', function () {
-    assert.throws(function () { TaintedUtils.substring(id) }, Error)
+    assert.throws(function () { TaintedUtils.substr(id) }, Error)
   })
 
   it('String not tainted', function () {
@@ -144,8 +144,8 @@ describe('Substring method', function () {
     const start = 1
     const end = op1.length
 
-    const res = op1.substring(start, end)
-    const ret = TaintedUtils.substring(id, res, op1, start, end)
+    const res = op1.substr(start, end)
+    const ret = TaintedUtils.substr(id, res, op1, start, end)
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   })
@@ -159,9 +159,9 @@ describe('Substring method', function () {
 
     const res = TaintedUtils.concat(id, op1 + op2, op1, op2)
 
-    let ret = res.substring(start, start)
+    let ret = res.substr(start, start)
 
-    ret = TaintedUtils.substring(id, ret, op1, start, res.length)
+    ret = TaintedUtils.substr(id, ret, op1, start, res.length)
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   })
 
@@ -174,8 +174,8 @@ describe('Substring method', function () {
     assert.strictEqual(op1, 'hello', 'Unexpected value')
     assert.equal(true, TaintedUtils.isTainted(id, op1), 'Unexpected value')
 
-    const res = op1.substring(start, end)
-    const ret = TaintedUtils.substring(id, res, op1, start, end)
+    const res = op1.substr(start, end)
+    const ret = TaintedUtils.substr(id, res, op1, start, end)
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   })
@@ -185,7 +185,7 @@ describe('Substring method', function () {
     const start = 1
     const end = op1.length
 
-    const res = op1.substring(1, end)
+    const res = op1.substr(1, end)
 
     const expected = [
       {
@@ -204,7 +204,7 @@ describe('Substring method', function () {
     assert.strictEqual(op1, 'hello', 'Unexpected value')
     assert.equal(true, TaintedUtils.isTainted(id, op1), 'Unexpected value')
 
-    const ret = TaintedUtils.substring(id, res, op1, start, end)
+    const ret = TaintedUtils.substr(id, res, op1, start, end)
 
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
@@ -216,13 +216,13 @@ describe('Substring method', function () {
     const start = op1.length
     const end = op1.length
 
-    const res = op1.substring(start, end)
+    const res = op1.substr(start, end)
 
     op1 = TaintedUtils.newTaintedString(id, op1, 'param', 'REQUEST')
     assert.strictEqual(op1, 'hello', 'Unexpected value')
     assert.equal(true, TaintedUtils.isTainted(id, op1), 'Unexpected value')
 
-    const ret = TaintedUtils.substring(id, res, op1, start, end)
+    const ret = TaintedUtils.substr(id, res, op1, start, end)
 
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')

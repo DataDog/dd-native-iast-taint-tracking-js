@@ -14,8 +14,11 @@
 #include "../tainted/transaction.h"
 #include "../tainted/string_resource.h"
 #include "../iast.h"
+#include "../utils/propagation.h"
+#include "v8.h"
 
-
+#define TO_V8STRING(arg) (v8::Local<v8::String>::Cast(arg))
+#define TO_INTEGER_VALUE(arg, v8_ctx) (arg->IntegerValue(v8_ctx).FromJust())
 
 using v8::Exception;
 using v8::FunctionCallbackInfo;
@@ -26,8 +29,8 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 
-using iast::tainted::Range;
 using iast::utils::GetLocalStringPointer;
+using iast::utils::getRangesInSlice;
 
 namespace iast {
 namespace api {
@@ -37,17 +40,89 @@ void substring(const FunctionCallbackInfo<Value>& args) {
     int argc = args.Length();
 
     if (argc < 4) {
-        isolate->ThrowException(v8::Exception::TypeError(
-                        v8::String::NewFromUtf8(isolate,
+        isolate->ThrowException(Exception::TypeError(
+                        String::NewFromUtf8(isolate,
                         "Wrong number of arguments",
-                        v8::NewStringType::kNormal).ToLocalChecked()));
+                        NewStringType::kNormal).ToLocalChecked()));
         return;
     }
 
     auto result = args[1];
     auto subject = args[2];
-    auto start = args[3];
-    auto end = args[4];
+    int resultLen = TO_V8STRING(result)->Length();
+    int subjectLen = TO_V8STRING(subject)->Length();
+    int start = TO_INTEGER_VALUE(args[3], context);
+    int end = subjectLen;
+    if (argc > 4) {
+        end = TO_INTEGER_VALUE(args[4], context);
+    }
+
+    if (resultLen == 0) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+    auto transaction = GetTransaction(GetLocalStringPointer(args[0]));
+    if (transaction == nullptr) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
+    if (subjectLen <= 1) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
+    auto taintedObj = transaction->FindTaintedObject(GetLocalStringPointer(subject));
+    if (!taintedObj) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
+    try {
+        start = MAX(start, 0);
+        auto newRanges = getRangesInSlice(transaction, taintedObj, MIN(start,end), MAX(start,end));
+        if (newRanges && newRanges->Size() > 0) {
+            if (resultLen == 1) {
+                result = tainted::NewExternalString(isolate, args[1]);
+            }
+            transaction->AddTainted(GetLocalStringPointer(result), newRanges, result);
+        }
+
+    } catch (const std::bad_alloc& err) {
+    } catch (const container::QueuedPoolBadAlloc& err) {
+    } catch (const container::PoolBadAlloc& err) {
+    }
+
+    args.GetReturnValue().Set(result);
+}
+
+void substr(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    auto context = isolate->GetCurrentContext();
+    int argc = args.Length();
+
+    if (argc < 4) {
+        isolate->ThrowException(Exception::TypeError(
+                        String::NewFromUtf8(isolate,
+                        "Wrong number of arguments",
+                        NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+
+    auto result = args[1];
+    int resultLen = TO_V8STRING(result)->Length();
+    if (resultLen == 0) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
+    auto subject = args[2];
+    int subjectLen = TO_V8STRING(subject)->Length();
+    int start = TO_INTEGER_VALUE(args[3], context);
+    int end = subjectLen;
+    if (argc > 4) {
+        end = TO_INTEGER_VALUE(args[4], context);
+    }
 
     auto transaction = GetTransaction(GetLocalStringPointer(args[0]));
     if (transaction == nullptr) {
@@ -55,80 +130,29 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    if (Local<String>::Cast(subject)->Length() <= 1) {
+    if (subjectLen <= 1) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
+    auto taintedObj = transaction->FindTaintedObject(GetLocalStringPointer(subject));
+    if (!taintedObj) {
         args.GetReturnValue().Set(result);
         return;
     }
 
     try {
-        uintptr_t subjectPointer = GetLocalStringPointer(subject);
-        auto taintedObj = transaction->FindTaintedObject(subjectPointer);
-        auto oRanges = taintedObj ? taintedObj->getRanges() : nullptr;
+        start = (start >= 0) ? start : subjectLen + start;
+        end = ((start + end) >= subjectLen) ? subjectLen : start + end;
 
-        int substringStart = start->ToInteger(context).ToLocalChecked()->Value();
-        int substringEnd = argc > 4 ?
-            end->ToInteger(context).ToLocalChecked()->Value() :
-            subject->ToString(context).ToLocalChecked()->Length();
-
-        Local<String> stringResult = result->ToString(context).ToLocalChecked();
-
-        if (oRanges != nullptr) {
-            auto newRanges = transaction->GetSharedVectorRange();
-            for (auto it = oRanges->begin(); it != oRanges->end(); ++it) {
-                auto oRange = *it;
-                if (oRange->start >= substringEnd) {
-                    break;
-                }
-
-                if (oRange->end <= substringStart) {
-                    continue;
-                }
-
-                int rangeEnd = oRange->end - substringStart;
-                auto stringLen = stringResult->Length();
-                if (rangeEnd > stringLen) {
-                    rangeEnd = stringLen;
-                }
-
-                if (substringStart > oRange->start && substringStart < oRange->end) {
-                    if (substringStart != 0 || rangeEnd != oRange->end) {
-                        auto newRange = transaction->GetRange(0, rangeEnd, oRange->inputInfo);
-                        if (newRange) {
-                            newRanges->PushBack(newRange);
-                        } else {
-                            break;
-                        }
-                    } else {
-                        newRanges->PushBack(oRange);
-                    }
-                } else {
-                    if (substringEnd > oRange->start && substringStart < oRange->end) {
-                        if (substringStart != 0 || rangeEnd != oRange->end) {
-                            int rangeStart = oRange->start - substringStart;
-                            auto newRange = transaction->GetRange(rangeStart,
-                                    rangeEnd,
-                                    oRange->inputInfo);
-                            if (newRange) {
-                                newRanges->PushBack(newRange);
-                            } else {
-                                break;
-                            }
-                        } else {
-                            newRanges->PushBack(oRange);
-                        }
-                    }
-                }
+        auto newRanges = getRangesInSlice(transaction, taintedObj, start, end);
+        if (newRanges && newRanges->Size() > 0) {
+            if (resultLen == 1) {
+                result = tainted::NewExternalString(isolate, args[1]);
             }
-
-            if (newRanges->Size()) {
-                // Uninternalize string
-                if (Local<String>::Cast(result)->Length() == 1) {
-                   result = tainted::NewExternalString(isolate, result);
-                }
-                auto key = GetLocalStringPointer(result);
-                transaction->AddTainted(key, newRanges, result);
-            }
+            transaction->AddTainted(GetLocalStringPointer(result), newRanges, result);
         }
+
     } catch (const std::bad_alloc& err) {
     } catch (const container::QueuedPoolBadAlloc& err) {
     } catch (const container::PoolBadAlloc& err) {
@@ -140,6 +164,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
 
 void Substring::Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "substring", substring);
+    NODE_SET_METHOD(exports, "substr", substr);
 }
 
 }   // namespace api

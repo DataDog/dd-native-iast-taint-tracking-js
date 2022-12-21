@@ -13,6 +13,7 @@
                 "./src/api/string_methods.cc",
                 "./src/api/concat.cc",
                 "./src/api/trim.cc",
+                "./src/api/slice.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

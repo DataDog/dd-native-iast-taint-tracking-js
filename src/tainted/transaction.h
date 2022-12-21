@@ -5,7 +5,8 @@
 #ifndef SRC_TAINTED_TRANSACTION_H_
 #define SRC_TAINTED_TRANSACTION_H_
 
-#include <cstddef>
+#include <stdint.h>
+#include <node.h>
 #include <cstdint>
 #include <map>
 #include <queue>

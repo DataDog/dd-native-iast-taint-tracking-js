@@ -11,5 +11,8 @@ describe('Addon loading', function () {
     assert(TaintedUtils.newTaintedString, 'Undefined')
     assert(TaintedUtils.isTainted, 'Undefined')
     assert(TaintedUtils.concat, 'Undefined')
+    assert(TaintedUtils.trim, 'Undefined')
+    assert(TaintedUtils.trimEnd, 'Undefined')
+    assert(TaintedUtils.slice, 'Undefined')
   })
 })

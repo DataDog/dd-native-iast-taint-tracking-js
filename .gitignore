@@ -47,3 +47,13 @@ test/cpputest/results/
 
 #prebuilded native images
 prebuilds/
+
+#CMake artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+#Debug files
+crash.log

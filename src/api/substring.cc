@@ -80,14 +80,13 @@ void substring(const FunctionCallbackInfo<Value>& args) {
 
     try {
         start = MAX(start, 0);
-        auto newRanges = getRangesInSlice(transaction, taintedObj, MIN(start,end), MAX(start,end));
+        auto newRanges = getRangesInSlice(transaction, taintedObj, MIN(start, end), MAX(start, end));
         if (newRanges && newRanges->Size() > 0) {
             if (resultLen == 1) {
                 result = tainted::NewExternalString(isolate, args[1]);
             }
             transaction->AddTainted(GetLocalStringPointer(result), newRanges, result);
         }
-
     } catch (const std::bad_alloc& err) {
     } catch (const container::QueuedPoolBadAlloc& err) {
     } catch (const container::PoolBadAlloc& err) {
@@ -152,7 +151,6 @@ void substr(const FunctionCallbackInfo<Value>& args) {
             }
             transaction->AddTainted(GetLocalStringPointer(result), newRanges, result);
         }
-
     } catch (const std::bad_alloc& err) {
     } catch (const container::QueuedPoolBadAlloc& err) {
     } catch (const container::PoolBadAlloc& err) {

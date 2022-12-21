@@ -3,13 +3,13 @@
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
 #ifndef SRC_UTILS_PROPAGATION_H_
-#define SRC_API_SLICE_H_
+#define SRC_UTILS_PROPAGATION_H_
 
 #include "../tainted/tainted_object.h"
 #include "../tainted/transaction.h"
 
-#define MAX(x,y) ((x > y) ? x : y)
-#define MIN(x,y) ((x < y) ? x : y)
+#define MAX(x, y) ((x > y) ? x : y)
+#define MIN(x, y) ((x < y) ? x : y)
 
 namespace iast {
 namespace utils {

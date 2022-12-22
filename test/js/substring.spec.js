@@ -116,18 +116,6 @@ const rangesTestCases = [
   }
 ]
 
-function substringCheckRanges (id, testString, start, end, expected) {
-  const inputString = taintFormattedString(id, testString)
-  assert.equal(TaintedUtils.isTainted(id, inputString), true, 'Not tainted')
-  const res = inputString.substring(start, end)
-
-  const ret = TaintedUtils.substring(id, res, inputString, start, end)
-  assert.equal(res, ret, 'Unexpected value')
-
-  const formattedResult = formatTaintedValue(id, ret)
-  assert.equal(formattedResult, expected, 'Unexpected ranges')
-}
-
 describe('Substring method', function () {
   const id = '1'
 
@@ -236,7 +224,15 @@ describe('Check Ranges format', function () {
   const id = '1'
   rangesTestCases.forEach(({ source, start, end, result }) => {
     it(`Test ${source}`, function () {
-      substringCheckRanges(id, source, start, end, result)
+      const inputString = taintFormattedString(id, source)
+      assert.equal(TaintedUtils.isTainted(id, inputString), true, 'Not tainted')
+      const res = inputString.substring(start, end)
+
+      const ret = TaintedUtils.substring(id, res, inputString, start, end)
+      assert.equal(res, ret, 'Unexpected value')
+
+      const formattedResult = formatTaintedValue(id, ret)
+      assert.equal(formattedResult, result, 'Unexpected ranges')
     })
   })
 })

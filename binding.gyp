@@ -5,6 +5,7 @@
             "sources": [
                 "./src/gc/gc.cc",
                 "./src/utils/jsobject_utils.cc",
+                "./src/utils/propagation.cc",
                 "./src/tainted/input_info.cc",
                 "./src/tainted/range.cc",
                 "./src/tainted/tainted_object.cc",
@@ -14,6 +15,7 @@
                 "./src/api/concat.cc",
                 "./src/api/trim.cc",
                 "./src/api/slice.cc",
+                "./src/api/substring.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

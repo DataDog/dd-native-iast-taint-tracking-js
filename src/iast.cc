@@ -14,6 +14,7 @@
 #include "api/trim.h"
 #include "api/slice.h"
 #include "api/substring.h"
+#include "api/replace.h"
 
 using transactionManger = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction,
       iast::tainted::transaction_key_t>>;
@@ -42,6 +43,7 @@ void Init(v8::Local<v8::Object> exports) {
     api::TrimOperations::Init(exports);
     api::SliceOperations::Init(exports);
     api::Substring::Init(exports);
+    api::ReplaceOperations::Init(exports);
     exports->GetIsolate()->AddGCEpilogueCallback(iast::gc::OnScavenge, v8::GCType::kGCTypeScavenge);
     exports->GetIsolate()->AddGCEpilogueCallback(iast::gc::OnMarkSweepCompact, v8::GCType::kGCTypeMarkSweepCompact);
 }

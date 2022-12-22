@@ -2,7 +2,7 @@
  * Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
  * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
  **/
-const { TaintedUtils } = require('./util')
+const { TaintedUtils, taintFormattedString, formatTaintedValue } = require('./util')
 const assert = require('assert')
 
 describe('Plus operator', function () {
@@ -145,51 +145,74 @@ describe('concat method', () => {
     TaintedUtils.removeTransaction(id)
   })
 
-  it('taints multiple operands', function () {
-    const op1 = 'hello'
-    const op2 = ' '
-    const op3 = 'world'
-    const op4 = TaintedUtils.newTaintedString(id, ' :)', 'param', 'REQUEST')
-    const res = op1.concat(op2, op3, op4)
-    const ret = TaintedUtils.concat(id, res, op1, op2, op3, op4)
+  const rangesTestCases = [
+    {
+      testStrings: [':+-A-+:', 'B', 'C'],
+      result: ':+-A-+:BC'
+    },
+    {
+      testStrings: ['A', ':+-B-+:', 'C'],
+      result: 'A:+-B-+:C'
+    },
+    {
+      testStrings: ['A', 'B', ':+-C-+:'],
+      result: 'AB:+-C-+:'
+    },
+    {
+      testStrings: ['A', '�', ':+-C-+:'],
+      result: 'A�:+-C-+:'
+    },
+    {
+      testStrings: ['A', null, ':+-C-+:'],
+      result: 'Anull:+-C-+:'
+    },
+    {
+      testStrings: ['A', undefined, ':+-C-+:'],
+      result: 'Aundefined:+-C-+:'
+    },
+    {
+      testStrings: ['A', 'B', 'C'],
+      result: 'ABC',
+      tainted: false
+    },
+    {
+      testStrings: [':+-A-+:', 'B', ':+-C-+:'],
+      result: ':+-A-+:B:+-C-+:'
+    },
+    {
+      testStrings: [':+-A-+:', ':+-B-+:', 'C'],
+      result: ':+-A-+::+-B-+:C'
+    },
+    {
+      testStrings: [':+-A-+: BC :+-D-+:', ':+-E-+:', 'F'],
+      result: ':+-A-+: BC :+-D-+::+-E-+:F'
+    },
+    {
+      testStrings: [':+-A-+: ���', ':+-B-+:', 'C'],
+      result: ':+-A-+: ���:+-B-+:C'
+    }
+  ]
 
+  function testConcatCheckRanges (formattedTestStrings, expectedResult, resultTainted) {
+    const [testString, ...rest] = formattedTestStrings
+      .map(formattedTestString => taintFormattedString(id, formattedTestString))
+    const res = String.prototype.concat.call(testString, ...rest)
+
+    const ret = TaintedUtils.concat(id, res, testString, ...rest)
     assert.equal(res, ret, 'Unexpected vale')
-    assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
-  })
+    assert.equal(TaintedUtils.isTainted(id, ret), resultTainted,
+      `Concat returned value ${resultTainted ? 'not tainted' : 'tainted'}`)
 
-  it('does not taint multiple operands if any is tainted', function () {
-    const op1 = 'hello'
-    const op2 = ' '
-    const op3 = 'world'
-    const op4 = ' :)'
-    const res = op1.concat(op2, op3, op4)
-    const ret = TaintedUtils.concat(id, res, op1, op2, op3, op4)
+    const formattedResult = resultTainted ? formatTaintedValue(id, ret) : ret
+    assert.equal(formattedResult, expectedResult, 'Unexpected ranges')
+  }
 
-    assert.equal(res, ret, 'Unexpected vale')
-    assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
-  })
-
-  it('taints multiple operands with one them undefined', function () {
-    const op1 = 'hello'
-    const op2 = undefined
-    const op3 = 'world'
-    const op4 = TaintedUtils.newTaintedString(id, ' :)', 'param', 'REQUEST')
-    const res = op1.concat(op2, op3, op4)
-    const ret = TaintedUtils.concat(id, res, op1, op2, op3, op4)
-
-    assert.equal(res, ret, 'Unexpected vale')
-    assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
-  })
-
-  it('taints multiple operands with one them null', function () {
-    const op1 = 'hello'
-    const op2 = null
-    const op3 = 'world'
-    const op4 = TaintedUtils.newTaintedString(id, ' :)', 'param', 'REQUEST')
-    const res = op1.concat(op2, op3, op4)
-    const ret = TaintedUtils.concat(id, res, op1, op2, op3, op4)
-
-    assert.equal(res, ret, 'Unexpected vale')
-    assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
+  describe('Check ranges', function () {
+    rangesTestCases.forEach(({ testStrings, result, tainted }) => {
+      it(`Test ${testStrings}`, () => {
+        const resultTainted = tainted === undefined ? true : tainted
+        testConcatCheckRanges(testStrings, result, resultTainted)
+      })
+    })
   })
 })

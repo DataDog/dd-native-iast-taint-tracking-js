@@ -12,21 +12,23 @@ const PARAM_NAME = 'param'
 const PARAM_TYPE = 'REQUEST'
 
 function taintFormattedString (transactionId, formattedString) {
-  return formattedString.split(RANGE_OPEN_MARK).reduce((previousValue, currentValue) => {
-    if (currentValue.length === 0) {
-      return previousValue
-    }
-    if (currentValue.indexOf(RANGE_CLOSING_MARK) > -1) {
-      const splitParts = currentValue.split(RANGE_CLOSING_MARK)
-      const tainted = TaintedUtils.newTaintedString(transactionId, splitParts[0], PARAM_NAME, PARAM_TYPE)
-      const previousPlusTainted = TaintedUtils.concat(transactionId, previousValue + tainted, previousValue, tainted)
-      if (splitParts.length === 1) return previousPlusTainted
-      const literal = splitParts[1]
-      return TaintedUtils.concat(transactionId, previousPlusTainted + literal, previousPlusTainted, literal)
-    } else {
-      return TaintedUtils.concat(transactionId, previousValue + currentValue, previousValue, currentValue)
-    }
-  }, '')
+  return formattedString
+    ? formattedString.split(RANGE_OPEN_MARK).reduce((previousValue, currentValue) => {
+      if (currentValue.length === 0) {
+        return previousValue
+      }
+      if (currentValue.indexOf(RANGE_CLOSING_MARK) > -1) {
+        const splitParts = currentValue.split(RANGE_CLOSING_MARK)
+        const tainted = TaintedUtils.newTaintedString(transactionId, splitParts[0], PARAM_NAME, PARAM_TYPE)
+        const previousPlusTainted = TaintedUtils.concat(transactionId, previousValue + tainted, previousValue, tainted)
+        if (splitParts.length === 1) return previousPlusTainted
+        const literal = splitParts[1]
+        return TaintedUtils.concat(transactionId, previousPlusTainted + literal, previousPlusTainted, literal)
+      } else {
+        return TaintedUtils.concat(transactionId, previousValue + currentValue, previousValue, currentValue)
+      }
+    }, '')
+    : formattedString
 }
 
 function formatTaintedValue (transactionId, taintedValue) {

@@ -30,5 +30,6 @@ declare module 'datadog-iast-taint-tracking' {
         slice(transactionId: string, result: string, original: string, start: number, end: number): string;
         substring(transactionId: string, subject: string, result: string, start: number, end: number): string;
         substr(transactionId: string, subject: string, result: string, start: number, length: number): string;
+        replace(transactionId: string, result: string, thisArg: string, matcher: unknown, replacer: unknown): string;
     }
 }

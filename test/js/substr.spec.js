@@ -136,7 +136,10 @@ describe('Substring method', function () {
   })
 
   it('Wrong arguments', function () {
+    const str = 'hello'
     assert.throws(function () { TaintedUtils.substr(id) }, Error)
+    assert.throws(function () { TaintedUtils.substr(id, str.substr()) }, Error)
+    assert.doesNotThrow(function () { TaintedUtils.substr(id, str.substr(), 0) }, Error)
   })
 
   it('String not tainted', function () {

@@ -17,6 +17,7 @@
 #include "../utils/propagation.h"
 #include "v8.h"
 
+#define SUBSTRING_MIN_ARGC  3
 #define TO_V8STRING(arg) (v8::Local<v8::String>::Cast(arg))
 #define TO_INTEGER_VALUE(arg, v8_ctx) (arg->IntegerValue(v8_ctx).FromJust())
 
@@ -39,7 +40,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
     auto context = isolate->GetCurrentContext();
     int argc = args.Length();
 
-    if (argc < 4) {
+    if (argc < SUBSTRING_MIN_ARGC) {
         isolate->ThrowException(Exception::TypeError(
                         String::NewFromUtf8(isolate,
                         "Wrong number of arguments",
@@ -48,6 +49,12 @@ void substring(const FunctionCallbackInfo<Value>& args) {
     }
 
     auto result = args[1];
+    if (argc == SUBSTRING_MIN_ARGC) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
+
     auto subject = args[2];
     int resultLen = TO_V8STRING(result)->Length();
     int subjectLen = TO_V8STRING(subject)->Length();
@@ -100,7 +107,7 @@ void substr(const FunctionCallbackInfo<Value>& args) {
     auto context = isolate->GetCurrentContext();
     int argc = args.Length();
 
-    if (argc < 4) {
+    if (argc < SUBSTRING_MIN_ARGC) {
         isolate->ThrowException(Exception::TypeError(
                         String::NewFromUtf8(isolate,
                         "Wrong number of arguments",
@@ -110,6 +117,11 @@ void substr(const FunctionCallbackInfo<Value>& args) {
 
     auto result = args[1];
     int resultLen = TO_V8STRING(result)->Length();
+    if (argc == SUBSTRING_MIN_ARGC) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
     if (resultLen == 0) {
         args.GetReturnValue().Set(result);
         return;

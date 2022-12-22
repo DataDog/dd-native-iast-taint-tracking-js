@@ -130,9 +130,9 @@ void substr(const FunctionCallbackInfo<Value>& args) {
     auto subject = args[2];
     int subjectLen = TO_V8STRING(subject)->Length();
     int start = TO_INTEGER_VALUE(args[3], context);
-    int end = subjectLen;
+    int  length = subjectLen;
     if (argc > 4) {
-        end = TO_INTEGER_VALUE(args[4], context);
+        length = TO_INTEGER_VALUE(args[4], context);
     }
 
     auto transaction = GetTransaction(GetLocalStringPointer(args[0]));
@@ -154,9 +154,9 @@ void substr(const FunctionCallbackInfo<Value>& args) {
 
     try {
         start = (start >= 0) ? start : subjectLen + start;
-        end = ((start + end) >= subjectLen) ? subjectLen : start + end;
+        length = ((start + length) >= subjectLen) ? subjectLen : start + length;
 
-        auto newRanges = getRangesInSlice(transaction, taintedObj, start, end);
+        auto newRanges = getRangesInSlice(transaction, taintedObj, start, length);
         if (newRanges && newRanges->Size() > 0) {
             if (resultLen == 1) {
                 result = tainted::NewExternalString(isolate, args[1]);

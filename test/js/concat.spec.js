@@ -2,7 +2,7 @@
  * Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
  * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
  **/
-const { TaintedUtils } = require('./util')
+const { TaintedUtils, taintFormattedString, formatTaintedValue } = require('./util')
 const assert = require('assert')
 
 describe('Plus operator', function () {
@@ -135,5 +135,92 @@ describe('Plus operator', function () {
     assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
 
     assert.deepEqual(expected, TaintedUtils.getRanges(id, ret))
+  })
+})
+
+describe('concat method', () => {
+  const id = '1'
+
+  afterEach(function () {
+    TaintedUtils.removeTransaction(id)
+  })
+
+  const rangesTestCases = [
+    {
+      testStrings: [':+-A-+:', 'B', 'C'],
+      result: ':+-A-+:BC'
+    },
+    {
+      testStrings: ['A', ':+-B-+:', 'C'],
+      result: 'A:+-B-+:C'
+    },
+    {
+      testStrings: ['A', 'B', ':+-C-+:'],
+      result: 'AB:+-C-+:'
+    },
+    {
+      testStrings: ['A', '�', ':+-C-+:'],
+      result: 'A�:+-C-+:'
+    },
+    {
+      testStrings: ['A', null, ':+-C-+:'],
+      result: 'Anull:+-C-+:'
+    },
+    {
+      testStrings: ['A', undefined, ':+-C-+:'],
+      result: 'Aundefined:+-C-+:'
+    },
+    {
+      testStrings: ['A', 'B', 'C'],
+      result: 'ABC',
+      tainted: false
+    },
+    {
+      testStrings: [':+-A-+:', 'B', ':+-C-+:'],
+      result: ':+-A-+:B:+-C-+:'
+    },
+    {
+      testStrings: [':+-A-+:', ':+-B-+:', 'C'],
+      result: ':+-A-+::+-B-+:C'
+    },
+    {
+      testStrings: [':+-A-+: BC :+-D-+:', ':+-E-+:', 'F'],
+      result: ':+-A-+: BC :+-D-+::+-E-+:F'
+    },
+    {
+      testStrings: [':+-A-+: ���', ':+-B-+:', 'C'],
+      result: ':+-A-+: ���:+-B-+:C'
+    },
+    {
+      testStrings: [':+-A-+:', 1, 'C'],
+      result: ':+-A-+:1C'
+    },
+    {
+      testStrings: ['A', {}, ':+-C-+:'],
+      result: 'A[object Object]:+-C-+:'
+    }
+  ]
+
+  function testConcatCheckRanges (formattedTestStrings, expectedResult, resultTainted) {
+    const [testString, ...rest] = formattedTestStrings
+      .map(formattedTestString => taintFormattedString(id, formattedTestString))
+    const res = String.prototype.concat.call(testString, ...rest)
+
+    const ret = TaintedUtils.concat(id, res, testString, ...rest)
+    assert.equal(res, ret, 'Unexpected vale')
+    assert.equal(TaintedUtils.isTainted(id, ret), resultTainted,
+      `Concat returned value ${resultTainted ? 'not tainted' : 'tainted'}`)
+
+    const formattedResult = resultTainted ? formatTaintedValue(id, ret) : ret
+    assert.equal(formattedResult, expectedResult, 'Unexpected ranges')
+  }
+
+  describe('Check ranges', function () {
+    rangesTestCases.forEach(({ testStrings, result, tainted }) => {
+      it(`Test ${testStrings}`, () => {
+        const resultTainted = tainted === undefined ? true : tainted
+        testConcatCheckRanges(testStrings, result, resultTainted)
+      })
+    })
   })
 })

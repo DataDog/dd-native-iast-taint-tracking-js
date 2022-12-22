@@ -34,6 +34,7 @@ function formatTaintedValue (transactionId, taintedValue) {
   if (!TaintedUtils.isTainted(transactionId, taintedValue)) {
     return taintedValue
   }
+
   return TaintedUtils.getRanges(transactionId, taintedValue).reduce((formattedString, range) => {
     formattedString =
       formattedString.slice(0, range.start + offset) +

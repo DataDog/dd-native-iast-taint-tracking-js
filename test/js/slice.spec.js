@@ -11,6 +11,18 @@ describe('Slice', function () {
   const testCases = [
     {
       source: ':+-foobarbaz-+:',
+      result: '',
+      start: 3,
+      end: 0
+    },
+    {
+      source: ':+-foobarbaz-+:',
+      result: ':+-bar-+:',
+      start: -6,
+      end: -3
+    },
+    {
+      source: ':+-foobarbaz-+:',
       result: ':+-foo-+:',
       start: 0,
       end: 3

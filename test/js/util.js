@@ -12,7 +12,7 @@ const PARAM_NAME = 'param'
 const PARAM_TYPE = 'REQUEST'
 
 function taintFormattedString (transactionId, formattedString) {
-  return formattedString
+  return formattedString && typeof formattedString === 'string'
     ? formattedString.split(RANGE_OPEN_MARK).reduce((previousValue, currentValue) => {
       if (currentValue.length === 0) {
         return previousValue

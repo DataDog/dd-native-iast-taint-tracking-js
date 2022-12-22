@@ -190,6 +190,14 @@ describe('concat method', () => {
     {
       testStrings: [':+-A-+: ���', ':+-B-+:', 'C'],
       result: ':+-A-+: ���:+-B-+:C'
+    },
+    {
+      testStrings: [':+-A-+:', 1, 'C'],
+      result: ':+-A-+:1C'
+    },
+    {
+      testStrings: ['A', {}, ':+-C-+:'],
+      result: 'A[object Object]:+-C-+:'
     }
   ]
 

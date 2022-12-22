@@ -108,7 +108,8 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
 }
 
 void IsTainted(const FunctionCallbackInfo<Value>& args) {
-    if (args.Length() < 2) {
+    auto argsLength = args.Length();
+    if (argsLength < 2) {
         auto isolate = args.GetIsolate();
         isolate->ThrowException(v8::Exception::TypeError(
                         v8::String::NewFromUtf8(isolate,
@@ -123,13 +124,14 @@ void IsTainted(const FunctionCallbackInfo<Value>& args) {
         args.GetReturnValue().Set(false);
         return;
     }
-
-    auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[1]));
-    if (taintedObj && taintedObj->getRanges()) {
-        args.GetReturnValue().Set(true);
-    } else {
-        args.GetReturnValue().Set(false);
+    for (auto i = 1; i < argsLength; i++) {
+        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[i]));
+        if (taintedObj && taintedObj->getRanges()) {
+            args.GetReturnValue().Set(true);
+            return;
+        }
     }
+    args.GetReturnValue().Set(false);
 }
 
 void GetRanges(const FunctionCallbackInfo<Value>& args) {

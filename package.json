@@ -48,6 +48,7 @@
     "index.js",
     "index.d.ts",
     "prebuilds/**/*",
+    "replace.js",
     "scripts/libc.js",
     "LICENSE",
     "LICENSE-3rdparty.csv",

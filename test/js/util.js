@@ -29,13 +29,27 @@ function taintFormattedString (transactionId, formattedString) {
   }, '')
 }
 
+function checkRangesOrder (ranges) {
+  let lastStart = -1
+  ranges.forEach(range => {
+    if (range.start < lastStart) {
+      throw new Error('Ranges must be ordered')
+    }
+    lastStart = range.start
+  })
+}
+
 function formatTaintedValue (transactionId, taintedValue) {
   let offset = 0
   if (!TaintedUtils.isTainted(transactionId, taintedValue)) {
     return taintedValue
   }
-
-  return TaintedUtils.getRanges(transactionId, taintedValue).reduce((formattedString, range) => {
+  const ranges = TaintedUtils.getRanges(transactionId, taintedValue)
+  if (!ranges || ranges.length === 0) {
+    return taintedValue
+  }
+  checkRangesOrder(ranges)
+  return ranges.reduce((formattedString, range) => {
     formattedString =
       formattedString.slice(0, range.start + offset) +
       RANGE_OPEN_MARK +

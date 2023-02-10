@@ -110,6 +110,17 @@ describe('Taint strings', function () {
     })
   })
 
+  it('Beyond max concurrent transactions', function () {
+    const MAX_TRANSACTION_MAP_SIZE = 2
+    const transactions = []
+    for (let i = 1; i < MAX_TRANSACTION_MAP_SIZE + 1; i++) {
+      transactions[i] = TaintedUtils.createTransaction(`beyondTest${i}`)
+      TaintedUtils.newTaintedString(transactions[i], `taintedString${i}`, 'param', 'request')
+    }
+
+    transactions.forEach((transactionId) => TaintedUtils.removeTransaction(transactionId))
+  })
+
   it('Beyond Max values', function () {
     let ret
     // let id = '1';

@@ -82,6 +82,9 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
 
     try {
         auto transaction = NewTransaction(transactionId);
+        if (transaction == nullptr) {
+            return;
+        }
         auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(parameterValue));
         if (taintedObj) {
             // Object already exist, nothing to do

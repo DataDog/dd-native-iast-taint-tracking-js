@@ -18,6 +18,7 @@ describe('Invalid arch require', function () {
     assert(TaintedUtils.createTransaction)
     assert(TaintedUtils.newTaintedString)
     assert(TaintedUtils.isTainted)
+    assert(TaintedUtils.getTaintedCount)
     assert(TaintedUtils.getRanges)
     assert(TaintedUtils.removeTransaction)
     assert(TaintedUtils.concat)

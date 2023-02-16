@@ -17,6 +17,9 @@ try {
     isTainted () {
       return false
     },
+    getTaintedCount () {
+      return 0
+    },
     getRanges () {
       return undefined
     },
@@ -49,6 +52,7 @@ try {
 const iastNativeMethods = {
   newTaintedString: addon.newTaintedString,
   isTainted: addon.isTainted,
+  getTaintedCount: addon.getTaintedCount,
   getRanges: addon.getRanges,
   createTransaction: addon.createTransaction,
   removeTransaction: addon.removeTransaction,

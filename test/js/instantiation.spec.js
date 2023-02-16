@@ -10,6 +10,7 @@ describe('Addon loading', function () {
     assert(TaintedUtils, 'Undefined module')
     assert(TaintedUtils.newTaintedString, 'Undefined')
     assert(TaintedUtils.isTainted, 'Undefined')
+    assert(TaintedUtils.getTaintedCount, 'Undefined')
     assert(TaintedUtils.concat, 'Undefined')
     assert(TaintedUtils.trim, 'Undefined')
     assert(TaintedUtils.trimEnd, 'Undefined')

@@ -147,13 +147,4 @@ describe('Taint strings', function () {
     assert.strictEqual(true, TaintedUtils.isTainted(id, taintedOneChar), 'Must be tainted')
     assert.strictEqual(false, TaintedUtils.isTainted(id, oneChar), 'Can not be tainted')
   })
-
-  it('Should return transaction tainted count', function () {
-    assert.strictEqual(0, TaintedUtils.getTaintedCount(id), 'Must be 0')
-
-    TaintedUtils.newTaintedString(id, 'a', 'param', 'request')
-    TaintedUtils.newTaintedString(id, 'b', 'param', 'request')
-
-    assert.strictEqual(2, TaintedUtils.getTaintedCount(id), 'Must be 2')
-  })
 })

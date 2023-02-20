@@ -17,8 +17,10 @@
 #include "../tainted/input_info.h"
 #include "../tainted/tainted_object.h"
 #include "../tainted/transaction.h"
+#include "../utils/jsobject_utils.h"
 #include "../gc/gc.h"
 #include "../iast.h"
+#include "v8.h"
 
 using v8::Exception;
 using v8::FunctionCallbackInfo;
@@ -29,6 +31,7 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 using v8::Array;
+using v8::Number;
 
 using iast::tainted::InputInfo;
 
@@ -137,26 +140,6 @@ void IsTainted(const FunctionCallbackInfo<Value>& args) {
     args.GetReturnValue().Set(false);
 }
 
-void GetTaintedCount(const FunctionCallbackInfo<Value>& args) {
-    auto argsLength = args.Length();
-    if (argsLength < 1) {
-        auto isolate = args.GetIsolate();
-        isolate->ThrowException(v8::Exception::TypeError(
-                        v8::String::NewFromUtf8(isolate,
-                        "Wrong number of arguments",
-                        v8::NewStringType::kNormal).ToLocalChecked()));
-        return;
-    }
-
-    uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
-    auto transaction = GetTransaction(transactionId);
-    if (!transaction) {
-        args.GetReturnValue().Set(0);
-        return;
-    }
-    args.GetReturnValue().Set(transaction->GetTaintedCount());
-}
-
 void GetRanges(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
@@ -207,7 +190,6 @@ void StringMethods::Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "createTransaction", CreateTransaction);
     NODE_SET_METHOD(exports, "newTaintedString", NewTaintedString);
     NODE_SET_METHOD(exports, "isTainted", IsTainted);  // TODO(julio): support several objects.
-    NODE_SET_METHOD(exports, "getTaintedCount", GetTaintedCount);
     NODE_SET_METHOD(exports, "getRanges", GetRanges);
     NODE_SET_METHOD(exports, "removeTransaction", DeleteTransaction);
 }

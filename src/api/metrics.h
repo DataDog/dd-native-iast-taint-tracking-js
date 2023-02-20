@@ -2,10 +2,9 @@
 * Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
-#ifndef SRC_API_METRICS_H
-#define SRC_API_METRICS_H
+#ifndef SRC_API_METRICS_H_
+#define SRC_API_METRICS_H_
 
-#include <linux/limits.h>
 #include <node.h>
 namespace iast {
 namespace api {
@@ -29,5 +28,5 @@ class Metrics {
 }   // namespace api
 }   // namespace iast
 
-#endif  // SRC_API_METRICS_H
+#endif  // SRC_API_METRICS_H_
 

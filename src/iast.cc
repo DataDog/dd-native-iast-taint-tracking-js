@@ -4,7 +4,6 @@
 **/
 
 #include <node.h>
-#include "api/metrics.h"
 #include "iast.h"
 #include "gc/gc.h"
 #include "container/singleton.h"

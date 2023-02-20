@@ -33,7 +33,7 @@ describe('Metrics', function () {
     assert.strictEqual(null, TaintedUtils.getMetrics(id, 4), 'Metrics expected to be null')
   })
 
-  it('Should return transaction tainted count', function () {
+  it('Should return the proper request count', function () {
     const expected = {
       requestCount: 1
     }

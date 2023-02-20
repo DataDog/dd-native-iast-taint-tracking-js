@@ -47,7 +47,7 @@ void GetMetrics(const FunctionCallbackInfo<Value>& args) {
         args.GetReturnValue().SetNull();
         return;
     }
-    
+
     auto context = isolate->GetCurrentContext();
     auto jsMetrics = Object::New(isolate);
     switch (static_cast<TelemetryVerbosity>(telemetryVerbosity->IntegerValue(context).FromJust())) {

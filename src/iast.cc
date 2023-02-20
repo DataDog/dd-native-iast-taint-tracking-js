@@ -4,6 +4,7 @@
 **/
 
 #include <node.h>
+#include <cstddef>
 #include "iast.h"
 #include "gc/gc.h"
 #include "container/singleton.h"
@@ -17,25 +18,29 @@
 #include "api/replace.h"
 #include "api/metrics.h"
 
-using transactionManger = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction,
+using transactionManager = iast::container::Singleton<iast::TransactionManager<iast::tainted::Transaction,
       iast::tainted::transaction_key_t>>;
 
 namespace iast {
 
 void RehashAllTransactions(void) {
-    transactionManger::GetInstance().RehashAll();
+    transactionManager::GetInstance().RehashAll();
 }
 
 void RemoveTransaction(transaction_key_t id) {
-    transactionManger::GetInstance().Remove(id);
+    transactionManager::GetInstance().Remove(id);
 }
 
 Transaction* GetTransaction(transaction_key_t id) {
-    return transactionManger::GetInstance().Get(id);
+    return transactionManager::GetInstance().Get(id);
 }
 
 Transaction* NewTransaction(transaction_key_t id) {
-    return transactionManger::GetInstance().New(id);
+    return transactionManager::GetInstance().New(id);
+}
+
+void SetMaxTransactions(size_t maxItems) {
+        transactionManager::GetInstance().setMaxItems(maxItems);
 }
 
 void Init(v8::Local<v8::Object> exports) {

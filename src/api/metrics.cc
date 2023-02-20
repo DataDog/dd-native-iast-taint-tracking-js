@@ -12,7 +12,6 @@
 
 using v8::Exception;
 using v8::FunctionCallbackInfo;
-using v8::Isolate;
 using v8::Local;
 using v8::NewStringType;
 using v8::Object;
@@ -36,7 +35,7 @@ void GetMetrics(const FunctionCallbackInfo<Value>& args) {
     }
 
 
-    auto level = args[1];
+    auto telemetryVerbosity = args[1];
     if (!args[1]->IsNumber()) {
         args.GetReturnValue().SetNull();
         return;
@@ -51,8 +50,8 @@ void GetMetrics(const FunctionCallbackInfo<Value>& args) {
     
     auto context = isolate->GetCurrentContext();
     auto jsMetrics = Object::New(isolate);
-    switch (static_cast<MetricsLevel>(level->IntegerValue(context).FromJust())) {
-        case MetricsLevel::INFORMATION:
+    switch (static_cast<TelemetryVerbosity>(telemetryVerbosity->IntegerValue(context).FromJust())) {
+        case TelemetryVerbosity::INFORMATION:
             jsMetrics->Set(context,
                     utils::NewV8String(isolate, "requestCount"),
                     Number::New(isolate, transaction->GetTaintedCount()))

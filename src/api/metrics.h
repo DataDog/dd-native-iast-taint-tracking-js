@@ -10,7 +10,7 @@
 namespace iast {
 namespace api {
 
-enum class MetricsLevel {
+enum class TelemetryVerbosity {
     OFF = 0,
     MANDATORY,
     INFORMATION,

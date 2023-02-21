@@ -50,7 +50,6 @@ jobs:
       napi: false
       package-manager: 'npm'
       prebuild: 'node scripts/prebuild'
-        # skip: 'linux-arm linux-ia32'
       target-name: 'iastnativemethods'
 
   cpp-test:

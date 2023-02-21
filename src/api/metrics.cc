@@ -51,6 +51,7 @@ void GetMetrics(const FunctionCallbackInfo<Value>& args) {
     auto context = isolate->GetCurrentContext();
     auto jsMetrics = Object::New(isolate);
     switch (static_cast<TelemetryVerbosity>(telemetryVerbosity->IntegerValue(context).FromJust())) {
+        case TelemetryVerbosity::DEBUG:
         case TelemetryVerbosity::INFORMATION:
             jsMetrics->Set(context,
                     utils::NewV8String(isolate, "requestCount"),

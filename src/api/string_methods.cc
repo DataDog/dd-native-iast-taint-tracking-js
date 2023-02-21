@@ -31,7 +31,6 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 using v8::Array;
-using v8::Number;
 
 using iast::tainted::InputInfo;
 

@@ -16,5 +16,6 @@ describe('Addon loading', function () {
     assert(TaintedUtils.slice, 'Undefined')
     assert(TaintedUtils.substring, 'Undefined')
     assert(TaintedUtils.substr, 'Undefined')
+    assert(TaintedUtils.getMetrics, 'Undefined')
   })
 })

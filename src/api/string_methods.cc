@@ -17,8 +17,10 @@
 #include "../tainted/input_info.h"
 #include "../tainted/tainted_object.h"
 #include "../tainted/transaction.h"
+#include "../utils/jsobject_utils.h"
 #include "../gc/gc.h"
 #include "../iast.h"
+#include "v8.h"
 
 using v8::Exception;
 using v8::FunctionCallbackInfo;
@@ -29,6 +31,7 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 using v8::Array;
+using v8::Number;
 
 using iast::tainted::InputInfo;
 

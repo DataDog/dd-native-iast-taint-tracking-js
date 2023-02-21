@@ -17,6 +17,7 @@
                 "./src/api/slice.cc",
                 "./src/api/substring.cc",
                 "./src/api/replace.cc",
+                "./src/api/metrics.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

@@ -21,5 +21,6 @@ describe('Invalid arch require', function () {
     assert(TaintedUtils.getRanges)
     assert(TaintedUtils.removeTransaction)
     assert(TaintedUtils.concat)
+    assert(TaintedUtils.getMetrics)
   })
 })

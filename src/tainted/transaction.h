@@ -53,6 +53,10 @@ class Transaction {
         return _taintedMap.Find(stringPointer);
     }
 
+    int GetTaintedCount() {
+        return _taintedMap.GetCount();
+    }
+
     void RehashMap(void) noexcept {
         _taintedMap.Rehash();
     }

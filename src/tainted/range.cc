@@ -52,6 +52,7 @@ v8::Local<v8::Object> Range::toJSObject(v8::Isolate* isolate) {
         endLabelLocal = v8::Local<v8::Value>::New(isolate, endLabel);
         iinfoLabelLocal = v8::Local<v8::Value>::New(isolate, iinfoLabel);
     }
+
     taintedRangev8Obj->Set(context, startLabelLocal, v8::Number::New(isolate, this->start)).Check();
     taintedRangev8Obj->Set(context, endLabelLocal, v8::Number::New(isolate, this->end)).Check();
     taintedRangev8Obj->Set(context,

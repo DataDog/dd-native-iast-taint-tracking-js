@@ -46,4 +46,14 @@ describe('Metrics', function () {
     expected.requestCount = 2
     assert.deepEqual(expected, TaintedUtils.getMetrics(id, Verbosity.INFORMATION), 'Metrics expected to be equal')
   })
+
+  it('Should return the properties in all verbosity levels', function () {
+    const expected = {
+      requestCount: 1
+    }
+
+    TaintedUtils.newTaintedString(id, 'a', 'param', 'request')
+    assert.deepEqual(expected, TaintedUtils.getMetrics(id, Verbosity.INFORMATION), 'Metrics expected to be equal')
+    assert.deepEqual(expected, TaintedUtils.getMetrics(id, Verbosity.DEBUG), 'Metrics expected to be equal')
+  })
 })

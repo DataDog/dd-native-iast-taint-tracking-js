@@ -117,7 +117,7 @@ const rangesTestCases = [
 ]
 
 describe('Substr method', function () {
-  const id = '1'
+  const id = TaintedUtils.createTransaction('1')
 
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
@@ -221,7 +221,12 @@ describe('Substr method', function () {
 })
 
 describe('Check Ranges format', function () {
-  const id = '1'
+  const id = TaintedUtils.createTransaction('1')
+
+  afterEach(function () {
+    TaintedUtils.removeTransaction(id)
+  })
+
   rangesTestCases.forEach(({ source, start, end, result }) => {
     it(`Test ${source}`, function () {
       const inputString = taintFormattedString(id, source)

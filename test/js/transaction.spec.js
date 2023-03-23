@@ -7,6 +7,10 @@ const { TaintedUtils } = require('./util')
 const assert = require('assert')
 
 describe('Transaction', function () {
+  after(function () {
+    TaintedUtils.setMaxTransactions(2)
+  })
+
   it('Create transactions beyond limit with the default value', function () {
     const id = TaintedUtils.createTransaction('1')
     const id2 = TaintedUtils.createTransaction('2')

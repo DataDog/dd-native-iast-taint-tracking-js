@@ -56,4 +56,32 @@ describe('Transaction', function () {
     TaintedUtils.removeTransaction(id2)
     TaintedUtils.removeTransaction(id3)
   })
+
+  it('Remove transaction beyond the limit', function () {
+    TaintedUtils.setMaxTransactions(1)
+
+    const id = TaintedUtils.createTransaction('1')
+    const id2 = TaintedUtils.createTransaction('2')
+
+    let ret = TaintedUtils.newTaintedString(id, 'value', 'param', 'REQUEST')
+    assert.strictEqual(true, TaintedUtils.isTainted(id, ret))
+
+    ret = TaintedUtils.newTaintedString(id2, 'value2', 'param', 'REQUEST')
+    assert.strictEqual(false, TaintedUtils.isTainted(id2, ret))
+
+    TaintedUtils.removeTransaction(id)
+    TaintedUtils.removeTransaction(id2)
+  })
+
+  it('Remove already deleted transaction', function () {
+    TaintedUtils.setMaxTransactions(1)
+
+    const id = TaintedUtils.createTransaction('1')
+
+    const ret = TaintedUtils.newTaintedString(id, 'value', 'param', 'REQUEST')
+    assert.strictEqual(true, TaintedUtils.isTainted(id, ret))
+
+    TaintedUtils.removeTransaction(id)
+    TaintedUtils.removeTransaction(id)
+  })
 })

@@ -40,7 +40,7 @@ Transaction* NewTransaction(transaction_key_t id) {
 }
 
 void SetMaxTransactions(size_t maxItems) {
-        transactionManager::GetInstance().setMaxItems(maxItems);
+    transactionManager::GetInstance().setMaxItems(maxItems);
 }
 
 void Init(v8::Local<v8::Object> exports) {

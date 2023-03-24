@@ -23,6 +23,7 @@ void RehashAllTransactions(void);
 void RemoveTransaction(transaction_key_t id);
 Transaction* GetTransaction(transaction_key_t id);
 Transaction* NewTransaction(transaction_key_t id);
+void SetMaxTransactions(size_t maxItems);
 
 }  // namespace iast
 

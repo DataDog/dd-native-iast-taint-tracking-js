@@ -30,6 +30,7 @@ declare module 'datadog-iast-taint-tracking' {
         getMetrics(transactionId: string, telemetryVerbosity: number): Metrics;
         getRanges(transactionId: string, original: string): NativeTaintedRange[];
         removeTransaction(transactionId: string): void;
+        setMaxTransactions(maxTransactions: number): void;
         concat(transactionId: string, result: string, op1: string, op2: string): string;
         trim(transactionId: string, result: string, thisArg: string): string;
         trimEnd(transactionId: string, result: string, thisArg: string): string;

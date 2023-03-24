@@ -6,7 +6,7 @@ const { TaintedUtils, taintFormattedString, formatTaintedValue } = require('./ut
 const assert = require('assert')
 
 describe('Plus operator', function () {
-  const id = '1'
+  const id = TaintedUtils.createTransaction('1')
 
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
@@ -139,7 +139,7 @@ describe('Plus operator', function () {
 })
 
 describe('concat method', () => {
-  const id = '1'
+  const id = TaintedUtils.createTransaction('1')
 
   afterEach(function () {
     TaintedUtils.removeTransaction(id)

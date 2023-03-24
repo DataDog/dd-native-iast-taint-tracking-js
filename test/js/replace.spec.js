@@ -6,7 +6,7 @@ const { TaintedUtils, taintFormattedString, formatTaintedValue } = require('./ut
 const assert = require('assert')
 
 describe('Replace', function () {
-  const id = '1'
+  const id = TaintedUtils.createTransaction('1')
 
   afterEach(function () {
     TaintedUtils.removeTransaction(id)

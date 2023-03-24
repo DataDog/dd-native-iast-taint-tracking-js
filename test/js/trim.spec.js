@@ -6,7 +6,7 @@ const { TaintedUtils, taintFormattedString, formatTaintedValue } = require('./ut
 const assert = require('assert')
 
 describe('Trim operator', function () {
-  const id = '1'
+  const id = TaintedUtils.createTransaction('1')
 
   const noTaintTestCases = {
     trim: [

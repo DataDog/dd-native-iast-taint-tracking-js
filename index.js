@@ -27,6 +27,8 @@ try {
     },
     removeTransaction () {
     },
+    setMaxTransactions () {
+    },
     replace (transactionId, result) {
       return result
     },
@@ -58,6 +60,7 @@ const iastNativeMethods = {
   getRanges: addon.getRanges,
   createTransaction: addon.createTransaction,
   removeTransaction: addon.removeTransaction,
+  setMaxTransactions: addon.setMaxTransactions,
   replace: require('./replace.js')(addon),
   concat: addon.concat,
   trim: addon.trim,

@@ -122,3 +122,26 @@ TEST(TransactionManager, insert_beyond_limit)
     iastManager.Remove(key1);
     iastManager.Remove(key2);
 }
+
+TEST(TransactionManager, create_beyond_limit)
+{
+    int elems = 0;
+    TransactionManager<FakeTransaction, transaction_key_t> iastManager;
+    elems = iastManager.getMaxItems();
+    CHECK_EQUAL(2, elems);
+
+    iastManager.New(1);
+    CHECK_EQUAL(1, iastManager.Size());
+
+    iastManager.New(2);
+    CHECK_EQUAL(2, iastManager.Size());
+
+    CHECK_EQUAL(nullptr, iastManager.New(3));
+
+    iastManager.setMaxItems(3);
+    iastManager.New(3);
+    CHECK_EQUAL(3, iastManager.Size());
+
+    iastManager.Clear();
+    CHECK_EQUAL(0, iastManager.Size());
+}

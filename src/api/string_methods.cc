@@ -185,12 +185,31 @@ void DeleteTransaction(const FunctionCallbackInfo<Value>& args) {
     RemoveTransaction(transactionId);
 }
 
+void SetMaxTransactions(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    if (args.Length() != 1) {
+        // Throw an Error that is passed back to JavaScript
+        isolate->ThrowException(Exception::TypeError(
+            String::NewFromUtf8(isolate,
+                "Wrong number of arguments",
+                NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+
+    if (!args[0]->IsNumber()) {
+        return;
+    }
+
+    iast::SetMaxTransactions(args[0]->IntegerValue(isolate->GetCurrentContext()).FromJust());
+}
+
 void StringMethods::Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "createTransaction", CreateTransaction);
     NODE_SET_METHOD(exports, "newTaintedString", NewTaintedString);
     NODE_SET_METHOD(exports, "isTainted", IsTainted);  // TODO(julio): support several objects.
     NODE_SET_METHOD(exports, "getRanges", GetRanges);
     NODE_SET_METHOD(exports, "removeTransaction", DeleteTransaction);
+    NODE_SET_METHOD(exports, "setMaxTransactions", SetMaxTransactions);
 }
 }  // namespace api
 }  // namespace iast

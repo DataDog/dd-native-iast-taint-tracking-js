@@ -136,7 +136,7 @@ TEST(TransactionManager, create_beyond_limit)
     iastManager.New(2);
     CHECK_EQUAL(2, iastManager.Size());
 
-    CHECK_EQUAL(nullptr, iastManager.New(3));
+    CHECK_EQUAL(static_cast<FakeTransaction*>(nullptr), iastManager.New(3));
 
     iastManager.setMaxItems(3);
     iastManager.New(3);

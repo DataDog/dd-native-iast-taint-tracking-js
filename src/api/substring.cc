@@ -60,7 +60,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
     int subjectLen = TO_V8STRING(subject)->Length();
     int start = TO_INTEGER_VALUE(args[3], context);
     int end = subjectLen;
-    if (argc > 4) {
+    if (argc > 4 && !args[4]->IsUndefined()) {
         end = TO_INTEGER_VALUE(args[4], context);
     }
 
@@ -130,8 +130,8 @@ void substr(const FunctionCallbackInfo<Value>& args) {
     auto subject = args[2];
     int subjectLen = TO_V8STRING(subject)->Length();
     int start = TO_INTEGER_VALUE(args[3], context);
-    int  length = subjectLen;
-    if (argc > 4) {
+    int length = subjectLen - start;
+    if (argc > 4 && !args[4]->IsUndefined()) {
         length = TO_INTEGER_VALUE(args[4], context);
     }
 

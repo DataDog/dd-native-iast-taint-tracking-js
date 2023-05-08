@@ -17,6 +17,7 @@ SharedRanges* getRangesInSlice(Transaction* transaction, TaintedObject* obj, int
         return newRanges;
     }
 
+    int resultLength = sliceEnd - sliceStart;
     for (auto it = oRanges->begin(); it != oRanges->end(); ++it) {
         auto oRange = *it;
         int start, end;
@@ -47,6 +48,9 @@ SharedRanges* getRangesInSlice(Transaction* transaction, TaintedObject* obj, int
             // parcial right
             start = oRange->start - sliceStart;
             end = sliceEnd;
+        }
+        if (end > resultLength) {
+            end = resultLength;
         }
 
         if (!newRanges) {

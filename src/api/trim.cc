@@ -13,6 +13,8 @@
 #include "../tainted/transaction.h"
 #include "../iast.h"
 
+#define TO_V8STRING(arg) (v8::Local<v8::String>::Cast(arg))
+
 using v8::FunctionCallbackInfo;
 using v8::Value;
 using v8::Local;
@@ -65,9 +67,7 @@ void TaintTrimOperator(const FunctionCallbackInfo<Value>& args) {
             left++;
         } while (*selfCh++);
 
-        v8::String::Utf8Value resultStr(isolate, args[1]);
-        std::string cResultStr(*resultStr);
-        int resultLength = cResultStr.length();
+        int resultLength = TO_V8STRING(args[1])->Length();
 
         auto resultRanges = transaction->GetSharedVectorRange();
         auto end = ranges->end();
@@ -136,9 +136,7 @@ void TaintTrimEndOperator(const FunctionCallbackInfo<Value>& args) {
             return;
         }
 
-        v8::String::Utf8Value resultStr(isolate, args[1]);
-        std::string cResultStr(*resultStr);
-        int resultLength = cResultStr.length();
+        int resultLength = TO_V8STRING(args[1])->Length();
 
         auto resultRanges = transaction->GetSharedVectorRange();
         auto end = ranges->end();

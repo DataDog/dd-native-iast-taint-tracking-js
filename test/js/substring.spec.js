@@ -21,6 +21,17 @@ const rangesTestCases = [
   },
   {
     source: ':+-foobarbaz-+:',
+    result: ':+-barbaz-+:',
+    start: 3,
+    end: undefined
+  },
+  {
+    source: ':+-foobarbaz-+:',
+    result: ':+-barbaz-+:',
+    start: 3
+  },
+  {
+    source: ':+-foobarbaz-+:',
     result: ':+-foo-+:',
     start: 0,
     end: 3
@@ -77,6 +88,17 @@ const rangesTestCases = [
     result: 'baz',
     start: 6,
     end: 9
+  },
+  {
+    source: 'foo:+-bar-+:baz',
+    result: ':+-r-+:baz',
+    start: 5,
+    end: undefined
+  },
+  {
+    source: 'foo:+-bar-+:baz',
+    result: ':+-r-+:baz',
+    start: 5
   },
   {
     source: 'foo:+-bar-+:b:+-az-+:',
@@ -227,13 +249,16 @@ describe('Check Ranges format', function () {
     TaintedUtils.removeTransaction(id)
   })
 
-  rangesTestCases.forEach(({ source, start, end, result }) => {
+  rangesTestCases.forEach((testData) => {
+    const { source, start, end, result } = testData
     it(`Test ${source}`, function () {
       const inputString = taintFormattedString(id, source)
       assert.equal(TaintedUtils.isTainted(id, inputString), true, 'Not tainted')
       const res = inputString.substring(start, end)
 
-      const ret = TaintedUtils.substring(id, res, inputString, start, end)
+      const ret = testData.hasOwnProperty('end')
+        ? TaintedUtils.substring(id, res, inputString, start, end)
+        : TaintedUtils.substring(id, res, inputString, start)
       assert.equal(res, ret, 'Unexpected value')
 
       const formattedResult = formatTaintedValue(id, ret)

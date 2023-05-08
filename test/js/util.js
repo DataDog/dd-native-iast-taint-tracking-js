@@ -47,10 +47,16 @@ function formatTaintedValue (transactionId, taintedValue) {
     return taintedValue
   }
   const ranges = TaintedUtils.getRanges(transactionId, taintedValue)
+
   if (!ranges || ranges.length === 0) {
     return taintedValue
   }
   checkRangesOrder(ranges)
+
+  if (ranges[ranges.length - 1].end > taintedValue.length) {
+    throw new Error(`Ranges out of value: max = ${taintedValue.length} and current = ${ranges[ranges.length - 1].end}`)
+  }
+
   return ranges.reduce((formattedString, range) => {
     formattedString =
       formattedString.slice(0, range.start + offset) +

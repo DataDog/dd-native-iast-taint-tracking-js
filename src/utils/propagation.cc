@@ -49,6 +49,7 @@ SharedRanges* getRangesInSlice(Transaction* transaction, TaintedObject* obj, int
             start = oRange->start - sliceStart;
             end = sliceEnd;
         }
+
         if (end > resultLength) {
             end = resultLength;
         }

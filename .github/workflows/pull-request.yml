@@ -56,8 +56,21 @@ jobs:
     strategy:
       matrix:
         version:
+          - node: 12
+            abi: 72
+            image: 12-buster
+          - node: 13
+            abi: 79
+            image: 13-buster
+          - node: 14
+            abi: 83
+            image: 14-buster
+          - node: 15
+            abi: 88
+            image: 15-buster
           - node: 18
             abi: 108
+            image: 18
         target:
           - dockerfile: Dockerfile
             libc: libc
@@ -73,7 +86,7 @@ jobs:
         env:
           PLATFORM: 'linux'
           LIBC: ${{ matrix.target.libc }}
-      - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version.node }} -f ./docker/${{ matrix.target.dockerfile }} .
+      - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version.node }} --build-arg NODE_IMAGE=${{matrix.version.image}} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name builder build
       - run: docker run --name tester build test:junit
       - run: docker cp builder:/build/prebuilds/${{ matrix.target.artifact }}/node-${{ matrix.version.abi }}.node .

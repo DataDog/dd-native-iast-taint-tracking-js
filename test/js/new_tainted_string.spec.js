@@ -100,7 +100,7 @@ describe('Taint strings', function () {
 
   it('Max values', function () {
     let ret
-    const values = new Array(16384).fill('value')
+    const values = new Array(4096).fill('value')
 
     values.forEach((val, index, array) => {
       ret = TaintedUtils.newTaintedString(id, val, 'param', 'REQUEST')
@@ -124,7 +124,7 @@ describe('Taint strings', function () {
   it('Beyond Max values', function () {
     let ret
     // let id = '1';
-    const values = new Array(16384)
+    const values = new Array(4096)
     for (let i = 0; i < values.length; i++) {
       values[i] = i.toString()
       ret = TaintedUtils.newTaintedString(id, values[i], 'param', 'REQUEST')

@@ -68,9 +68,21 @@ jobs:
           - node: 15
             abi: 88
             image: 15-buster
+          - node: 16
+            abi: 93
+            image: 16
+          - node: 17
+            abi: 102
+            image: 17
           - node: 18
             abi: 108
             image: 18
+          - node: 19
+            abi: 111
+            image: 19
+          - node: 20
+            abi: 115
+            image: 20
         target:
           - dockerfile: Dockerfile
             libc: libc

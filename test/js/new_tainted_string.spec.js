@@ -5,6 +5,8 @@
 const { TaintedUtils } = require('./util')
 const assert = require('assert')
 
+const MAX_TAINTED_OBJECTS = 4096
+
 describe('Taint strings', function () {
   const value = 'test'
   const id = TaintedUtils.createTransaction('1')
@@ -100,7 +102,7 @@ describe('Taint strings', function () {
 
   it('Max values', function () {
     let ret
-    const values = new Array(16384).fill('value')
+    const values = new Array(MAX_TAINTED_OBJECTS).fill('value')
 
     values.forEach((val, index, array) => {
       ret = TaintedUtils.newTaintedString(id, val, 'param', 'REQUEST')
@@ -124,7 +126,7 @@ describe('Taint strings', function () {
   it('Beyond Max values', function () {
     let ret
     // let id = '1';
-    const values = new Array(16384)
+    const values = new Array(MAX_TAINTED_OBJECTS)
     for (let i = 0; i < values.length; i++) {
       values[i] = i.toString()
       ret = TaintedUtils.newTaintedString(id, values[i], 'param', 'REQUEST')
@@ -133,7 +135,7 @@ describe('Taint strings', function () {
       assert.strictEqual(ret, true, 'Unexpected value')
     }
 
-    // element 16385
+    // element MAX_TAINTED_OBJECTS + 1
     const beyondLimit = 'beyond'
     ret = TaintedUtils.newTaintedString(id, beyondLimit, 'param', 'REQUEST')
     assert.strictEqual(ret, 'beyond', 'Unexpected value')

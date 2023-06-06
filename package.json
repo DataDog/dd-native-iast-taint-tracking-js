@@ -2,7 +2,7 @@
   "name": "@datadog/native-iast-taint-tracking",
   "home": "https://github.com/DataDog/dd-native-iast-taint-tracking-js/blob/main/README.md",
   "repository": "git@github.com:DataDog/dd-native-iast-taint-tracking-js.git",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Datadog IAST tant tracking support for NodeJS",
   "main": "index.js",
   "scripts": {

@@ -71,9 +71,9 @@ jobs:
         with:
           submodules: true
       - uses: mikepenz/action-junit-report@v3
-      - run: docker build -t cpputest-musl --build-arg TAG=${{ matrix.alpine.tag }} -f ./docker/${{ matrix.target.dockerfile }} .
-      - run: docker run --name test-musl cpputest-musl
-      - run: docker cp test-musl:/build/test/cpputest/results/ .
+      - run: docker build -t cpputest-libc --build-arg TAG=${{ matrix.alpine.tag }} -f ./docker/${{ matrix.target.dockerfile }} .
+      - run: docker run --name test-libc cpputest-libc
+      - run: docker cp test-libc:/build/test/cpputest/results/ .
         if: always()
         with:
           report_paths: '**/results/cpputest_*.xml'

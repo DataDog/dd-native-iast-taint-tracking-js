@@ -53,34 +53,42 @@ jobs:
       skip: 'linux-arm linux-ia32'
       target-name: 'iastnativemethods'
 
-  cpp-test:
+  cpp-test-libc:
     needs: ['build']
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version:
-          - node: 12
-            abi: 72
-          - node: 13
-            abi: 79
-          - node: 14
-            abi: 83
-          - node: 15
-            abi: 88
-          - node: 16
-            abi: 93
-          - node: 17
-            abi: 102
-          - node: 18
-            abi: 108
-          - node: 19
-            abi: 111
-          - node: 20
-            abi: 115
+        debian:
+          - tag: oldstable
+          - tag: stable
+          - tag: testing
         target:
           - dockerfile: Dockerfile
             libc: libc
             artifact: linux-x64
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: mikepenz/action-junit-report@v3
+      - run: docker build -t cpputest-libc --build-arg TAG=${{ matrix.alpine.tag }} -f ./docker/${{ matrix.target.dockerfile }} .
+      - run: docker run --name test-libc cpputest-libc
+      - run: docker cp test-libc:/build/test/cpputest/results/ .
+        if: always()
+        with:
+          report_paths: '**/results/cpputest_*.xml'
+          check_name: junit test report ${{ matrix.target.name }}
+
+  cpp-test-musl:
+    needs: ['build']
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        alpine:
+          - tag: 2.7
+          - tag: 3.18
+          - tag: latest
+        target:
           - dockerfile: alpine.Dockerfile
             libc: musl
             artifact: linuxmusl-x64
@@ -88,15 +96,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - run: npm i --ignore-scripts
-        env:
-          PLATFORM: 'linux'
-          LIBC: ${{ matrix.target.libc }}
-      - run: docker build -t build --build-arg NODE_VERSION=${{ matrix.version.node }} -f ./docker/${{ matrix.target.dockerfile }} .
-      - run: docker run --name builder build
-      - run: docker run --name tester build test:junit
-      - run: docker cp builder:/build/prebuilds/${{ matrix.target.artifact }}/node-${{ matrix.version.abi }}.node .
-      - run: docker cp tester:/build/test/cpputest/results/ .
+      - run: docker build -t cpputest-musl --build-arg TAG=${{ matrix.alpine.tag }} -f ./docker/${{ matrix.target.dockerfile }} .
+      - run: docker run --name test-musl cpputest-musl
+      - run: docker cp test-musl:/build/test/cpputest/results/ .
       - uses: mikepenz/action-junit-report@v3
         if: always()
         with:
@@ -169,7 +171,7 @@ jobs:
     needs: ['check-licenses']
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '19'
@@ -179,7 +181,7 @@ jobs:
   check-licenses:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '19'

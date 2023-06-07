@@ -1,5 +1,5 @@
-ARG NODE_VERSION
-FROM node:$NODE_VERSION-alpine
+ARG TAG
+FROM alpine:$TAG
 
 RUN apk add py3-pip make g++ cmake cpputest 
 # node 13 image does not have cpputest-static as a separate packege
@@ -11,7 +11,5 @@ WORKDIR /build
 COPY ./package.json .
 COPY ./package-lock.json .
 
-RUN npm ci --ignore-scripts
 COPY . .
-ENTRYPOINT ["npm", "run"]
-CMD ["build"]
+CMD ["sh", "./scripts/cpputest.sh", "--ci"]

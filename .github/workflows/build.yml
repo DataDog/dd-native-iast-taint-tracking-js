@@ -70,7 +70,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - run: docker build -t cpputest-libc --build-arg TAG=${{ matrix.alpine.tag }} -f ./docker/${{ matrix.target.dockerfile }} .
+      - run: docker build -t cpputest-libc --build-arg TAG=${{ matrix.debian.tag }} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name test-libc cpputest-libc
       - run: docker cp test-libc:/build/test/cpputest/results/ .
       - uses: mikepenz/action-junit-report@v3

@@ -85,7 +85,7 @@ jobs:
     strategy:
       matrix:
         alpine:
-          - tag: 2.7
+          - tag: 3.8
           - tag: 3.18
           - tag: latest
         target:

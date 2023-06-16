@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - v[0-9]+.x
+      - julio/create_release
 
 jobs:
   build:
@@ -13,22 +14,67 @@ jobs:
       napi: false
       package-manager: 'npm'
       prebuild: 'node scripts/prebuild'
-      skip: 'linux-arm linux-ia32'
+      skip: 'linux-arm linux-arm64 linux-ia32 windows-ia32 windows-x64 macos-arm64'
       target-name: 'iastnativemethods'
 
-  publish:
+  pack:
     needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+      - run: npm pack
+      - uses: codex-team/action-nodejs-package-info@v1
+        id: package
+      - uses: actions/upload-artifact@v3
+        with:
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+          path: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
+
+  create_release:
+    needs: pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: codex-team/action-nodejs-package-info@v1.1
+        id: package
+      - uses: actions/download-artifact@v3
+        with:
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+      - uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.package.outputs.version }}
+          release_name: Release ${{ steps.package.outputs.version }}
+          body: |
+            Test release
+          draft: false
+          prerelease: false
+      - run: ls -l
+      - uses: actions/upload-release-asset@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
+          asset_name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+          asset_content_type: application/tar+gzip
+
+  publish:
+    needs: pack
     runs-on: ubuntu-latest
     environment: npm
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
       - uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
-      - run: npm publish
+      - run: npm publish --dry-run
       - uses: codex-team/action-nodejs-package-info@v1.1
         id: package
       - run: |

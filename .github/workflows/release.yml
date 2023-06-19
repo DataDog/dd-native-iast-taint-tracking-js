@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - v[0-9]+.x
-      - julio/create_release
-
 jobs:
   build:
     uses: Datadog/action-prebuildify/.github/workflows/build.yml@main
@@ -14,7 +12,7 @@ jobs:
       napi: false
       package-manager: 'npm'
       prebuild: 'node scripts/prebuild'
-      skip: 'linux-arm linux-arm64 linux-ia32 windows-ia32 windows-x64 macos-arm64'
+      skip: 'linux-arm linux-ia32'
       target-name: 'iastnativemethods'
 
   pack:
@@ -52,9 +50,8 @@ jobs:
             Test release
           draft: false
           prerelease: false
-      - run: ls -l
       - uses: actions/upload-release-asset@v1
-        env: 
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -74,7 +71,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
-      - run: npm publish --dry-run
+      - run: npm publish
       - uses: codex-team/action-nodejs-package-info@v1.1
         id: package
       - run: |

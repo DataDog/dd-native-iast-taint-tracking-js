@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - v[0-9]+.x
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 jobs:
   build:
     uses: Datadog/action-prebuildify/.github/workflows/build.yml@main
@@ -71,9 +71,4 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
-      - run: npm publish
-      - uses: codex-team/action-nodejs-package-info@v1.1
-        id: package
-      - run: |
-          git tag v${{ steps.package.outputs.version }}
-          git push origin v${{ steps.package.outputs.version }}
+      - run: npm publish --dry-run

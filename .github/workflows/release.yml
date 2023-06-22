@@ -2,9 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - v[0-9]+.x
-
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 jobs:
   build:
     uses: Datadog/action-prebuildify/.github/workflows/build.yml@main
@@ -16,21 +15,61 @@ jobs:
       skip: 'linux-arm linux-ia32'
       target-name: 'iastnativemethods'
 
-  publish:
+  pack:
     needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+      - run: npm pack
+      - uses: codex-team/action-nodejs-package-info@v1
+        id: package
+      - uses: actions/upload-artifact@v3
+        with:
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+          path: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
+
+  create_release:
+    needs: pack
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v3
+      - uses: codex-team/action-nodejs-package-info@v1.1
+        id: package
+      - uses: actions/download-artifact@v3
+        with:
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+      - uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.package.outputs.version }}
+          release_name: Release ${{ steps.package.outputs.version }}
+          body: |
+            Release
+          draft: false
+          prerelease: false
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
+          asset_name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+          asset_content_type: application/tar+gzip
+
+  publish:
+    needs: pack
     runs-on: ubuntu-latest
     environment: npm
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
       - uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
       - run: npm publish
-      - uses: codex-team/action-nodejs-package-info@v1.1
-        id: package
-      - run: |
-          git tag v${{ steps.package.outputs.version }}
-          git push origin v${{ steps.package.outputs.version }}

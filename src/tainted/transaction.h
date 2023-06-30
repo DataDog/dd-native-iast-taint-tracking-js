@@ -39,8 +39,8 @@ class Transaction {
             v8::Local<v8::Value> parameterValue,
             v8::Local<v8::Value> type);
 
-    Range* GetRange(int start, int end, InputInfo *inputInfo) {
-        return _rangesPool.Pop(start, end, inputInfo);
+    Range* GetRange(int start, int end, InputInfo *inputInfo, int secureMarks) {
+        return _rangesPool.Pop(start, end, inputInfo, secureMarks);
     }
 
     SharedRanges* GetSharedVectorRange(void) {

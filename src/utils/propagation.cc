@@ -58,7 +58,7 @@ SharedRanges* getRangesInSlice(Transaction* transaction, TaintedObject* obj, int
             newRanges = transaction->GetSharedVectorRange();
         }
 
-        newRanges->PushBack(transaction->GetRange(start, end, oRange->inputInfo));
+        newRanges->PushBack(transaction->GetRange(start, end, oRange->inputInfo, oRange->secureMarks));
     }
     return newRanges;
 }

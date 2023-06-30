@@ -22,7 +22,8 @@ describe('Ranges', function () {
         parameterName: 'param',
         parameterValue: 'test',
         type: 'REQUEST'
-      }
+      },
+      secureMarks: 0
     }]
     const taintedValue = TaintedUtils.newTaintedString(id, value, param, 'REQUEST')
 

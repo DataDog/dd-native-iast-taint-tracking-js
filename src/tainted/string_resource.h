@@ -5,6 +5,7 @@
 #ifndef SRC_TAINTED_STRING_RESOURCE_H_
 #define SRC_TAINTED_STRING_RESOURCE_H_
 #include <node.h>
+#include <string>
 
 namespace iast {
 namespace tainted {
@@ -27,6 +28,17 @@ class StringResource : public v8::String::ExternalStringResource {
 };
 
 v8::Local<v8::String> NewExternalString(v8::Isolate* isolate, v8::Local<v8::Value> obj);
+inline v8::Local<v8::String> NewStringInstanceForNewTaintedObject(v8::Isolate* isolate, v8::Local<v8::String> obj) {
+    // if string length < 10 then make a new one in order to avoid cache issues.
+    int len =  obj->Length();
+    if (len == 1) {
+        return tainted::NewExternalString(isolate, obj);
+    } else {
+        v8::String::Utf8Value param1(isolate, obj);
+        std::string cppStr(*param1);
+        return v8::String::NewFromUtf8(isolate, cppStr.c_str(), v8::NewStringType::kNormal).ToLocalChecked();
+    }
+}
 }  // namespace tainted
 }  // namespace iast
 #endif  // SRC_TAINTED_STRING_RESOURCE_H_

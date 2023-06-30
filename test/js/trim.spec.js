@@ -327,6 +327,19 @@ describe('Trim operator', function () {
       testTrimNoTaintedResult(String.prototype.trim, TaintedUtils.trim)
     })
 
+    it('Secure marks are inherited', () => {
+      let op1 = '   hello world   '
+      op1 = TaintedUtils.newTaintedString(id, op1, 'param1', 'REQUEST')
+      op1 = TaintedUtils.addSecureMarksToTaintedString(id, op1, 0b0110)
+
+      let result = op1.trim()
+      result = TaintedUtils.trim(id, result, op1)
+
+      const ranges = TaintedUtils.getRanges(id, result)
+      assert.equal(ranges.length, 1)
+      assert.equal(ranges[0].secureMarks, 0b0110)
+    })
+
     describe('Check result not tainted when no ranges left', function () {
       noTaintTestCases.trim.forEach((testString) => {
         it(`Test ${testString}`, () => {

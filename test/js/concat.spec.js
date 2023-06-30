@@ -36,6 +36,23 @@ describe('Plus operator', function () {
     assert.equal(true, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   })
 
+  it('Secure marks are inherited', () => {
+    let op1 = 'hello'
+    let op2 = ' world'
+    op1 = TaintedUtils.newTaintedString(id, op1, 'param', 'REQUEST')
+    op2 = TaintedUtils.newTaintedString(id, op2, 'param', 'REQUEST')
+    op1 = TaintedUtils.addSecureMarksToTaintedString(id, op1, 0b0110)
+    op2 = TaintedUtils.addSecureMarksToTaintedString(id, op2, 0b1001)
+
+    let ret = op1 + op2
+    ret = TaintedUtils.concat(id, ret, op1, op2)
+
+    const ranges = TaintedUtils.getRanges(id, ret)
+    assert.equal(ranges.length, 2)
+    assert.equal(ranges[0].secureMarks, 0b0110)
+    assert.equal(ranges[1].secureMarks, 0b1001)
+  })
+
   it('Check ranges', function () {
     let op1 = 'hello'
     let op2 = ' world'
@@ -50,7 +67,8 @@ describe('Plus operator', function () {
             parameterName: 'param',
             parameterValue: 'hello',
             type: 'REQUEST'
-          }
+          },
+        secureMarks: 0
       },
       {
         start: op1.length,
@@ -60,7 +78,8 @@ describe('Plus operator', function () {
             parameterName: 'param',
             parameterValue: ' world',
             type: 'REQUEST'
-          }
+          },
+        secureMarks: 0
       }
     ]
 
@@ -93,7 +112,8 @@ describe('Plus operator', function () {
             parameterName: 'param',
             parameterValue: 'hello',
             type: 'REQUEST'
-          }
+          },
+        secureMarks: 0
       }
     ]
 
@@ -122,7 +142,8 @@ describe('Plus operator', function () {
             parameterName: 'param',
             parameterValue: ' world',
             type: 'REQUEST'
-          }
+          },
+        secureMarks: 0
       }
     ]
 

@@ -195,6 +195,24 @@ describe('Replace', function () {
         assert.equal(formatTaintedValue(id, result), expected, 'Unexpected vale')
       })
     })
+
+    it('Secure marks are inherited', () => {
+      let op1 = 'helloREPLACEworld'
+      let op2 = ' '
+      op1 = TaintedUtils.newTaintedString(id, op1, 'param1', 'REQUEST')
+      op2 = TaintedUtils.newTaintedString(id, op2, 'param2', 'REQUEST')
+      op1 = TaintedUtils.addSecureMarksToTaintedString(id, op1, 0b0110)
+      op2 = TaintedUtils.addSecureMarksToTaintedString(id, op2, 0b1001)
+
+      let result = op1.replace('REPLACE', op2)
+      result = TaintedUtils.replace(id, result, op1, 'REPLACE', op2)
+
+      const ranges = TaintedUtils.getRanges(id, result)
+      assert.equal(ranges.length, 3)
+      assert.equal(ranges[0].secureMarks, 0b0110)
+      assert.equal(ranges[1].secureMarks, 0b1001)
+      assert.equal(ranges[2].secureMarks, 0b0110)
+    })
   })
 
   describe('when the matcher is a Regex and replacer is string without special char', () => {

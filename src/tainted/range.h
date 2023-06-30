@@ -13,13 +13,14 @@ namespace iast {
 namespace tainted {
 class Range {
  public:
-    explicit Range(int start, int end, InputInfo *inputInfo);
+    explicit Range(int start, int end, InputInfo *inputInfo, int secureMarks);
     Range(const Range& taintedRange);
     ~Range();
     v8::Local<v8::Object> toJSObject(v8::Isolate* isolate);
     int start;
     int end;
     InputInfo* inputInfo;
+    int secureMarks;
 };
 }    // namespace tainted
 }    // namespace iast

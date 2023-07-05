@@ -39,7 +39,7 @@ class Transaction {
             v8::Local<v8::Value> parameterValue,
             v8::Local<v8::Value> type);
 
-    Range* GetRange(int start, int end, InputInfo *inputInfo, int secureMarks) {
+    Range* GetRange(int start, int end, InputInfo *inputInfo, secure_marks_t secureMarks) {
         return _rangesPool.Pop(start, end, inputInfo, secureMarks);
     }
 

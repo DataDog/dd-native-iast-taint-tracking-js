@@ -34,6 +34,7 @@ using v8::Value;
 using v8::Array;
 
 using iast::tainted::InputInfo;
+using iast::tainted::secure_marks_t;
 
 namespace iast {
 namespace api {
@@ -143,39 +144,36 @@ void AddSecureMarksToTaintedString(const FunctionCallbackInfo<Value>& args) {
 
     args.GetReturnValue().Set(taintedString);
 
-    int secureMarks = secureMarksArgument->IntegerValue(context).FromJust();
+    secure_marks_t secureMarks = secureMarksArgument->IntegerValue(context).FromJust();
     if (secureMarks == 0) {
         // not secure marks to add
         return;
     }
 
     uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
+    auto transaction = NewTransaction(transactionId);
+    if (transaction == nullptr) {
+        return;
+    }
+    auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(taintedString));
+    if (!taintedObj) {
+        // It is not a tainted object, do nothing
+        return;
+    }
     try {
-        auto transaction = NewTransaction(transactionId);
-        if (transaction == nullptr) {
-            return;
-        }
-        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(taintedString));
-        if (!taintedObj) {
-            // It is not a tainted object, do nothing
-            return;
-        }
-
         auto newRanges = transaction->GetSharedVectorRange();
-        if (newRanges) {
-            auto oRanges = taintedObj->getRanges();
-            taintedString = tainted::NewStringInstanceForNewTaintedObject
-                    (isolate, v8::Local<v8::String>::Cast(taintedString));
-            for (auto it = oRanges->begin(); it != oRanges->end(); ++it) {
-                auto oRange = *it;
-                int start = oRange->start;
-                int end = oRange->end;
-                int oSecureMarks = oRange->secureMarks;
-                newRanges->PushBack(transaction->GetRange(start, end, oRange->inputInfo, oSecureMarks | secureMarks));
-            }
-            transaction->AddTainted(utils::GetLocalStringPointer(taintedString), newRanges, taintedString);
-            args.GetReturnValue().Set(taintedString);
+        auto oRanges = taintedObj->getRanges();
+        taintedString = tainted::NewStringInstanceForNewTaintedObject
+                (isolate, v8::Local<v8::String>::Cast(taintedString));
+        for (auto it = oRanges->begin(); it != oRanges->end(); ++it) {
+            auto oRange = *it;
+            auto start = oRange->start;
+            auto end = oRange->end;
+            auto oSecureMarks = oRange->secureMarks;
+            newRanges->PushBack(transaction->GetRange(start, end, oRange->inputInfo, oSecureMarks | secureMarks));
         }
+        transaction->AddTainted(utils::GetLocalStringPointer(taintedString), newRanges, taintedString);
+        args.GetReturnValue().Set(taintedString);
     } catch (const std::bad_alloc& err) {
     } catch (const container::QueuedPoolBadAlloc& err) {
     } catch (const container::PoolBadAlloc& err) {

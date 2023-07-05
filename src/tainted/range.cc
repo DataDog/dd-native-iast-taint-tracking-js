@@ -21,7 +21,7 @@ v8::Persistent<v8::Value> endLabel;
 v8::Persistent<v8::Value> iinfoLabel;
 v8::Persistent<v8::Value> secureMarksLabel;
 
-Range::Range(int start, int end, InputInfo *inputInfo, int secureMarks) {
+Range::Range(int start, int end, InputInfo *inputInfo, secure_marks_t secureMarks) {
     this->start = start;
     this->end = end;
     this->inputInfo = inputInfo;

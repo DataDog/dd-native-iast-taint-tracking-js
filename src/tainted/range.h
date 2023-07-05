@@ -11,16 +11,17 @@
 
 namespace iast {
 namespace tainted {
+using secure_marks_t = uint16_t;
 class Range {
  public:
-    explicit Range(int start, int end, InputInfo *inputInfo, int secureMarks);
+    explicit Range(int start, int end, InputInfo *inputInfo, secure_marks_t secureMarks);
     Range(const Range& taintedRange);
     ~Range();
     v8::Local<v8::Object> toJSObject(v8::Isolate* isolate);
     int start;
     int end;
     InputInfo* inputInfo;
-    int secureMarks;
+    secure_marks_t secureMarks;
 };
 }    // namespace tainted
 }    // namespace iast

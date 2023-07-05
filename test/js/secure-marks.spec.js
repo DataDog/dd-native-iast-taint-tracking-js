@@ -7,12 +7,18 @@
 const { TaintedUtils } = require('./util')
 const assert = require('assert')
 describe('Secure marks', function () {
-  const id = '666'
+  const id = TaintedUtils.createTransaction('666')
   const value = 'test'
   const param = 'param'
 
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
+  })
+
+  it('Wrong arguments', function () {
+    assert.throws(function () {
+      TaintedUtils.addSecureMarksToTaintedString(id, value)
+    }, Error)
   })
 
   it('By default securemarks is 0', () => {
@@ -103,7 +109,19 @@ describe('Secure marks', function () {
     const markedRanges1 = TaintedUtils.getRanges(id, result)
 
     assert.equal(markedRanges1.length, 2)
+    assert.equal(markedRanges1[0].secureMarks, 0b1)
     assert.equal(markedRanges1[1].secureMarks, 0b1)
-    assert.equal(markedRanges1[1].secureMarks, 0b1)
+  })
+
+  it('Secure marks limits test', () => {
+    const originalTaintedValue = TaintedUtils.newTaintedString(id, 'range1TOREPLACErange2', param, 'REQUEST')
+    const taintedValueWithSecureMarks = TaintedUtils.addSecureMarksToTaintedString(id, originalTaintedValue, 0xffaf)
+    const taintedValueWithSecureMarks2 =
+      TaintedUtils.addSecureMarksToTaintedString(id, originalTaintedValue, 0xffaff) // over the limit
+
+    const markedRanges1 = TaintedUtils.getRanges(id, taintedValueWithSecureMarks)
+    const markedRanges2 = TaintedUtils.getRanges(id, taintedValueWithSecureMarks2)
+    assert.equal(markedRanges1[0].secureMarks, 0xffaf)
+    assert.equal(markedRanges2[0].secureMarks, 0xfaff)
   })
 })

@@ -29,7 +29,6 @@ class StringResource : public v8::String::ExternalStringResource {
 
 v8::Local<v8::String> NewExternalString(v8::Isolate* isolate, v8::Local<v8::Value> obj);
 inline v8::Local<v8::String> NewStringInstanceForNewTaintedObject(v8::Isolate* isolate, v8::Local<v8::String> obj) {
-    // if string length < 10 then make a new one in order to avoid cache issues.
     int len =  obj->Length();
     if (len == 1) {
         return tainted::NewExternalString(isolate, obj);

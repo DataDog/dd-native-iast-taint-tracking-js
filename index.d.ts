@@ -16,6 +16,7 @@ declare module 'datadog-iast-taint-tracking' {
         start: number;
         end: number;
         iinfo: NativeInputInfo;
+        secureMarks: number;
         readonly ref?: string;
     }
 

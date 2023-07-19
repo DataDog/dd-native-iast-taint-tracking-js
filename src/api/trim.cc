@@ -85,7 +85,7 @@ void TaintTrimOperator(const FunctionCallbackInfo<Value>& args) {
             }
 
             if (newRangeEnd > newRangeStart) {
-                auto newRange = transaction->GetRange(newRangeStart, newRangeEnd, range->inputInfo);
+                auto newRange = transaction->GetRange(newRangeStart, newRangeEnd, range->inputInfo, range->secureMarks);
                 resultRanges->PushBack(newRange);
             }
         }
@@ -150,7 +150,7 @@ void TaintTrimEndOperator(const FunctionCallbackInfo<Value>& args) {
             }
 
             if (newRangeEnd > newRangeStart) {
-                auto newRange = transaction->GetRange(newRangeStart, newRangeEnd, range->inputInfo);
+                auto newRange = transaction->GetRange(newRangeStart, newRangeEnd, range->inputInfo, range->secureMarks);
                 resultRanges->PushBack(newRange);
             }
         }

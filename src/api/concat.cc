@@ -70,7 +70,7 @@ void TaintConcatOperator(const FunctionCallbackInfo<Value>& args) {
                             auto argRange = *it;
                             auto newRange = transaction->GetRange(offset + argRange->start
                                     , offset + argRange->end,
-                                    argRange->inputInfo);
+                                    argRange->inputInfo, argRange->secureMarks);
                             ranges->PushBack(newRange);
                         }
                     } else {

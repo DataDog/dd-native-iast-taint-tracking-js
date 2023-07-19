@@ -58,7 +58,7 @@ inline void addReplacerRanges(Transaction* transaction,
             for (auto replacerIt = replacerRanges->begin(); replacerItEnd != replacerIt; replacerIt++) {
                 auto range = (*replacerIt);
                 newRanges->PushBack(transaction->GetRange(range->start + toReplaceStart,
-                            range->end + toReplaceStart, range->inputInfo));
+                            range->end + toReplaceStart, range->inputInfo, range->secureMarks));
             }
         }
     }
@@ -86,7 +86,8 @@ inline SharedRanges* adjustReplacementRanges(Transaction* transaction,
             if (range->end <= toReplaceStart) {
                 newRanges->PushBack(range);
             } else if (range->end > toReplaceStart) {
-                newRanges->PushBack(transaction->GetRange(range->start, toReplaceStart, range->inputInfo));
+                newRanges->PushBack(transaction->GetRange(range->start, toReplaceStart,
+                                                          range->inputInfo, range->secureMarks));
                 break;
             }
             ++subjectIt;
@@ -102,13 +103,13 @@ inline SharedRanges* adjustReplacementRanges(Transaction* transaction,
                 if (range->start <= toReplaceEnd) {
                     newRanges->PushBack(transaction->GetRange(toReplaceEnd + offset,
                                 range->end + offset,
-                                range->inputInfo));
+                                range->inputInfo, range->secureMarks));
                 } else if (offset == 0) {
                     newRanges->PushBack(range);
                 } else {
                     newRanges->PushBack(transaction->GetRange(range->start + offset,
                                 range->end + offset,
-                                range->inputInfo));
+                                range->inputInfo, range->secureMarks));
                 }
             }
             subjectIt++;
@@ -161,7 +162,7 @@ inline SharedRanges* adjustRegexReplacementRanges(Transaction* transaction,
                     if (start == range->start && end == range->end) {
                         newRanges->PushBack(range);
                     } else {
-                        newRanges->PushBack(transaction->GetRange(start, end, range->inputInfo));
+                        newRanges->PushBack(transaction->GetRange(start, end, range->inputInfo, range->secureMarks));
                     }
                 }
                 if (breakLoop) {
@@ -183,13 +184,13 @@ inline SharedRanges* adjustRegexReplacementRanges(Transaction* transaction,
             if (lastEnd < range->end) {
                 if (lastEnd > range->start) {
                     newRanges->PushBack(transaction->GetRange(lastEnd + offset, range->end + offset,
-                                range->inputInfo));
+                                range->inputInfo, range->secureMarks));
                 } else if (offset == 0) {
                     newRanges->PushBack(range);
                 } else {
                     newRanges->PushBack(
                             transaction->GetRange(range->start + offset, range->end + offset,
-                                range->inputInfo));
+                                range->inputInfo, range->secureMarks));
                 }
             }
             ++subjectIt;

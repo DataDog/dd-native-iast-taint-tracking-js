@@ -177,4 +177,17 @@ describe('Slice', function () {
       })
     })
   })
+
+  it('Secure marks are inherited', () => {
+    let op1 = 'hello world'
+    op1 = TaintedUtils.newTaintedString(id, op1, 'param1', 'REQUEST')
+    op1 = TaintedUtils.addSecureMarksToTaintedString(id, op1, 0b0110)
+
+    let result = op1.slice(6)
+    result = TaintedUtils.slice(id, result, op1, 6)
+
+    const ranges = TaintedUtils.getRanges(id, result)
+    assert.equal(ranges.length, 1)
+    assert.equal(ranges[0].secureMarks, 0b0110)
+  })
 })

@@ -21,6 +21,7 @@
 #include "../gc/gc.h"
 #include "../iast.h"
 #include "v8.h"
+#include "../utils/string_utils.h"
 
 using v8::Exception;
 using v8::FunctionCallbackInfo;
@@ -33,6 +34,7 @@ using v8::Value;
 using v8::Array;
 
 using iast::tainted::InputInfo;
+using iast::tainted::secure_marks_t;
 
 namespace iast {
 namespace api {
@@ -98,7 +100,7 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
 
         auto range = transaction->GetRange(0,
                 utils::GetLength(args.GetIsolate(), parameterValue),
-                inputInfo);
+                inputInfo, 0);
         auto ranges = transaction->GetSharedVectorRange();
         ranges->PushBack(range);
         auto stringPointer = utils::GetLocalStringPointer(parameterValue);
@@ -112,6 +114,71 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
     }
 }
 
+void AddSecureMarksToTaintedString(const FunctionCallbackInfo<Value>& args) {
+    auto isolate = args.GetIsolate();
+    if (args.Length() < 3) {
+        isolate->ThrowException(v8::Exception::TypeError(
+                v8::String::NewFromUtf8(isolate,
+                                        "Wrong number of arguments",
+                                        v8::NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+
+    if (!(args[0]->IsString()) || !Local<String>::Cast(args[0])->Length()) {
+        // invalid transaction id, return taintedString
+        args.GetReturnValue().Set(args[1]);
+        return;
+    }
+
+    if (!(args[1]->IsString())) {
+        // invalid taintedString, return it
+        args.GetReturnValue().Set(args[1]);
+        return;
+    }
+
+    auto context = isolate->GetCurrentContext();
+
+    auto transactionIdArgument = args[0];
+    auto taintedString = args[1];
+    auto secureMarksArgument = args[2];
+
+    args.GetReturnValue().Set(taintedString);
+
+    secure_marks_t secureMarks = secureMarksArgument->IntegerValue(context).FromJust();
+    if (secureMarks == 0) {
+        // not secure marks to add
+        return;
+    }
+
+    uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
+    auto transaction = NewTransaction(transactionId);
+    if (transaction == nullptr) {
+        return;
+    }
+    auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(taintedString));
+    if (!taintedObj) {
+        // It is not a tainted object, do nothing
+        return;
+    }
+    try {
+        auto newRanges = transaction->GetSharedVectorRange();
+        auto oRanges = taintedObj->getRanges();
+        taintedString = tainted::NewStringInstanceForNewTaintedObject
+                (isolate, v8::Local<v8::String>::Cast(taintedString));
+        for (auto it = oRanges->begin(); it != oRanges->end(); ++it) {
+            auto oRange = *it;
+            auto start = oRange->start;
+            auto end = oRange->end;
+            auto oSecureMarks = oRange->secureMarks;
+            newRanges->PushBack(transaction->GetRange(start, end, oRange->inputInfo, oSecureMarks | secureMarks));
+        }
+        transaction->AddTainted(utils::GetLocalStringPointer(taintedString), newRanges, taintedString);
+        args.GetReturnValue().Set(taintedString);
+    } catch (const std::bad_alloc& err) {
+    } catch (const container::QueuedPoolBadAlloc& err) {
+    } catch (const container::PoolBadAlloc& err) {
+    }
+}
 void IsTainted(const FunctionCallbackInfo<Value>& args) {
     auto argsLength = args.Length();
     if (argsLength < 2) {
@@ -149,7 +216,6 @@ void GetRanges(const FunctionCallbackInfo<Value>& args) {
                 NewStringType::kNormal).ToLocalChecked()));
         return;
     }
-
     uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
     auto transaction = GetTransaction(transactionId);
     if (transaction != nullptr) {
@@ -206,6 +272,7 @@ void SetMaxTransactions(const FunctionCallbackInfo<Value>& args) {
 void StringMethods::Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "createTransaction", CreateTransaction);
     NODE_SET_METHOD(exports, "newTaintedString", NewTaintedString);
+    NODE_SET_METHOD(exports, "addSecureMarksToTaintedString", AddSecureMarksToTaintedString);
     NODE_SET_METHOD(exports, "isTainted", IsTainted);  // TODO(julio): support several objects.
     NODE_SET_METHOD(exports, "getRanges", GetRanges);
     NODE_SET_METHOD(exports, "removeTransaction", DeleteTransaction);

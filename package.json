@@ -10,6 +10,7 @@
     "build:arm": "node-gyp configure -arch=arm64 && node-gyp build -arch=arm64",
     "build:asan": "node-gyp configure && CXXFLAGS=\"-g -O0 -fsanitize=address\" LDFLAGS=\"-fsanitize=address\" node-gyp build",
     "build:valgrind": "node-gyp configure && CXXFLAGS=\"-g -O0\" node-gyp build",
+    "install": "exit 0",
     "lint": "eslint . -c ./.eslintrc.json",
     "postbuild": "node ./scripts/pack.js",
     "postbuild:asan": "npm run postbuild",

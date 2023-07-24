@@ -26,7 +26,7 @@ jobs:
         id: package
       - uses: actions/upload-artifact@v3
         with:
-          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
           path: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
 
   create_release:
@@ -68,8 +68,12 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v3
+      - uses: codex-team/action-nodejs-package-info@v1.1
+        id: package
       - uses: actions/download-artifact@v3
+        with:
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
       - uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
-      - run: npm publish
+      - run: npm publish ./datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz

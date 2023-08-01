@@ -11,8 +11,16 @@ describe('Taint strings', function () {
   const value = 'test'
   const id = TaintedUtils.createTransaction('1')
 
+  before(() => {
+    TaintedUtils.setMaxTransactions(1)
+  })
+
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
+  })
+
+  after(() => {
+    TaintedUtils.setMaxTransactions(2)
   })
 
   it('Taint new string with undefined transaction', function () {

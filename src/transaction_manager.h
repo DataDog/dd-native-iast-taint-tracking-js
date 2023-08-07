@@ -20,12 +20,12 @@ class TransactionManager {
     void operator=(TransactionManager const&) = delete;
 
     T* New(U id) {
-        if (_map.size() >= _maxItems) {
-            return nullptr;
-        }
-
         auto found = _map.find(id);
         if (found == _map.end()) {
+            if (_map.size() >= _maxItems) {
+                return nullptr;
+            }
+
             T* item = _pool.Pop(id);
             _map[id] = item;
             return item;

@@ -151,7 +151,8 @@ void AddSecureMarksToTaintedString(const FunctionCallbackInfo<Value>& args) {
     }
 
     uintptr_t transactionId = utils::GetLocalStringPointer(transactionIdArgument);
-    auto transaction = NewTransaction(transactionId);
+
+    auto transaction = GetTransaction(transactionId);
     if (transaction == nullptr) {
         return;
     }

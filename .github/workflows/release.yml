@@ -39,7 +39,7 @@ jobs:
         id: package
       - uses: actions/download-artifact@v3
         with:
-          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
+          name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
       - uses: actions/create-release@v1
         id: create_release
         env:

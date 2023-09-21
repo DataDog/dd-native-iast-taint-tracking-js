@@ -108,6 +108,16 @@ describe('Taint strings', function () {
     assert.strictEqual(ret, false, 'Unexpected value')
   })
 
+  it('Do not taint empty string', function () {
+    let ret
+    const value = ''
+
+    ret = TaintedUtils.newTaintedString(id, value, 'param', 'REQUEST')
+    assert.strictEqual(ret, '', 'Unexpected value')
+    ret = TaintedUtils.isTainted(id, ret)
+    assert.strictEqual(ret, false, 'Unexpected value')
+  })
+
   it('Max values', function () {
     let ret
     const values = new Array(MAX_TAINTED_OBJECTS).fill('value')

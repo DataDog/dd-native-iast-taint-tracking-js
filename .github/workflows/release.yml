@@ -64,6 +64,8 @@ jobs:
     needs: pack
     runs-on: ubuntu-latest
     environment: npm
+    permissions:
+      id-token: write
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -76,4 +78,4 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
-      - run: npm publish ./datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
+      - run: npm publish ./datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz --provenance

@@ -38,6 +38,13 @@ void slice(const FunctionCallbackInfo<Value>& args) {
     auto context = isolate->GetCurrentContext();
     auto vResult = args[1];
     auto vSubject = args[2];
+
+    int len =  v8::Local<v8::String>::Cast(vResult)->Length();
+    if (len == 0) {
+        args.GetReturnValue().Set(vResult);
+        return;
+    }
+
     int sliceStart = args[3]->IntegerValue(context).FromJust();
 
     Transaction* transaction = GetTransaction(GetLocalStringPointer(args[0]));

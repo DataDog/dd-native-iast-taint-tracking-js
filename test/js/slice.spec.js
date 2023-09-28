@@ -178,6 +178,16 @@ describe('Slice', function () {
     })
   })
 
+  it('Check slice empty string result', function () {
+    let op1 = 'hello world'
+    op1 = TaintedUtils.newTaintedString(id, op1, 'param1', 'REQUEST')
+
+    let result = op1.slice(6, 6)
+    result = TaintedUtils.slice(id, result, op1, 6)
+
+    assert.equal(TaintedUtils.isTainted(id, result), false, 'Empty string is tainted')
+  })
+
   it('Secure marks are inherited', () => {
     let op1 = 'hello world'
     op1 = TaintedUtils.newTaintedString(id, op1, 'param1', 'REQUEST')

@@ -7,7 +7,7 @@ jobs:
     needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [12, 14, 16, 18, 19, 20]
+        version: [12, 14, 16, 18, 19, 20, 21]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,7 +24,7 @@ jobs:
     needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [12, 14, 16, 18, 19, 20]
+        version: [12, 14, 16, 18, 19, 20, 21]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

@@ -115,6 +115,30 @@ describe('Slice', function () {
       result: 'b:+-a-+:z:+-z-+::+-z-+:',
       start: 6,
       end: 20
+    },
+    {
+      source: ':+-bar-+:foo:+-baz-+:',
+      result: ':+-bar-+:foo:+-b-+:',
+      start: -200,
+      end: -2
+    },
+    {
+      source: ':+-bar-+:foo:+-baz-+:',
+      result: '',
+      start: -200,
+      end: -30
+    },
+    {
+      source: ':+-bar-+:foo:+-baz-+:',
+      result: ':+-bar-+:foo:+-ba-+:',
+      start: -200,
+      end: 8
+    },
+    {
+      source: ':+-bar-+:foo:+-baz-+:',
+      result: ':+-bar-+:foo:+-baz-+:',
+      start: -200,
+      end: 200
     }
   ]
 

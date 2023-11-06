@@ -64,7 +64,7 @@ void slice(const FunctionCallbackInfo<Value>& args) {
         int subjectLength = Local<String>::Cast(vSubject)->Length();
         int resultLength = Local<String>::Cast(vResult)->Length();
         int sliceEnd = args.Length() > 4 ? args[4]->IntegerValue(context).FromJust() : subjectLength;
-        sliceStart = sliceStart < 0 ? subjectLength + sliceStart : sliceStart;
+        sliceStart = sliceStart < 0 ? MAX(subjectLength + sliceStart, 0) : sliceStart;
         sliceEnd = sliceEnd < 0 ? subjectLength + sliceEnd : sliceEnd;
         auto newRanges = getRangesInSlice(transaction, taintedObj, sliceStart, sliceEnd);
         if (newRanges && newRanges->Size() > 0) {

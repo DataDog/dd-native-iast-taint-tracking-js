@@ -153,7 +153,7 @@ void substr(const FunctionCallbackInfo<Value>& args) {
     }
 
     try {
-        start = (start >= 0) ? start : subjectLen + start;
+        start = (start >= 0) ? start : MAX(subjectLen + start, 0);
         length = ((start + length) >= subjectLen) ? subjectLen : start + length;
 
         auto newRanges = getRangesInSlice(transaction, taintedObj, start, length);

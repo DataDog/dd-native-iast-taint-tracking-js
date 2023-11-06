@@ -135,6 +135,36 @@ const rangesTestCases = [
     result: 'b:+-a-+:z:+-z-+::+-z-+:',
     start: 6,
     end: 20
+  },
+  {
+    source: ':+-bar-+:foo:+-baz-+:',
+    result: ':+-bar-+:foo:+-b-+:',
+    start: -200,
+    end: 7
+  },
+  {
+    source: ':+-bar-+:foo:+-baz-+:',
+    result: '',
+    start: -200,
+    end: -30
+  },
+  {
+    source: ':+-bar-+:foo:+-baz-+:',
+    result: ':+-bar-+:foo:+-baz-+:',
+    start: -200,
+    end: 200
+  },
+  {
+    source: ':+-bar-+:foo:+-baz-+:',
+    result: ':+-ar-+:foo:+-b-+:',
+    start: 7,
+    end: 1
+  },
+  {
+    source: ':+-bar-+:foo:+-baz-+:',
+    result: '',
+    start: 10,
+    end: 19
   }
 ]
 

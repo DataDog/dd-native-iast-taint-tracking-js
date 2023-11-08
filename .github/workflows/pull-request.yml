@@ -40,7 +40,7 @@ jobs:
 
   build:
     needs: ['cpp-lint', 'js-lint']
-    uses: Datadog/action-prebuildify/.github/workflows/build.yml@ccapell/fix-node-gyp-python
+    uses: Datadog/action-prebuildify/.github/workflows/build.yml@main
     with:
       cache: false
       napi: false

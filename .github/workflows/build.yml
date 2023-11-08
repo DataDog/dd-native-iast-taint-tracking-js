@@ -52,7 +52,6 @@ jobs:
       prebuild: 'node scripts/prebuild'
       skip: 'linux-arm linux-ia32'
       target-name: 'iastnativemethods'
-      min-node-version: 14
 
   cpp-test-libc:
     needs: ['build']

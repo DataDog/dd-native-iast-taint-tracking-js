@@ -164,6 +164,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
+      - run: |
+          npm install --global node-gyp --ignore-engines
+        shell: bash
       - run: npm ci --ignore-scripts
       - uses: codex-team/action-nodejs-package-info@v1
         id: package

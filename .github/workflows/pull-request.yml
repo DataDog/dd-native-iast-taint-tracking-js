@@ -165,11 +165,11 @@ jobs:
         with:
           node-version: '18'
       - run: npm ci --ignore-scripts
-      - uses: codex-team/action-nodejs-package-info@v1
-        id: package
       - run: |
           npm install --global node-gyp --ignore-engines
         shell: bash
+      - uses: codex-team/action-nodejs-package-info@v1
+        id: package
       - uses: actions/download-artifact@v3
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}

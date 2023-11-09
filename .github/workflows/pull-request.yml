@@ -165,7 +165,7 @@ jobs:
         with:
           node-version: '18'
       - run: npm ci --ignore-scripts
-      - run: npm install node-gyp
+      - run: npm install -g node-gyp
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
       - uses: actions/download-artifact@v3

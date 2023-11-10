@@ -20,6 +20,8 @@ and project dependencies:
 $ npm install
 ```
 
+Last but not least, you should install `node-gyp` in your environment: [node-gyp installation](https://github.com/nodejs/node-gyp#installation)
+
 Tests can be launched with the following commands:
 1. `$ npm run test`
 2. `$ npm run test-js`

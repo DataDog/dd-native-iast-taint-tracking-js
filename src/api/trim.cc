@@ -42,14 +42,14 @@ void TaintTrimOperator(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transaction = GetTransaction(utils::GetLocalStringPointer(args[0]));
+    auto transaction = GetTransaction(utils::GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(args[1]);
         return;
     }
 
     try {
-        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[2]));
+        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalPointer(args[2]));
         auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
         if (ranges == nullptr) {
             args.GetReturnValue().Set(args[1]);
@@ -95,7 +95,7 @@ void TaintTrimOperator(const FunctionCallbackInfo<Value>& args) {
             if (resultLength == 1) {
                 res = tainted::NewExternalString(isolate, res);
             }
-            auto key = utils::GetLocalStringPointer(res);
+            auto key = utils::GetLocalPointer(res);
             transaction->AddTainted(key, resultRanges, res);
             args.GetReturnValue().Set(res);
             return;
@@ -122,14 +122,14 @@ void TaintTrimEndOperator(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transaction = GetTransaction(utils::GetLocalStringPointer(args[0]));
+    auto transaction = GetTransaction(utils::GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(args[1]);
         return;
     }
 
     try {
-        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalStringPointer(args[2]));
+        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalPointer(args[2]));
         auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
         if (ranges == nullptr) {
             args.GetReturnValue().Set(args[1]);
@@ -160,7 +160,7 @@ void TaintTrimEndOperator(const FunctionCallbackInfo<Value>& args) {
             if (resultLength == 1) {
                 res = tainted::NewExternalString(isolate, res);
             }
-            auto key = utils::GetLocalStringPointer(res);
+            auto key = utils::GetLocalPointer(res);
             transaction->AddTainted(key, resultRanges, res);
             args.GetReturnValue().Set(res);
             return;

@@ -41,7 +41,7 @@ void GetMetrics(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    uintptr_t transactionId = utils::GetLocalStringPointer(args[0]);
+    uintptr_t transactionId = utils::GetLocalPointer(args[0]);
     auto transaction = GetTransaction(transactionId);
     if (!transaction) {
         args.GetReturnValue().SetNull();

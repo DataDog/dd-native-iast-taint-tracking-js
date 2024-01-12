@@ -30,7 +30,7 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 
-using iast::utils::GetLocalStringPointer;
+using iast::utils::GetLocalPointer;
 using iast::utils::getRangesInSlice;
 
 namespace iast {
@@ -68,7 +68,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         args.GetReturnValue().Set(result);
         return;
     }
-    auto transaction = GetTransaction(GetLocalStringPointer(args[0]));
+    auto transaction = GetTransaction(GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(result);
         return;
@@ -79,7 +79,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto taintedObj = transaction->FindTaintedObject(GetLocalStringPointer(subject));
+    auto taintedObj = transaction->FindTaintedObject(GetLocalPointer(subject));
     if (!taintedObj) {
         args.GetReturnValue().Set(result);
         return;
@@ -92,7 +92,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
             if (resultLen == 1) {
                 result = tainted::NewExternalString(isolate, args[1]);
             }
-            transaction->AddTainted(GetLocalStringPointer(result), newRanges, result);
+            transaction->AddTainted(GetLocalPointer(result), newRanges, result);
         }
     } catch (const std::bad_alloc& err) {
     } catch (const container::QueuedPoolBadAlloc& err) {
@@ -135,7 +135,7 @@ void substr(const FunctionCallbackInfo<Value>& args) {
         length = TO_INTEGER_VALUE(args[4], context);
     }
 
-    auto transaction = GetTransaction(GetLocalStringPointer(args[0]));
+    auto transaction = GetTransaction(GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(result);
         return;
@@ -146,7 +146,7 @@ void substr(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto taintedObj = transaction->FindTaintedObject(GetLocalStringPointer(subject));
+    auto taintedObj = transaction->FindTaintedObject(GetLocalPointer(subject));
     if (!taintedObj) {
         args.GetReturnValue().Set(result);
         return;
@@ -161,7 +161,7 @@ void substr(const FunctionCallbackInfo<Value>& args) {
             if (resultLen == 1) {
                 result = tainted::NewExternalString(isolate, args[1]);
             }
-            transaction->AddTainted(GetLocalStringPointer(result), newRanges, result);
+            transaction->AddTainted(GetLocalPointer(result), newRanges, result);
         }
     } catch (const std::bad_alloc& err) {
     } catch (const container::QueuedPoolBadAlloc& err) {

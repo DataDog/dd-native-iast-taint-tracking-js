@@ -33,7 +33,7 @@ class TaintedObject: public iast::WeakObjIface<TaintedObject*> {
     bool IsEmpty() { return target.IsEmpty(); }
 
     weak_key_t Get() {
-        return utils::GetLocalStringPointer(target.Get(v8::Isolate::GetCurrent()));
+        return utils::GetLocalPointer(target.Get(v8::Isolate::GetCurrent()));
     }
 
     void Reset(v8::Local<v8::Value> v) {

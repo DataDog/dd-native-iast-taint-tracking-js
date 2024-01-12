@@ -61,11 +61,11 @@ class Transaction {
         _taintedMap.Rehash();
     }
 
-    void AddTainted(weak_key_t key, SharedRanges* ranges, v8::Local<v8::Value> jsString) {
+    void AddTainted(weak_key_t key, SharedRanges* ranges, v8::Local<v8::Value> jsValue) {
         // TODO(julio): trigger exception from the pool rather than a nullptr
         auto tainted = _taintedObjPool.Pop(key,
                 ranges,
-                jsString);
+                jsValue);
         if (tainted) {
             _taintedMap.Insert(key, tainted);
         }

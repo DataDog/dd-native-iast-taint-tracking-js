@@ -21,7 +21,7 @@ using v8::Isolate;
 using v8::String;
 using v8::NewStringType;
 using v8::Exception;
-using utils::GetLocalStringPointer;
+using utils::GetLocalPointer;
 using utils::getRangesInSlice;
 
 void slice(const FunctionCallbackInfo<Value>& args) {
@@ -47,13 +47,13 @@ void slice(const FunctionCallbackInfo<Value>& args) {
 
     int sliceStart = args[3]->IntegerValue(context).FromJust();
 
-    Transaction* transaction = GetTransaction(GetLocalStringPointer(args[0]));
+    Transaction* transaction = GetTransaction(GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(vResult);
         return;
     }
 
-    auto taintedObj = transaction->FindTaintedObject(GetLocalStringPointer(vSubject));
+    auto taintedObj = transaction->FindTaintedObject(GetLocalPointer(vSubject));
 
     if (!taintedObj) {
         args.GetReturnValue().Set(vResult);
@@ -71,7 +71,7 @@ void slice(const FunctionCallbackInfo<Value>& args) {
             if (resultLength == 1) {
                 vResult = tainted::NewExternalString(isolate, args[1]);
             }
-            transaction->AddTainted(GetLocalStringPointer(vResult), newRanges, vResult);
+            transaction->AddTainted(GetLocalPointer(vResult), newRanges, vResult);
         }
     } catch (const std::bad_alloc& err) {
     } catch (const container::QueuedPoolBadAlloc& err) {

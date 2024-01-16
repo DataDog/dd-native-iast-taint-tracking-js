@@ -67,6 +67,7 @@ describe('Taint objects', function () {
   })
 
   it('Check tainted String object', function () {
+    // eslint-disable-next-line no-new-wrappers
     const taintedValue = TaintedUtils.newTaintedObject(id, new String('test'), 'param', 'REQUEST')
     const ret = TaintedUtils.isTainted(id, taintedValue)
     assert.strictEqual(ret, true, 'Unexpected value')

@@ -83,7 +83,7 @@ describe('Taint objects', function () {
 
     assert.deepEqual(ranges[0], {
       start: 0,
-      end: 536870888, // v8 string max size = 4 ? (1 << 28) - 16 : (1 << 29) - 24;
+      end: 4,
       iinfo: {
         parameterName: 'param',
         parameterValue: value,

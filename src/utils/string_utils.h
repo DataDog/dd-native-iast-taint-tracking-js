@@ -47,16 +47,20 @@ inline int GetLength(v8::Isolate* isolate, v8::Local<v8::Value> val) {
         return v8::String::Cast(*val)->Length();
     } else if (val->IsStringObject()) {
         return v8::StringObject::Cast(*val)->ValueOf()->Length();
+    } else if (val->IsArrayBuffer()) {
+        return v8::ArrayBuffer::Cast(*val)->ByteLength();
+    } else if (val->IsArrayBufferView()) {
+        return v8::ArrayBufferView::Cast(*val)->ByteLength();
     } else {
         if (val->IsUndefined()) {
             return 0;
         } else if (val->IsNull()) {
             return 0;
         } else {
-            return v8::String::kMaxLength;
-            // auto context = isolate->GetCurrentContext();
-            // auto firstLocalString =  val->ToString(context).ToLocalChecked();
-            // return firstLocalString->Length();
+            // TODO: this case is when we try to taint unknown objects. We could return v8::String::kMaxLength to avoid calling val->ToString
+            auto context = isolate->GetCurrentContext();
+            auto firstLocalString =  val->ToString(context).ToLocalChecked();
+            return firstLocalString->Length();
         }
     }
 }

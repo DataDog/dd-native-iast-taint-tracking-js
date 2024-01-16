@@ -11,7 +11,7 @@
                 "./src/tainted/tainted_object.cc",
                 "./src/tainted/transaction.cc",
                 "./src/tainted/string_resource.cc",
-                "./src/api/string_methods.cc",
+                "./src/api/taint_methods.cc",
                 "./src/api/concat.cc",
                 "./src/api/trim.cc",
                 "./src/api/slice.cc",

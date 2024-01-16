@@ -12,7 +12,7 @@
 #include <iterator>
 #include <memory>
 
-#include "string_methods.h"
+#include "taint_methods.h"
 #include "../tainted/string_resource.h"
 #include "../tainted/input_info.h"
 #include "../tainted/tainted_object.h"
@@ -183,6 +183,7 @@ void AddSecureMarksToTaintedString(const FunctionCallbackInfo<Value>& args) {
     } catch (const container::PoolBadAlloc& err) {
     }
 }
+
 void IsTainted(const FunctionCallbackInfo<Value>& args) {
     auto argsLength = args.Length();
     if (argsLength < 2) {
@@ -332,7 +333,7 @@ void NewTaintedObject(const FunctionCallbackInfo<Value>& args) {
     }
 }
 
-void StringMethods::Init(Local<Object> exports) {
+void TaintMethods::Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "createTransaction", CreateTransaction);
     NODE_SET_METHOD(exports, "newTaintedString", NewTaintedString);
     NODE_SET_METHOD(exports, "addSecureMarksToTaintedString", AddSecureMarksToTaintedString);

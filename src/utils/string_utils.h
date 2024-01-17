@@ -57,7 +57,7 @@ inline int GetLength(v8::Isolate* isolate, v8::Local<v8::Value> val) {
         } else if (val->IsNull()) {
             return 0;
         } else {
-            // TODO(julio_igor): this case is when we try to taint unknown objects. 
+            // TODO(julio_igor): this case is when we try to taint unknown objects.
             // Could it return v8::String::kMaxLength to avoid calling val->ToString?
             auto context = isolate->GetCurrentContext();
             auto firstLocalString =  val->ToString(context).ToLocalChecked();

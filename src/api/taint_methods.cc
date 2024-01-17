@@ -290,7 +290,8 @@ void NewTaintedObject(const FunctionCallbackInfo<Value>& args) {
     }
 
     if ((args[1]->IsString())) {
-        return NewTaintedString(args);
+        args.GetReturnValue().Set(args[1]);
+        return;
     }
 
     auto transactionIdArgument = args[0];

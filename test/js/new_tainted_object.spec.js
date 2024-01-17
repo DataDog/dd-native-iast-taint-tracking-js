@@ -36,28 +36,13 @@ describe('Taint objects', function () {
     assert.strictEqual(ret, value, 'Unexpected value')
   })
 
-  it('Taint string through newTaintedObject method', function () {
+  it('Taint string through newTaintedObject method should not taint string', function () {
     const value = 'test'
     const ret = TaintedUtils.newTaintedObject(id, value, 'param', 'REQUEST')
     assert.strictEqual(ret, value, 'Unexpected value')
 
     // a new string is created when value length < 10
-    assert.strictEqual(true, TaintedUtils.isTainted(id, ret), 'value should be tainted')
-
-    const ranges = TaintedUtils.getRanges(id, ret)
-
-    assert.strictEqual(ranges.length, 1, 'Unexpected ranges length')
-
-    assert.deepEqual(ranges[0], {
-      start: 0,
-      end: ret.length,
-      iinfo: {
-        parameterName: 'param',
-        parameterValue: ret,
-        type: 'REQUEST'
-      },
-      secureMarks: 0
-    })
+    assert.strictEqual(false, TaintedUtils.isTainted(id, ret), 'value should not be tainted')
   })
 
   it('Check tainted object', function () {

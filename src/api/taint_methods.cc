@@ -289,7 +289,7 @@ void NewTaintedObject(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    if ((args[1]->IsString())) {
+    if (args[1]->IsString()) {
         args.GetReturnValue().Set(args[1]);
         return;
     }

@@ -27,7 +27,7 @@ using v8::Integer;
 using v8::Int32;
 
 using iast::tainted::Range;
-using iast::utils::GetLocalStringPointer;
+using iast::utils::GetLocalPointer;
 
 namespace iast {
 namespace api {
@@ -209,7 +209,7 @@ void TaintReplaceStringByStringMethod(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transaction = GetTransaction(GetLocalStringPointer(args[0]));
+    auto transaction = GetTransaction(GetLocalPointer(args[0]));
     if (!transaction) {
         args.GetReturnValue().Set(replaceResult);
         return;
@@ -218,8 +218,8 @@ void TaintReplaceStringByStringMethod(const FunctionCallbackInfo<Value>& args) {
     try {
         MatcherArguments methodArguments = {args[1], args[2], args[3], args[4], args[5]};
 
-        auto taintedSubject = transaction->FindTaintedObject(GetLocalStringPointer(methodArguments.self));
-        auto taintedReplacer = transaction->FindTaintedObject(GetLocalStringPointer(methodArguments.replacer));
+        auto taintedSubject = transaction->FindTaintedObject(GetLocalPointer(methodArguments.self));
+        auto taintedReplacer = transaction->FindTaintedObject(GetLocalPointer(methodArguments.replacer));
         auto subjectRanges = (taintedSubject) ? taintedSubject->getRanges() : nullptr;
         auto replacerRanges = (taintedReplacer) ? taintedReplacer->getRanges() : nullptr;
 
@@ -236,7 +236,7 @@ void TaintReplaceStringByStringMethod(const FunctionCallbackInfo<Value>& args) {
             if (resultLength == 1) {
                 replaceResult = tainted::NewExternalString(isolate, replaceResult);
             }
-            auto key = GetLocalStringPointer(replaceResult);
+            auto key = GetLocalPointer(replaceResult);
             transaction->AddTainted(key, newRanges, replaceResult);
         }
     } catch (const std::bad_alloc& err) {
@@ -257,7 +257,7 @@ void TaintReplaceStringByStringUsingRegexMethod(const FunctionCallbackInfo<Value
         return;
     }
 
-    auto transaction = GetTransaction(GetLocalStringPointer(args[0]));
+    auto transaction = GetTransaction(GetLocalPointer(args[0]));
     if (!transaction) {
         args.GetReturnValue().Set(replaceResult);
         return;
@@ -266,8 +266,8 @@ void TaintReplaceStringByStringUsingRegexMethod(const FunctionCallbackInfo<Value
     try {
         MatcherArguments methodArguments = {args[1], args[2], args[3], args[4], args[5]};
 
-        auto taintedSubject = transaction->FindTaintedObject(GetLocalStringPointer(methodArguments.self));
-        auto taintedReplacer = transaction->FindTaintedObject(GetLocalStringPointer(methodArguments.replacer));
+        auto taintedSubject = transaction->FindTaintedObject(GetLocalPointer(methodArguments.self));
+        auto taintedReplacer = transaction->FindTaintedObject(GetLocalPointer(methodArguments.replacer));
         auto subjectRanges = (taintedSubject) ? taintedSubject->getRanges() : nullptr;
         auto replacerRanges = (taintedReplacer) ? taintedReplacer->getRanges() : nullptr;
 
@@ -288,7 +288,7 @@ void TaintReplaceStringByStringUsingRegexMethod(const FunctionCallbackInfo<Value
             if (resultLength == 1) {
                 replaceResult = tainted::NewExternalString(args.GetIsolate(), replaceResult);
             }
-            auto key = utils::GetLocalStringPointer(replaceResult);
+            auto key = utils::GetLocalPointer(replaceResult);
             transaction->AddTainted(key, newRanges, replaceResult);
         }
     } catch (const std::bad_alloc& err) {

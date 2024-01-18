@@ -9,7 +9,7 @@
 #include "gc/gc.h"
 #include "container/singleton.h"
 #include "transaction_manager.h"
-#include "api/string_methods.h"
+#include "api/taint_methods.h"
 #include "tainted/transaction.h"
 #include "api/concat.h"
 #include "api/trim.h"
@@ -44,7 +44,7 @@ void SetMaxTransactions(size_t maxItems) {
 }
 
 void Init(v8::Local<v8::Object> exports) {
-    api::StringMethods::Init(exports);
+    api::TaintMethods::Init(exports);
     api::ConcatOperations::Init(exports);
     api::TrimOperations::Init(exports);
     api::SliceOperations::Init(exports);

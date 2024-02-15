@@ -18,6 +18,7 @@
                 "./src/api/substring.cc",
                 "./src/api/replace.cc",
                 "./src/api/metrics.cc",
+                "./src/api/string_case.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

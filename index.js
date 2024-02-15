@@ -55,6 +55,9 @@ try {
     },
     substr (transaction, result) {
       return result
+    },
+    stringCase (transaction, result) {
+      return result
     }
   }
 }
@@ -75,7 +78,8 @@ const iastNativeMethods = {
   trimEnd: addon.trimEnd,
   slice: addon.slice,
   substring: addon.substring,
-  substr: addon.substr
+  substr: addon.substr,
+  stringCase: addon.stringCase
 }
 
 module.exports = iastNativeMethods

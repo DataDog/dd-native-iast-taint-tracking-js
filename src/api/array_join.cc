@@ -39,8 +39,7 @@ void copyRangesWithOffset(Transaction* transaction,
                 origRange->start + offset,
                 origRange->end + offset,
                 origRange->inputInfo,
-                origRange->secureMarks
-            );
+                origRange->secureMarks);
             if (newRange != nullptr) {
                 destRanges->PushBack(newRange);
             } else {

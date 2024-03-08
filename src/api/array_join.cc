@@ -33,9 +33,14 @@ void copyRangesWithOffset(Transaction* transaction,
         int offset) {
     if (origRanges != nullptr) {
         auto end = origRanges->end();
-        for (auto it = origRanges->begin(); it != end; it++) {        
+        for (auto it = origRanges->begin(); it != end; it++) {
             auto origRange = *it;
-            auto newRange = transaction->GetRange(origRange->start + offset, origRange->end + offset, origRange->inputInfo, origRange->secureMarks);
+            auto newRange = transaction->GetRange(
+                origRange->start + offset,
+                origRange->end + offset,
+                origRange->inputInfo,
+                origRange->secureMarks
+            );
             if (newRange != nullptr) {
                 destRanges->PushBack(newRange);
             } else {
@@ -93,7 +98,7 @@ void ArrayJoinOperator(const FunctionCallbackInfo<Value>& args) {
         args.GetReturnValue().Set(args[1]);
         return;
     }
-    
+
     auto thisArg = args[2];
     if (thisArg->IsObject()) {
         auto arrObj = v8::Object::Cast(*args[2]);
@@ -110,7 +115,7 @@ void ArrayJoinOperator(const FunctionCallbackInfo<Value>& args) {
                     }
                 }
                 auto arr = v8::Array::Cast(arrObj);
-    
+
                 auto newRanges = getJoinResultRanges(isolate, transaction, arr, separatorRanges, separatorLength);
                 if (newRanges != nullptr) {
                     auto key = utils::GetLocalPointer(args[1]);

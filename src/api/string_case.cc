@@ -47,12 +47,12 @@ void StringCaseOperator(const FunctionCallbackInfo<Value>& args) {
         args.GetReturnValue().Set(args[1]);
         return;
     }
-    
+
     if (args[1] == args[2]) {
         args.GetReturnValue().Set(args[1]);
         return;
     }
-    
+
     auto taintedObj = transaction->FindTaintedObject(utils::GetLocalPointer(args[2]));
     if (!taintedObj) {
         args.GetReturnValue().Set(args[1]);
@@ -65,7 +65,7 @@ void StringCaseOperator(const FunctionCallbackInfo<Value>& args) {
             args.GetReturnValue().Set(args[1]);
             return;
         }
-        
+
         auto res = args[1];
         int resultLength = TO_V8STRING(res)->Length();
         if (resultLength == 1) {
@@ -75,7 +75,6 @@ void StringCaseOperator(const FunctionCallbackInfo<Value>& args) {
         transaction->AddTainted(key, ranges, res);
         args.GetReturnValue().Set(res);
         return;
-
     } catch (const std::bad_alloc& err) {
     } catch (const container::QueuedPoolBadAlloc& err) {
     } catch (const container::PoolBadAlloc& err) {

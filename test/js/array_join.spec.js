@@ -65,6 +65,36 @@ describe('String case operator', function () {
       joinResult: 'abc:+-###-+:def'
     },
     {
+      testArray: ['佫:+-𝒳-+:佫', ':+-😂😂😂-+:', 'abc', '𝒳:+-佫佫佫-+:𝒳'],
+      testSeparator: undefined,
+      joinResult: '佫:+-𝒳-+:佫,:+-😂😂😂-+:,abc,𝒳:+-佫佫佫-+:𝒳'
+    },
+    {
+      testArray: ['佫:+-𝒳-+:佫', ':+-😂😂😂-+:', 'abc', '𝒳:+-佫佫佫-+:𝒳'],
+      testSeparator: '###',
+      joinResult: '佫:+-𝒳-+:佫###:+-😂😂😂-+:###abc###𝒳:+-佫佫佫-+:𝒳'
+    },
+    {
+      testArray: ['佫:+-𝒳-+:佫', ':+-😂😂😂-+:', 'abc', '𝒳:+-佫佫佫-+:𝒳'],
+      testSeparator: 123,
+      joinResult: '佫:+-𝒳-+:佫123:+-😂😂😂-+:123abc123𝒳:+-佫佫佫-+:𝒳'
+    },
+    {
+      testArray: ['佫:+-𝒳-+:佫', ':+-😂😂😂-+:', 'abc', '𝒳:+-佫佫佫-+:𝒳'],
+      testSeparator: ':+-###-+:',
+      joinResult: '佫:+-𝒳-+:佫:+-###-+::+-😂😂😂-+::+-###-+:abc:+-###-+:𝒳:+-佫佫佫-+:𝒳'
+    },
+    {
+      testArray: ['佫:+-𝒳-+:佫', ':+-😂😂😂-+:', 'abc', '𝒳:+-佫佫佫-+:𝒳'],
+      testSeparator: '佫𝒳😂',
+      joinResult: '佫:+-𝒳-+:佫佫𝒳😂:+-😂😂😂-+:佫𝒳😂abc佫𝒳😂𝒳:+-佫佫佫-+:𝒳'
+    },
+    {
+      testArray: ['佫:+-𝒳-+:佫', ':+-😂😂😂-+:', 'abc', '𝒳:+-佫佫佫-+:𝒳'],
+      testSeparator: '佫:+-𝒳-+:😂',
+      joinResult: '佫:+-𝒳-+:佫佫:+-𝒳-+:😂:+-😂😂😂-+:佫:+-𝒳-+:😂abc佫:+-𝒳-+:😂𝒳:+-佫佫佫-+:𝒳'
+    },
+    {
       testArray: [':+-abc-+:', 'def', 'gh:+-ij-+:kl'],
       testSeparator: ':+-###-+:',
       joinResult: ':+-abc-+::+-###-+:def:+-###-+:gh:+-ij-+:kl'
@@ -78,6 +108,61 @@ describe('String case operator', function () {
       testArray: [':+-abc-+:', 'def', 'gh:+-ij-+:kl'],
       testSeparator: ':+-o-+:',
       joinResult: ':+-abc-+::+-o-+:def:+-o-+:gh:+-ij-+:kl'
+    },
+    {
+      testArray: [{ a: 1 }, ':+-abc-+:', 666],
+      testSeparator: undefined,
+      joinResult: '[object Object],:+-abc-+:,666'
+    },
+    {
+      testArray: [{ a: 1 }, ':+-abc-+:', 666],
+      testSeparator: ':+-o-+:',
+      joinResult: '[object Object]:+-o-+::+-abc-+::+-o-+:666'
+    },
+    {
+      testArray: [{ a: 1 }, ':+-abc-+:', 666],
+      testSeparator: 'AB:+-CD-+:EF',
+      joinResult: '[object Object]AB:+-CD-+:EF:+-abc-+:AB:+-CD-+:EF666'
+    },
+    {
+      testArray: [undefined, ':+-abc-+:', 666],
+      testSeparator: undefined,
+      joinResult: ',:+-abc-+:,666'
+    },
+    {
+      testArray: [undefined, ':+-abc-+:', 666],
+      testSeparator: ':+-o-+:',
+      joinResult: ':+-o-+::+-abc-+::+-o-+:666'
+    },
+    {
+      testArray: [undefined, ':+-abc-+:', 666],
+      testSeparator: 'AB:+-CD-+:EF',
+      joinResult: 'AB:+-CD-+:EF:+-abc-+:AB:+-CD-+:EF666'
+    },
+    {
+      testArray: [null, ':+-abc-+:', 666],
+      testSeparator: undefined,
+      joinResult: ',:+-abc-+:,666'
+    },
+    {
+      testArray: [null, ':+-abc-+:', 666],
+      testSeparator: ':+-o-+:',
+      joinResult: ':+-o-+::+-abc-+::+-o-+:666'
+    },
+    {
+      testArray: [null, ':+-abc-+:', 666],
+      testSeparator: 'AB:+-CD-+:EF',
+      joinResult: 'AB:+-CD-+:EF:+-abc-+:AB:+-CD-+:EF666'
+    },
+    {
+      testArray: [[':+-foo-+:', 'bar'], ':+-abc-+:', 666],
+      testSeparator: ':+-o-+:',
+      joinResult: ':+-foo-+:,bar:+-o-+::+-abc-+::+-o-+:666'
+    },
+    {
+      testArray: [null, undefined, { a: 1 }, [':+-foo-+:', '佫:+-𝒳-+:佫', 'bar'], ':+-abc-+:', 666],
+      testSeparator: ':+-###-+:',
+      joinResult: ':+-###-+::+-###-+:[object Object]:+-###-+::+-foo-+:,佫:+-𝒳-+:佫,bar:+-###-+::+-abc-+::+-###-+:666'
     }
   ]
 

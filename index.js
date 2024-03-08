@@ -58,6 +58,9 @@ try {
     },
     stringCase (transaction, result) {
       return result
+    },
+    arrayJoin (transaction, result) {
+      return result
     }
   }
 }
@@ -79,7 +82,8 @@ const iastNativeMethods = {
   slice: addon.slice,
   substring: addon.substring,
   substr: addon.substr,
-  stringCase: addon.stringCase
+  stringCase: addon.stringCase,
+  arrayJoin: addon.arrayJoin
 }
 
 module.exports = iastNativeMethods

@@ -19,6 +19,7 @@
                 "./src/api/replace.cc",
                 "./src/api/metrics.cc",
                 "./src/api/string_case.cc",
+                "./src/api/array_join.cc",
                 "./src/iast.cc"
             ],
             "include_dirs" : [

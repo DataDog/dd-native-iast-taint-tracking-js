@@ -7,7 +7,7 @@ const assert = require('assert')
 
 describe('String case operator', function () {
   const id = TaintedUtils.createTransaction('1')
-  
+
   const rangesTestCases = [
     {
       testString: ':+-abcdef-+:',
@@ -60,7 +60,7 @@ describe('String case operator', function () {
   }
 
   function testStringCaseNoTaintedResult (stringCaseFn, taintedStringCaseFn) {
-    let testString = 'abcDEF'
+    const testString = 'abcDEF'
     const res = stringCaseFn.call(testString)
     const ret = taintedStringCaseFn(id, res, testString)
     assert.equal(res, ret, 'Unexpected vale')
@@ -93,8 +93,8 @@ describe('String case operator', function () {
   afterEach(function () {
     TaintedUtils.removeTransaction(id)
   })
-  
-  describe('stingCase', function() {
+
+  describe('stingCase', function () {
     it('Wrong arguments stringCase', function () {
       assert.throws(function () {
         TaintedUtils.stringCase(id)
@@ -171,5 +171,4 @@ describe('String case operator', function () {
       })
     })
   })
-  
 })

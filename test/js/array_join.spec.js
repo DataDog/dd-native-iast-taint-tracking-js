@@ -7,7 +7,7 @@ const assert = require('assert')
 
 describe('String case operator', function () {
   const id = TaintedUtils.createTransaction('1')
-  
+
   const rangesTestCases = [
     {
       testArray: [':+-a-+:'],
@@ -84,18 +84,18 @@ describe('String case operator', function () {
   function testArrayJoinResult (arrayJoinFn, taintedArrayJoinFn) {
     let testString = 'sit amet'
     let testSeparator = '-'
-    let testArray = ['lorem', 'ipsum', 1234]
+    const testArray = ['lorem', 'ipsum', 1234]
 
     testString = TaintedUtils.newTaintedString(id, testString, 'PARAM_NAME', 'PARAM_TYPE')
     testSeparator = TaintedUtils.newTaintedString(id, testSeparator, 'PARAM_NAME', 'PARAM_TYPE')
-    
+
     assert.strictEqual(testString, 'sit amet', 'Unexpected value')
     assert.equal(true, TaintedUtils.isTainted(id, testString), 'Unexpected value')
     assert.strictEqual(testSeparator, '-', 'Unexpected value')
     assert.equal(true, TaintedUtils.isTainted(id, testSeparator), 'Unexpected value')
-    
+
     testArray.push(testString)
-    
+
     const res = arrayJoinFn.call(testArray, testSeparator)
     const ret = taintedArrayJoinFn(id, res, testArray, testSeparator)
     assert.equal(res, ret, 'Unexpected vale')
@@ -103,15 +103,21 @@ describe('String case operator', function () {
   }
 
   function testArrayJoinNoTaintedResult (arrayJoinFn, taintedArrayJoinFn) {
-    let testArray = ['lorem', 'ipsum', 1234]
-    let testSeparator = '-'
+    const testArray = ['lorem', 'ipsum', 1234]
+    const testSeparator = '-'
     const res = arrayJoinFn.call(testArray, testSeparator)
     const ret = taintedArrayJoinFn(id, res, testArray, testSeparator)
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   }
 
-  function testArrayJoinCheckRanges (arrayJoinFn, taintedArrayJoinFn, formattedTestArray, formattedTestSeparator, expectedResult) {
+  function testArrayJoinCheckRanges (
+    arrayJoinFn,
+    taintedArrayJoinFn,
+    formattedTestArray,
+    formattedTestSeparator,
+    expectedResult
+  ) {
     const testArray = formattedTestArray.map((formattedTestString) => taintFormattedString(id, formattedTestString))
     const testSeparator = taintFormattedString(id, formattedTestSeparator)
     const res = arrayJoinFn.call(testArray, testSeparator)
@@ -145,11 +151,11 @@ describe('String case operator', function () {
         TaintedUtils.arrayJoin(id, 'result', ['test', 'array'], 'separator')
       }, Error)
     })
-    
+
     it('Check result', function () {
       testArrayJoinResult(Array.prototype.join, TaintedUtils.arrayJoin)
     })
-    
+
     it('Check result from not tainted value', function () {
       testArrayJoinNoTaintedResult(Array.prototype.join, TaintedUtils.arrayJoin)
     })
@@ -158,17 +164,17 @@ describe('String case operator', function () {
       let op1 = 'HELLO'
       op1 = TaintedUtils.newTaintedString(id, op1, 'param1', 'REQUEST')
       op1 = TaintedUtils.addSecureMarksToTaintedString(id, op1, 0b0110)
-      
+
       let op2 = 'WORLD'
       op2 = TaintedUtils.newTaintedString(id, op2, 'param2', 'REQUEST')
       op2 = TaintedUtils.addSecureMarksToTaintedString(id, op2, 0b0100)
-      
+
       let separator = ' --- '
       separator = TaintedUtils.newTaintedString(id, separator, 'separator', 'REQUEST')
-      separator = TaintedUtils.addSecureMarksToTaintedString(id, op2, 0b0101)
+      separator = TaintedUtils.addSecureMarksToTaintedString(id, separator, 0b0101)
 
       const arrayTest = [op1, op2]
-      
+
       let result = arrayTest.join(separator)
       result = TaintedUtils.arrayJoin(id, result, arrayTest, separator)
 
@@ -180,7 +186,7 @@ describe('String case operator', function () {
     })
 
     describe('Check ranges', function () {
-      rangesTestCases.forEach(({ testArray, testSeparator, joinResult}) => {
+      rangesTestCases.forEach(({ testArray, testSeparator, joinResult }) => {
         it(`Test ${joinResult}`, () => {
           testArrayJoinCheckRanges(Array.prototype.join, TaintedUtils.arrayJoin, testArray, testSeparator, joinResult)
         })

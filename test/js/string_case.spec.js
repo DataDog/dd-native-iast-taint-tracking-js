@@ -43,6 +43,21 @@ describe('String case operator', function () {
       testString: ':+-ABC-+:def',
       toLowerResult: ':+-abc-+:def',
       toUpperResult: ':+-ABC-+:DEF'
+    },
+    {
+      testString: ':+-佫😂😂😂𝒳-+:',
+      toLowerResult: ':+-佫😂😂😂𝒳-+:',
+      toUpperResult: ':+-佫😂😂😂𝒳-+:'
+    },
+    {
+      testString: ':+-佫-+::+-😂😂😂-+::+-𝒳-+:',
+      toLowerResult: ':+-佫-+::+-😂😂😂-+::+-𝒳-+:',
+      toUpperResult: ':+-佫-+::+-😂😂😂-+::+-𝒳-+:'
+    },
+    {
+      testString: 'ABC佫:+-#😂l😂M😂#-+:𝒳xyz',
+      toLowerResult: 'abc佫:+-#😂l😂m😂#-+:𝒳xyz',
+      toUpperResult: 'ABC佫:+-#😂L😂M😂#-+:𝒳XYZ'
     }
   ]
 
@@ -73,7 +88,7 @@ describe('String case operator', function () {
     assert.equal(TaintedUtils.isTainted(id, testString), true, 'Test string not tainted')
     const ret = taintedStringCaseFn(id, res, testString)
     assert.equal(res, ret, 'Unexpected vale')
-    assert.equal(TaintedUtils.isTainted(id, ret), true, 'String caes returned value not tainted')
+    assert.equal(TaintedUtils.isTainted(id, ret), true, 'String case returned value not tainted')
 
     const formattedResult = formatTaintedValue(id, ret)
     assert.equal(formattedResult, expectedResult, 'Unexpected ranges')

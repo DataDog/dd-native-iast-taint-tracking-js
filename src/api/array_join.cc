@@ -29,7 +29,7 @@ const int DEFAULT_JOIN_SEPARATOR_LENGTH = 1;
 
 void copyRangesWithOffset(Transaction* transaction,
         SharedRanges* origRanges,
-        SharedRanges* destRanges,
+        SharedRanges* &destRanges,
         int offset) {
     if (origRanges != nullptr) {
         auto end = origRanges->end();
@@ -41,6 +41,9 @@ void copyRangesWithOffset(Transaction* transaction,
                 origRange->inputInfo,
                 origRange->secureMarks);
             if (newRange != nullptr) {
+                if (destRanges == nullptr) {
+                    destRanges = transaction->GetSharedVectorRange();
+                } 
                 destRanges->PushBack(newRange);
             } else {
                 break;
@@ -55,7 +58,7 @@ SharedRanges* getJoinResultRanges(Isolate* isolate,
         int separatorLength) {
     auto length = arr->Length();
     int offset = 0;
-    auto newRanges = transaction->GetSharedVectorRange();
+    SharedRanges* newRanges = nullptr;
     auto context = isolate->GetCurrentContext();
     for (uint32_t i = 0; i < length; i++) {
         if (i > 0) {

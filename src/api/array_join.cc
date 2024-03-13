@@ -87,39 +87,43 @@ void ArrayJoinOperator(const FunctionCallbackInfo<Value>& args) {
                         v8::NewStringType::kNormal).ToLocalChecked()));
         return;
     }
-    if (!args[1]->IsString()) {
-        args.GetReturnValue().Set(args[1]);
+    
+    auto result = args[1];
+    
+    if (!result->IsString()) {
+        args.GetReturnValue().Set(result);
         return;
     }
 
     auto transaction = GetTransaction(utils::GetLocalPointer(args[0]));
     if (transaction == nullptr) {
-        args.GetReturnValue().Set(args[1]);
+        args.GetReturnValue().Set(result);
         return;
     }
 
     auto thisArg = args[2];
     if (thisArg->IsObject()) {
-        auto arrObj = v8::Object::Cast(*args[2]);
+        auto arrObj = v8::Object::Cast(*thisArg);
         if (arrObj->IsArray()) {
             try {
                 int separatorLength = DEFAULT_JOIN_SEPARATOR_LENGTH;
                 SharedRanges* separatorRanges = nullptr;
                 if (args.Length() > 3) {
-                    auto separatorValue = (*args[3]);
+                    auto separatorArg = args[3];
+                    auto separatorValue = (*separatorArg);
                     if (!separatorValue->IsUndefined()) {
-                        auto taintedSeparator = transaction->FindTaintedObject(utils::GetLocalPointer(args[3]));
+                        auto taintedSeparator = transaction->FindTaintedObject(utils::GetLocalPointer(separatorArg));
                         separatorRanges = taintedSeparator ? taintedSeparator->getRanges() : nullptr;
-                        separatorLength = utils::GetCoercedLength(isolate, args[3]);
+                        separatorLength = utils::GetCoercedLength(isolate, separatorArg);
                     }
                 }
                 auto arr = v8::Array::Cast(arrObj);
 
                 auto newRanges = getJoinResultRanges(isolate, transaction, arr, separatorRanges, separatorLength);
                 if (newRanges != nullptr) {
-                    auto key = utils::GetLocalPointer(args[1]);
-                    transaction->AddTainted(key, newRanges, args[1]);
-                    args.GetReturnValue().Set(args[1]);
+                    auto key = utils::GetLocalPointer(result);
+                    transaction->AddTainted(key, newRanges, result);
+                    args.GetReturnValue().Set(result);
                     return;
                 }
             } catch (const std::bad_alloc& err) {

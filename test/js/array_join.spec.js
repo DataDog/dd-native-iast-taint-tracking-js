@@ -5,7 +5,7 @@
 const { TaintedUtils, taintFormattedString, formatTaintedValue } = require('./util')
 const assert = require('assert')
 
-describe('String case operator', function () {
+describe('Array join operator', function () {
   const id = TaintedUtils.createTransaction('1')
 
   const rangesTestCases = [

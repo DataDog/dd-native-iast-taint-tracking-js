@@ -105,7 +105,7 @@ void ArrayJoinOperator(const FunctionCallbackInfo<Value>& args) {
             try {
                 int separatorLength = DEFAULT_JOIN_SEPARATOR_LENGTH;
                 SharedRanges* separatorRanges = nullptr;
-                if (args.Length() > 2) {
+                if (args.Length() > 3) {
                     auto separatorValue = (*args[3]);
                     if (!separatorValue->IsUndefined()) {
                         auto taintedSeparator = transaction->FindTaintedObject(utils::GetLocalPointer(args[3]));

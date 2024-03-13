@@ -24,7 +24,8 @@ void StringResource::CopyCharArrToUint16Arr(const char* charArr, uint16_t* resul
 v8::Local<v8::String> NewExternalString(v8::Isolate* isolate, v8::Local<v8::Value> obj) {
     v8::String::Utf8Value originalStringValue(isolate, obj);
     const char* originalCharArr = *originalStringValue;
-    auto resource = new StringResource(originalCharArr, originalStringValue.length());
+    int length = v8::Local<v8::String>::Cast(obj)->Length();
+    auto resource = new StringResource(originalCharArr, length);
     return v8::String::NewExternalTwoByte(isolate, resource).ToLocalChecked();
 }
 }  // namespace tainted

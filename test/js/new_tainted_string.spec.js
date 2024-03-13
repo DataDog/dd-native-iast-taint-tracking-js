@@ -167,4 +167,16 @@ describe('Taint strings', function () {
     assert.strictEqual(true, TaintedUtils.isTainted(id, taintedOneChar), 'Must be tainted')
     assert.strictEqual(false, TaintedUtils.isTainted(id, oneChar), 'Can not be tainted')
   })
+
+  describe('Taint special one char strings', function () {
+    const specialOneCharStrings = ['佫', 'ü', 'ô', 'é', 'à']
+
+    specialOneCharStrings.forEach((testStr) => {
+      it(`Taint ${testStr}`, function () {
+        const taintedStr = TaintedUtils.newTaintedString(id, testStr, 'param', 'request')
+        assert.strictEqual(true, TaintedUtils.isTainted(id, taintedStr), 'Must be tainted')
+        assert.strictEqual(testStr, taintedStr, 'Strings must be equal')
+      })
+    })
+  })
 })

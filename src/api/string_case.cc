@@ -60,7 +60,7 @@ void StringCaseOperator(const FunctionCallbackInfo<Value>& args) {
     }
 
     try {
-        auto ranges = taintedObj ? taintedObj->getRanges() : nullptr;
+        auto ranges = taintedObj->getRanges();
         if (ranges == nullptr) {
             args.GetReturnValue().Set(args[1]);
             return;

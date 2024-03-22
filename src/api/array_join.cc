@@ -29,7 +29,7 @@ const int DEFAULT_JOIN_SEPARATOR_LENGTH = 1;
 
 void copyRangesWithOffset(Transaction* transaction,
         SharedRanges* origRanges,
-        SharedRanges* &destRanges,
+        SharedRanges** destRanges,
         int offset) {
     if (origRanges != nullptr) {
         auto end = origRanges->end();
@@ -41,10 +41,10 @@ void copyRangesWithOffset(Transaction* transaction,
                 origRange->inputInfo,
                 origRange->secureMarks);
             if (newRange != nullptr) {
-                if (destRanges == nullptr) {
-                    destRanges = transaction->GetSharedVectorRange();
-                } 
-                destRanges->PushBack(newRange);
+                if (*destRanges == nullptr) {
+                    *destRanges = transaction->GetSharedVectorRange();
+                }
+                (*destRanges)->PushBack(newRange);
             } else {
                 break;
             }
@@ -62,7 +62,7 @@ SharedRanges* getJoinResultRanges(Isolate* isolate,
     auto context = isolate->GetCurrentContext();
     for (uint32_t i = 0; i < length; i++) {
         if (i > 0) {
-            copyRangesWithOffset(transaction, separatorRanges, newRanges, offset);
+            copyRangesWithOffset(transaction, separatorRanges, &newRanges, offset);
             offset += separatorLength;
         }
         auto maybeItem = arr->Get(context, i);
@@ -70,7 +70,7 @@ SharedRanges* getJoinResultRanges(Isolate* isolate,
             auto item = maybeItem.ToLocalChecked();
             auto taintedItem = transaction->FindTaintedObject(utils::GetLocalPointer(item));
             auto itemRanges = taintedItem ? taintedItem->getRanges() : nullptr;
-            copyRangesWithOffset(transaction, itemRanges, newRanges, offset);
+            copyRangesWithOffset(transaction, itemRanges, &newRanges, offset);
             offset += utils::GetLength(isolate, item);
         }
     }
@@ -90,9 +90,9 @@ void ArrayJoinOperator(const FunctionCallbackInfo<Value>& args) {
                         v8::NewStringType::kNormal).ToLocalChecked()));
         return;
     }
-    
+
     auto result = args[1];
-    
+
     if (!result->IsString()) {
         args.GetReturnValue().Set(result);
         return;

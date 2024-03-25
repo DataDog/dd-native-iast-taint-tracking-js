@@ -40,6 +40,7 @@ void copyRangesWithOffset(Transaction* transaction,
                 origRange->end + offset,
                 origRange->inputInfo,
                 origRange->secureMarks);
+
             if (newRange != nullptr) {
                 if (*destRanges == nullptr) {
                     *destRanges = transaction->GetSharedVectorRange();
@@ -74,9 +75,7 @@ SharedRanges* getJoinResultRanges(Isolate* isolate,
             offset += utils::GetLength(isolate, item);
         }
     }
-    if (newRanges->Size() == 0) {
-        return nullptr;
-    }
+
     return newRanges;
 }
 

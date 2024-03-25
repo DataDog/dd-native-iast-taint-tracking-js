@@ -236,6 +236,13 @@ describe('Array join operator', function () {
         TaintedUtils.arrayJoin(id, 'result', ['test', 'array'], 'separator')
       }, Error)
     })
+    
+    it('With empty array', function () {
+      TaintedUtils.newTaintedString(id, 'tainted', 'param', 'request')
+      assert.doesNotThrow(function () {
+        TaintedUtils.arrayJoin(id, '', [])
+      }, Error)
+    })
 
     it('Check result', function () {
       testArrayJoinResult(Array.prototype.join, TaintedUtils.arrayJoin)

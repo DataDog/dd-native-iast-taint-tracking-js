@@ -179,4 +179,15 @@ describe('Taint strings', function () {
       })
     })
   })
+
+  it('Taint new string from parent', function () {
+    const parent = TaintedUtils.newTaintedString(id, 'parent', 'param', 'REQUEST')
+    const ret = TaintedUtils.newTaintedStringFromParent(id, value, parent)
+    const retRanges = TaintedUtils.getRanges(id, ret)
+    const parentRanges = TaintedUtils.getRanges(id, parent)
+    assert.strictEqual(retRanges.length, 1, 'Only one range expected')
+    assert.strictEqual(retRanges[0].iinfo.parameterName, parentRanges[0].iinfo.parameterName)
+    assert.strictEqual(retRanges[0].iinfo.parameterValue, parentRanges[0].iinfo.parameterValue)
+    assert.strictEqual(retRanges[0].iinfo.type, parentRanges[0].iinfo.type)
+  })
 })

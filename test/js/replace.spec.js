@@ -182,6 +182,13 @@ describe('Replace', function () {
         matcher: 'CD',
         replacer: ':+-ZYX-+:',
         expected: 'AB:+-ZYX-+:EF'
+      },
+      {
+        description: 'Select replacement',
+        self: 'SELECT column1, column2, column3 WHERE column4 = "<replace_this>"',
+        matcher: '<replace_this>',
+        replacer: ':+-ZYX-+:',
+        expected: 'SELECT column1, column2, column3 WHERE column4 = ":+-ZYX-+:"'
       }
     ]
 
@@ -463,6 +470,13 @@ describe('Replace', function () {
         matcher: /A(J)/g,
         replacer: ':+-Z-+:Y:+-X-+:',
         expected: ':+-AB-+::+-Z-+:Y:+-X-+:J:+-BAB-+::+-Z-+:Y:+-X-+:J'
+      },
+      {
+        description: 'Select replacement',
+        self: 'SELECT column1, column2, column3 WHERE column4 = "<replace_this>"',
+        matcher: /<replace_this>/,
+        replacer: ':+-ZYX-+:',
+        expected: 'SELECT column1, column2, column3 WHERE column4 = ":+-ZYX-+:"'
       }
     ]
 

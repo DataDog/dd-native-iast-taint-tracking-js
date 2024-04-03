@@ -393,10 +393,10 @@ void NewTaintedObject(const FunctionCallbackInfo<Value>& args) {
         InputInfo* inputInfo = transaction->createNewInputInfo(
                     parameterName, parameterValue, type);
 
-        auto ranges = transaction->GetSharedVectorRange();
         auto range = transaction->GetRange(0,
             utils::GetLength(args.GetIsolate(), parameterValue),
             inputInfo, 0);
+        auto ranges = transaction->GetSharedVectorRange();
         ranges->PushBack(range);
 
         auto valuePointer = utils::GetLocalPointer(parameterValue);

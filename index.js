@@ -9,7 +9,6 @@ let addon
 try {
   addon = require('node-gyp-build')(__dirname)
 } catch (e) {
-  console.error(e)
   addon = {
     createTransaction (transactionId) {
       return transactionId

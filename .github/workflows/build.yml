@@ -11,7 +11,7 @@ jobs:
     needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [14, 15, 16, 17, 18, 19, 20, 21]
+        version: [14, 15, 16, 17, 18, 19, 20, 21, 22]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
     needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [14, 15, 16, 17, 18, 19, 20, 21]
+        version: [14, 15, 16, 17, 18, 19, 20, 21, 22]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -176,7 +176,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '19'
+          node-version: '20'
       - run: npm i --ignore-scripts
       - run: npm run lint
 
@@ -186,7 +186,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '19'
+          node-version: '20'
       - run: npm i --ignore-scripts
       - run: node scripts/check_licenses.js
 

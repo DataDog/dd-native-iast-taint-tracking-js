@@ -112,11 +112,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
       - run: npm pack
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
           path: '*.tgz'
@@ -148,7 +148,7 @@ jobs:
       - run: npm install node-gyp
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
       - run: npm i --verbose datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz

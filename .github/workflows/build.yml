@@ -11,7 +11,7 @@ jobs:
     needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [14, 15, 16, 17, 18, 19, 20, 21]
+        version: [14, 15, 16, 17, 18, 19, 20, 21, 22]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
     needs: ['cpp-lint', 'js-lint']
     strategy:
       matrix:
-        version: [14, 15, 16, 17, 18, 19, 20, 21]
+        version: [14, 15, 16, 17, 18, 19, 20, 21, 22]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -112,11 +112,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
       - run: npm pack
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
           path: '*.tgz'
@@ -148,7 +150,7 @@ jobs:
       - run: npm install node-gyp
       - uses: codex-team/action-nodejs-package-info@v1
         id: package
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
       - run: npm i --verbose datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
@@ -176,7 +178,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '19'
+          node-version: '20'
       - run: npm i --ignore-scripts
       - run: npm run lint
 
@@ -186,7 +188,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '19'
+          node-version: '20'
       - run: npm i --ignore-scripts
       - run: node scripts/check_licenses.js
 

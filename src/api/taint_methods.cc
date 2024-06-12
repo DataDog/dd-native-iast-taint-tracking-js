@@ -23,6 +23,8 @@
 #include "v8.h"
 #include "../utils/string_utils.h"
 
+#define TO_V8STRING(arg) (v8::Local<v8::String>::Cast(arg))
+
 using v8::Exception;
 using v8::FunctionCallbackInfo;
 using v8::Isolate;
@@ -114,6 +116,80 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
         // TODO(julio): log exception?
     } catch (const container::PoolBadAlloc& err) {
         // TODO(julio): log exception?
+    }
+}
+
+void NewTaintedStringFromParent(const FunctionCallbackInfo<Value>& args) {
+    // transactionId, original, parentTainted
+    auto isolate = args.GetIsolate();
+
+    if (args.Length() < 3) {
+        isolate->ThrowException(v8::Exception::TypeError(
+                v8::String::NewFromUtf8(isolate,
+                                        "Wrong number of arguments",
+                                        v8::NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+
+    args.GetReturnValue().Set(args[1]);
+    if (!(args[0]->IsString()) || !Local<String>::Cast(args[0])->Length()) {
+        return;
+    }
+
+    if (!(args[1]->IsString())) {
+        return;
+    }
+    auto transactionIdArgument = args[0];
+    auto originalValue = args[1];
+    auto parentValue = args[2];
+
+    uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
+
+    try {
+        auto transaction = NewTransaction(transactionId);
+        if (transaction == nullptr) {
+            return;
+        }
+
+        auto taintedObj = transaction->FindTaintedObject(utils::GetLocalPointer(originalValue));
+        if (taintedObj) {
+            // Object already exist, nothing to do
+            return;
+        }
+
+        auto parentTaintedObj = transaction->FindTaintedObject(utils::GetLocalPointer(parentValue));
+        if (!parentTaintedObj) {
+            // Parent is not tainted
+            return;
+        }
+
+        auto ranges = parentTaintedObj->getRanges();
+        if (ranges == nullptr) {
+            return;
+        }
+
+        int resultLength = TO_V8STRING(args[1])->Length();
+        auto range = *ranges->begin();
+        int newRangeStart = 0;
+        int newRangeEnd = resultLength;
+        auto newRange = transaction->GetRange(newRangeStart, newRangeEnd, range->inputInfo, 0);
+
+        auto res = args[1];
+        if (resultLength == 1) {
+            res = tainted::NewExternalString(isolate, res);
+        }
+
+        auto resultRanges = transaction->GetSharedVectorRange();
+        resultRanges->PushBack(newRange);
+
+        auto key = utils::GetLocalPointer(res);
+
+        transaction->AddTainted(key, resultRanges, res);
+        args.GetReturnValue().Set(res);
+        return;
+    } catch (const std::bad_alloc& err) {
+    } catch (const container::QueuedPoolBadAlloc& err) {
+    } catch (const container::PoolBadAlloc& err) {
     }
 }
 
@@ -337,6 +413,7 @@ void NewTaintedObject(const FunctionCallbackInfo<Value>& args) {
 void TaintMethods::Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "createTransaction", CreateTransaction);
     NODE_SET_METHOD(exports, "newTaintedString", NewTaintedString);
+    NODE_SET_METHOD(exports, "newTaintedStringFromParent", NewTaintedStringFromParent);
     NODE_SET_METHOD(exports, "addSecureMarksToTaintedString", AddSecureMarksToTaintedString);
     NODE_SET_METHOD(exports, "isTainted", IsTainted);  // TODO(julio): support several objects.
     NODE_SET_METHOD(exports, "getRanges", GetRanges);

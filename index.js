@@ -16,6 +16,9 @@ try {
     newTaintedString (transactionId, original) {
       return original
     },
+    newTaintedStringFromParent (transactionId, original) {
+      return original
+    },
     newTaintedObject (transactionId, original) {
       return original
     },
@@ -68,6 +71,7 @@ try {
 const iastNativeMethods = {
   newTaintedString: addon.newTaintedString,
   newTaintedObject: addon.newTaintedObject,
+  newTaintedStringFromParent: addon.newTaintedStringFromParent,
   addSecureMarksToTaintedString: addon.addSecureMarksToTaintedString,
   isTainted: addon.isTainted,
   getMetrics: addon.getMetrics,

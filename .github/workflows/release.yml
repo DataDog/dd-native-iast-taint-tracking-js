@@ -34,6 +34,8 @@ jobs:
     needs: pack
     runs-on: ubuntu-latest
     environment: release
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - uses: codex-team/action-nodejs-package-info@v1.1

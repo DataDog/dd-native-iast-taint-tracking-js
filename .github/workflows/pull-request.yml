@@ -46,7 +46,7 @@ jobs:
       napi: false
       package-manager: 'npm'
       prebuild: 'node scripts/prebuild'
-      skip: 'linux-arm linux-ia32'
+      skip: 'linux-arm,linux-ia32'
       target-name: 'iastnativemethods'
       min-node-version: 16
 
@@ -134,8 +134,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v4
-        with:
-          name: prebuilds
       - run: npm pack
       - uses: codex-team/action-nodejs-package-info@v1
         id: package

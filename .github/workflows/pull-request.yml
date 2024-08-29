@@ -53,6 +53,8 @@ jobs:
   cpp-test-libc:
     needs: ['build']
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
     strategy:
       matrix:
         debian:
@@ -77,6 +79,8 @@ jobs:
   cpp-test-musl:
     needs: ['build']
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
     strategy:
       matrix:
         alpine:
@@ -158,6 +162,8 @@ jobs:
             artifact: darwin-x64
 
     runs-on: ${{ matrix.target.os }}
+    permissions:
+      checks: write
     env:
       NPM_TAINTEDUTILS: true
     steps:

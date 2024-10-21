@@ -26,8 +26,8 @@
                 "<!(node -e \"require('nan')\")"
             ],
             "cflags!": [ "-fno-exceptions", "-fno-rtti" ],
-            "cflags_cc!": [ "-fno-exceptions", "-fno-rtti"  ],
-            "cflags_cc": [ "-std=c++20" ],
+            "cflags_cc!": [ "-fno-exceptions", "-fno-rtti", "-std=gnu++20"  ],
+            "cflags_cc": [ "-std=gnu++2a" ],
             "conditions": [
                 ['OS=="mac"', {
                     "xcode_settings": {

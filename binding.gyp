@@ -26,15 +26,20 @@
                 "<!(node -e \"require('nan')\")"
             ],
             "cflags!": [ "-fno-exceptions", "-fno-rtti" ],
-            "cflags_cc!": [ "-fno-exceptions", "-fno-rtti"  ],
-            "cflags_cc": [ "-std=c++17" ],
+            "cflags_cc!": [ "-fno-exceptions", "-fno-rtti", "-std=gnu++20"  ],
+            "cflags_cc": [ "-std=gnu++2a" ],
             "conditions": [
                 ['OS=="mac"', {
                     "xcode_settings": {
-                        "MACOSX_DEPLOYMENT_TARGET": "10.7",
+                        "MACOSX_DEPLOYMENT_TARGET": "10.10",
                         "CLANG_CXX_LIBRARY": "libc++",
                         "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
-                        "GCC_ENABLE_CPP_RTTI": "YES"
+                        "GCC_ENABLE_CPP_RTTI": "YES",
+                        "OTHER_CFLAGS": [
+                            "-std=c++20",
+                            "-stdlib=libc++",
+                            "-Wall"
+                        ]
                     }
                 }],
                 ['OS=="win"', {

@@ -28,7 +28,7 @@ declare module 'datadog-iast-taint-tracking' {
         createTransaction(transactionId: string): string;
         newTaintedString(transactionId: string, original: string, paramName: string, type: string): string;
         newTaintedObject(transactionId: string, original: any, paramName: string, type: string): any;
-        addSecureMarksToTaintedString(transactionId: string, taintedString: string, secureMarks: number): string;
+        addSecureMarksToTaintedString(transactionId: string, taintedString: string, secureMarks: number, createNewTainted?: boolean): string;
         isTainted(transactionId: string, ...args: string[]): boolean;
         getMetrics(transactionId: string, telemetryVerbosity: number): Metrics;
         getRanges(transactionId: string, original: string): NativeTaintedRange[];

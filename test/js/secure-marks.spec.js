@@ -22,7 +22,7 @@ try {
     makeReferenceEqual()
     v8.setFlagsFromString('--no-allow-natives-syntax')
   // eslint-disable-next-line no-empty
-  } catch (e) {/* empty */}
+  } catch (e) { /* empty */ }
 }
 
 describe('Secure marks', function () {

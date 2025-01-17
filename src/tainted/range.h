@@ -11,7 +11,7 @@
 
 namespace iast {
 namespace tainted {
-using secure_marks_t = uint16_t;
+using secure_marks_t = uint32_t;
 class Range {
  public:
     explicit Range(int start, int end, InputInfo *inputInfo, secure_marks_t secureMarks);

@@ -6,6 +6,25 @@
 
 const { TaintedUtils } = require('./util')
 const assert = require('assert')
+
+let referenceEqual
+function makeReferenceEqual () {
+  // eslint-disable-next-line no-new-func
+  referenceEqual = new Function('value1', 'value2', 'return %ReferenceEqual(value1, value2)')
+}
+
+try {
+  makeReferenceEqual()
+} catch (e) {
+  try {
+    const v8 = require('v8')
+    v8.setFlagsFromString('--allow-natives-syntax')
+    makeReferenceEqual()
+    v8.setFlagsFromString('--no-allow-natives-syntax')
+  // eslint-disable-next-line no-empty
+  } catch (e) { /* empty */ }
+}
+
 describe('Secure marks', function () {
   const id = TaintedUtils.createTransaction('666')
   const value = 'test'
@@ -117,11 +136,49 @@ describe('Secure marks', function () {
     const originalTaintedValue = TaintedUtils.newTaintedString(id, 'range1TOREPLACErange2', param, 'REQUEST')
     const taintedValueWithSecureMarks = TaintedUtils.addSecureMarksToTaintedString(id, originalTaintedValue, 0xffaf)
     const taintedValueWithSecureMarks2 =
-      TaintedUtils.addSecureMarksToTaintedString(id, originalTaintedValue, 0xffaff) // over the limit
+      TaintedUtils.addSecureMarksToTaintedString(id, originalTaintedValue, 0x1ffffffff) // over the limit
 
     const markedRanges1 = TaintedUtils.getRanges(id, taintedValueWithSecureMarks)
     const markedRanges2 = TaintedUtils.getRanges(id, taintedValueWithSecureMarks2)
     assert.equal(markedRanges1[0].secureMarks, 0xffaf)
-    assert.equal(markedRanges2[0].secureMarks, 0xfaff)
+    assert.equal(markedRanges2[0].secureMarks, 0xffffffff)
+  })
+
+  describe('createNewTainted flag', () => {
+    it('when false no new tainted should be created', () => {
+      const originalTaintedValue = TaintedUtils.newTaintedString(id, 'tainted', param, 'REQUEST')
+      const taintedWithSecureMarks = TaintedUtils.addSecureMarksToTaintedString(id, originalTaintedValue, 0b1, false)
+
+      assert(referenceEqual(originalTaintedValue, taintedWithSecureMarks))
+
+      const markedRanges1 = TaintedUtils.getRanges(id, originalTaintedValue)
+      const markedRanges2 = TaintedUtils.getRanges(id, taintedWithSecureMarks)
+      assert.equal(markedRanges1[0].secureMarks, 0b1)
+      assert.equal(markedRanges2[0].secureMarks, 0b1)
+    })
+
+    it('when undefined new tainted should be created', () => {
+      const originalTaintedValue = TaintedUtils.newTaintedString(id, 'tainted', param, 'REQUEST')
+      const taintedWithSecureMarks = TaintedUtils.addSecureMarksToTaintedString(id, originalTaintedValue, 0b1)
+
+      const markedRanges1 = TaintedUtils.getRanges(id, originalTaintedValue)
+      const markedRanges2 = TaintedUtils.getRanges(id, taintedWithSecureMarks)
+      assert.equal(markedRanges1[0].secureMarks, 0)
+      assert.equal(markedRanges2[0].secureMarks, 0b1)
+
+      assert(!referenceEqual(originalTaintedValue, taintedWithSecureMarks))
+    })
+
+    it('when true new tainted should be created', () => {
+      const originalTaintedValue = TaintedUtils.newTaintedString(id, 'tainted', param, 'REQUEST')
+      const taintedWithSecureMarks = TaintedUtils.addSecureMarksToTaintedString(id, originalTaintedValue, 0b1, true)
+
+      const markedRanges1 = TaintedUtils.getRanges(id, originalTaintedValue)
+      const markedRanges2 = TaintedUtils.getRanges(id, taintedWithSecureMarks)
+      assert.equal(markedRanges1[0].secureMarks, 0)
+      assert.equal(markedRanges2[0].secureMarks, 0b1)
+
+      assert(!referenceEqual(originalTaintedValue, taintedWithSecureMarks))
+    })
   })
 })

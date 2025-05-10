@@ -13,7 +13,7 @@ file(GLOB SOURCE_FILES
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
-add_definitions("-DNODE_VERSION_v16")
+add_definitions("-DNODE_VERSION_v18")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
 # Include N-API wrappers

@@ -40,8 +40,10 @@ class TransactionManager {
         std::cout << "~ Transaction Get " << id << std::endl;
         auto found = _map.find(id);
         if (found == _map.end()) {
+            std::cout << "~ Transaction Get - no transaction :(" << id << std::endl;
             return nullptr;
         } else {
+            std::cout << "~ Transaction Get - found transaction :(" << id << std::endl;
             return found->second;
         }
     }

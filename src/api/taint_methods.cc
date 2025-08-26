@@ -246,6 +246,8 @@ void GetRanges(const FunctionCallbackInfo<Value>& args) {
             args.GetReturnValue().Set(jsRanges);
             return;
         }
+    } else {
+        std::cout << "~ GetRanges: no transaction" << std::endl;
     }
     args.GetReturnValue().SetNull();
 }

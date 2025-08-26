@@ -114,11 +114,13 @@ class WeakMap {
     }
 
     void Rehash() {
+        std::cout << std::endl <<  "~~~~~~ ~~~ ~~~~~~" << std::endl << "~~~~~~ Rehash ~~~~~~" << std::endl << std::endl;
         for (size_t index = 0; index < N; index++) {
             T prev = nullptr;
             auto obj = static_cast<T>(this->items[index]);
             while (obj != nullptr) {
                 if (obj->IsEmpty()) {
+                    std::cout << "~~ removed by GC" <<  index << std::endl;
                     // removed by GC so prev remains the same
                     remove(index, prev, obj);
                     auto toDelete = obj;
@@ -127,6 +129,7 @@ class WeakMap {
                 } else {
                     auto newPointer = obj->Get();
                     if (newPointer != obj->_key) {
+                        std::cout << "~~ moved by GC " << newPointer << " :: " << index << std::endl;
                         // moved by GC so prev remains the same
                         remove(index, prev, obj);
                         auto toInsert = obj;

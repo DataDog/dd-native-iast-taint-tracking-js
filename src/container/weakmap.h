@@ -52,6 +52,7 @@ class WeakMap {
     T Find(weak_key_t key) {
         T ret = nullptr;
         auto index = GET_INDEX(key, MASK);
+        std::cout << "~ Find " << index << std::endl;
         auto obj = static_cast<T>(this->items[index]);
         while (obj != nullptr) {
             if (obj->_key == key) {

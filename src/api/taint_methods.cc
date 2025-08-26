@@ -248,7 +248,7 @@ void GetRanges(const FunctionCallbackInfo<Value>& args) {
             return;
         }
     } else {
-        std::cout << "~ GetRanges: no transaction" << std::endl;
+        std::cout << "~ GetRanges: No transaction :'(" << std::endl;
     }
     args.GetReturnValue().SetNull();
 }

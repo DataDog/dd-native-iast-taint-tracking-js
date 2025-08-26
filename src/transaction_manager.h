@@ -20,6 +20,7 @@ class TransactionManager {
     void operator=(TransactionManager const&) = delete;
 
     T* New(U id) {
+        std::cout << "~ Transaction New " << id << std::endl;
         auto found = _map.find(id);
         if (found == _map.end()) {
             if (_map.size() >= _maxItems) {
@@ -40,15 +41,16 @@ class TransactionManager {
         std::cout << "~ Transaction Get " << id << std::endl;
         auto found = _map.find(id);
         if (found == _map.end()) {
-            std::cout << "~ Transaction Get - no transaction :(" << id << std::endl;
+            std::cout << "~ Transaction Get - NO transaction found :'( " << id << std::endl;
             return nullptr;
         } else {
-            std::cout << "~ Transaction Get - found transaction :(" << id << std::endl;
+            std::cout << "~ Transaction Get - transaction found :))) " << id << std::endl;
             return found->second;
         }
     }
 
     void Remove(U id) noexcept {
+        std::cout << "~ Transaction Remove " << id << std::endl;
         auto found = _map.find(id);
         if (found != _map.end()) {
             T* item = found->second;
@@ -59,7 +61,9 @@ class TransactionManager {
     }
 
     void RehashAll(void) noexcept {
+        std::cout << "~ Transaction RehashAll" << std::endl;
         for (auto entry : _map) {
+            std::cout << "~ Transaction RehashAll entry: " << entry.first << std::endl;
             if (entry.second) {
                 entry.second->RehashMap();
             }
@@ -67,6 +71,7 @@ class TransactionManager {
     }
 
     void Clear(void) noexcept {
+        std::cout << "~ Transaction Clear" << std::endl;
         for (auto it = _map.begin(); it != _map.end(); ++it) {
             _pool.Push(it->second);
         }

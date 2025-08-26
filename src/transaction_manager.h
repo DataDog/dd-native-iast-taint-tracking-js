@@ -23,6 +23,7 @@ class TransactionManager {
         auto found = _map.find(id);
         if (found == _map.end()) {
             if (_map.size() >= _maxItems) {
+                std::cout << "~ Transaction max items reached " << std::endl;
                 return nullptr;
             }
 
@@ -36,6 +37,7 @@ class TransactionManager {
     }
 
     T* Get(U id) {
+        std::cout << "~ Transaction Get " << id << std::endl;
         auto found = _map.find(id);
         if (found == _map.end()) {
             return nullptr;

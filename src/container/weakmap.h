@@ -78,6 +78,7 @@ class WeakMap {
         }
 
         auto index = GET_INDEX(key, MASK);
+        std::cout << "~ Insert " << index << std::endl;
         auto taintedObjectInArray = this->items[index];
         if (taintedObjectInArray != nullptr) {
             obj->_next = taintedObjectInArray;
@@ -91,6 +92,7 @@ class WeakMap {
 
     void Del(weak_key_t key) {
         auto index = GET_INDEX(key, MASK);
+        std::cout << "~ Del " << index << std::endl;
         auto root = this->items[index];
         auto prev = root;
         if (root->_key == key) {

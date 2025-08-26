@@ -11,6 +11,7 @@
 #include <list>
 #include <iterator>
 #include <memory>
+#include <iostream>
 
 #include "taint_methods.h"
 #include "../tainted/string_resource.h"

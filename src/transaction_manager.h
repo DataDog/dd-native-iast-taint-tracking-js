@@ -39,6 +39,10 @@ class TransactionManager {
 
     T* Get(U id) {
         std::cout << "~ Transaction Get " << id << std::endl;
+        for (auto entry : _map) {
+            std::cout << "~ Transaction Get for entry: " << entry.first << std::endl;
+        }
+        std::cout << "~ Transaction Get ~~~~~~~" << std::endl;
         auto found = _map.find(id);
         if (found == _map.end()) {
             std::cout << "~ Transaction Get - NO transaction found :'( " << id << std::endl;

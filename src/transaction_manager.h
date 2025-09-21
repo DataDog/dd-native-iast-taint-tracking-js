@@ -8,6 +8,7 @@
 #include <map>
 #include <iostream>
 #include <atomic>
+#include <utility>
 #include "container/queued_pool.h"
 
 
@@ -17,24 +18,24 @@ template <typename T, typename U>
 class TransactionManager {
  private:
     static std::atomic<uint64_t> next_id_;
-    
+
  public:
     TransactionManager() = default;
     TransactionManager(TransactionManager const&) = delete;
     void operator=(TransactionManager const&) = delete;
-    
+
     static U GenerateNewId() {
         U id = static_cast<U>(next_id_++);
         std::cout << "~ Generated new transaction ID: " << id << std::endl;
         return id;
     }
-    
+
     std::pair<U, T*> NewWithGeneratedId() {
         if (_map.size() >= _maxItems) {
             std::cout << "~ Transaction max items reached " << std::endl;
             return {0, nullptr};
         }
-        
+
         U id = GenerateNewId();
         T* item = _pool.Pop(id);
         _map[id] = item;

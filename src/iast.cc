@@ -41,6 +41,10 @@ Transaction* NewTransaction(transaction_key_t id) {
     return transactionManager::GetInstance().New(id);
 }
 
+std::pair<transaction_key_t, Transaction*> NewTransactionWithGeneratedId() {
+    return transactionManager::GetInstance().NewWithGeneratedId();
+}
+
 void SetMaxTransactions(size_t maxItems) {
     transactionManager::GetInstance().setMaxItems(maxItems);
 }

@@ -23,6 +23,7 @@ void RehashAllTransactions(void);
 void RemoveTransaction(transaction_key_t id);
 Transaction* GetTransaction(transaction_key_t id);
 Transaction* NewTransaction(transaction_key_t id);
+std::pair<transaction_key_t, Transaction*> NewTransactionWithGeneratedId();
 void SetMaxTransactions(size_t maxItems);
 
 }  // namespace iast

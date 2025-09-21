@@ -40,9 +40,31 @@ using iast::tainted::secure_marks_t;
 namespace iast {
 namespace api {
 
+inline bool ExtractTransactionId(v8::Isolate* isolate, v8::Local<v8::Value> arg, uint64_t& transactionId) {
+    if (!arg->IsNumber()) {
+        return false;
+    }
+    auto context = isolate->GetCurrentContext();
+    transactionId = static_cast<uint64_t>(arg->NumberValue(context).FromJust());
+    return true;
+}
+
 void CreateTransaction(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
-    args.GetReturnValue().Set(tainted::NewExternalString(isolate, args[0]));
+    
+    auto result = NewTransactionWithGeneratedId();
+    auto transactionId = result.first;
+    auto transaction = result.second;
+    
+    if (transaction == nullptr) {
+        isolate->ThrowException(v8::Exception::TypeError(
+            v8::String::NewFromUtf8(isolate,
+                "Error creating transaction",
+                v8::NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+    
+    args.GetReturnValue().Set(v8::Number::New(isolate, static_cast<double>(transactionId)));
 }
 
 void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
@@ -86,7 +108,11 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
 
     args.GetReturnValue().Set(parameterValue);
 
-    uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
+    uint64_t transactionId;
+    if (!ExtractTransactionId(isolate, transactionIdArgument, transactionId)) {
+        // Invalid transaction ID
+        return;
+    }
 
     try {
         auto transaction = NewTransaction(transactionId);
@@ -155,7 +181,11 @@ void AddSecureMarksToTaintedString(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
+    uint64_t transactionId;
+    if (!ExtractTransactionId(isolate, transactionIdArgument, transactionId)) {
+        // Invalid transaction ID
+        return;
+    }
 
     auto transaction = GetTransaction(transactionId);
     if (transaction == nullptr) {
@@ -205,7 +235,12 @@ void IsTainted(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    uintptr_t transactionId = utils::GetLocalPointer(args[0]);
+    uint64_t transactionId;
+    if (!ExtractTransactionId(args.GetIsolate(), args[0], transactionId)) {
+        // Invalid transaction ID
+        args.GetReturnValue().Set(false);
+        return;
+    }
     auto transaction = GetTransaction(transactionId);
     if (!transaction) {
         args.GetReturnValue().Set(false);
@@ -231,7 +266,13 @@ void GetRanges(const FunctionCallbackInfo<Value>& args) {
                 NewStringType::kNormal).ToLocalChecked()));
         return;
     }
-    uintptr_t transactionId = utils::GetLocalPointer(args[0]);
+
+    uint64_t transactionId;
+    if (!ExtractTransactionId(isolate, args[0], transactionId)) {
+        // Invalid transaction ID
+        args.GetReturnValue().SetNull();
+        return;
+    }
     auto transaction = GetTransaction(transactionId);
     if (transaction != nullptr) {
         auto taintedObj = transaction->FindTaintedObject(utils::GetLocalPointer(args[1]));
@@ -264,7 +305,11 @@ void DeleteTransaction(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transactionId = utils::GetLocalPointer(args[0]);
+    uint64_t transactionId;
+    if (!ExtractTransactionId(isolate, args[0], transactionId)) {
+        // Invalid transaction ID
+        return;
+    }
     RemoveTransaction(transactionId);
 }
 
@@ -313,7 +358,11 @@ void NewTaintedObject(const FunctionCallbackInfo<Value>& args) {
 
     args.GetReturnValue().Set(parameterValue);
 
-    uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
+    uint64_t transactionId;
+    if (!ExtractTransactionId(isolate, transactionIdArgument, transactionId)) {
+        // Invalid transaction ID
+        return;
+    }
 
     try {
         auto transaction = NewTransaction(transactionId);

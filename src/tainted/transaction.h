@@ -32,6 +32,8 @@ class Transaction {
  public:
     Transaction() {}
     explicit Transaction(transaction_key_t id) : _id(id) {}
+    explicit Transaction(transaction_key_t id, v8::Local<v8::Value> jsObject) 
+        : _id(id), _jsObjectRef(v8::Isolate::GetCurrent(), jsObject) {}
     ~Transaction() noexcept;
     void Clean(void) noexcept;
 
@@ -71,6 +73,39 @@ class Transaction {
         }
     }
 
+    // GC tracking methods
+    bool HasJsObjectReference() const noexcept {
+        return !_jsObjectRef.IsEmpty();
+    }
+    
+    transaction_key_t GetCurrentTransactionKey() const noexcept {
+        if (_jsObjectRef.IsEmpty()) {
+            return _id;
+        }
+        auto isolate = v8::Isolate::GetCurrent();
+        if (!isolate) {
+            return _id;
+        }
+        v8::HandleScope handle_scope(isolate);
+        auto localRef = _jsObjectRef.Get(isolate);
+        return *reinterpret_cast<uintptr_t*>(*localRef);
+    }
+    
+    transaction_key_t GetOriginalTransactionKey() const noexcept {
+        return _id;
+    }
+    
+    void UpdateTransactionKey(transaction_key_t newKey) noexcept {
+        _id = newKey;
+    }
+    
+    void UpdateJsObjectReference(v8::Local<v8::Value> jsObject) noexcept {
+        if (!_jsObjectRef.IsEmpty()) {
+            _jsObjectRef.Reset();
+        }
+        _jsObjectRef.Reset(v8::Isolate::GetCurrent(), jsObject);
+    }
+
  private:
     void cleanSharedVectors(void);
     void cleanInputInfos(void) noexcept;
@@ -81,6 +116,7 @@ class Transaction {
     RangePool _rangesPool;
     std::vector<InputInfo*> _usedInputInfo;
     transaction_key_t _id;
+    v8::Persistent<v8::Value> _jsObjectRef;
 };
 
 }  // namespace tainted

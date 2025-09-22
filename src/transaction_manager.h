@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <map>
 #include <iostream>
+#include <vector>
 #include "container/queued_pool.h"
 
 
@@ -34,7 +35,7 @@ class TransactionManager {
             return item;
         }
     }
-    
+
     // New method to create transaction with V8 object reference for GC tracking
     T* New(U id, v8::Local<v8::Value> jsObject) {
         auto found = _map.find(id);
@@ -82,21 +83,21 @@ class TransactionManager {
                 entry.second->RehashMap();
             }
         }
-        
+
         // Then, check and update transaction keys that may have been moved by GC
         RehashTransactionKeys();
     }
-    
+
     void RehashTransactionKeys(void) noexcept {
         std::vector<std::pair<U, T*>> toReinsert;
-        
+
         // Find transactions whose keys have changed due to GC
         for (auto it = _map.begin(); it != _map.end();) {
             auto transaction = it->second;
             if (transaction && transaction->HasJsObjectReference()) {
                 auto currentKey = transaction->GetCurrentTransactionKey();
                 auto originalKey = transaction->GetOriginalTransactionKey();
-                
+
                 if (currentKey != originalKey) {
                     // Key has changed due to GC, need to re-insert with new key
                     toReinsert.push_back({currentKey, transaction});
@@ -109,7 +110,7 @@ class TransactionManager {
                 ++it;
             }
         }
-        
+
         // Re-insert transactions with updated keys
         for (auto& pair : toReinsert) {
             _map[pair.first] = pair.second;

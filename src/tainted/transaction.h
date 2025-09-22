@@ -32,7 +32,7 @@ class Transaction {
  public:
     Transaction() {}
     explicit Transaction(transaction_key_t id) : _id(id) {}
-    explicit Transaction(transaction_key_t id, v8::Local<v8::Value> jsObject) 
+    explicit Transaction(transaction_key_t id, v8::Local<v8::Value> jsObject)
         : _id(id), _jsObjectRef(v8::Isolate::GetCurrent(), jsObject) {}
     ~Transaction() noexcept;
     void Clean(void) noexcept;
@@ -73,11 +73,10 @@ class Transaction {
         }
     }
 
-    // GC tracking methods
     bool HasJsObjectReference() const noexcept {
         return !_jsObjectRef.IsEmpty();
     }
-    
+
     transaction_key_t GetCurrentTransactionKey() const noexcept {
         if (_jsObjectRef.IsEmpty()) {
             return _id;
@@ -90,15 +89,15 @@ class Transaction {
         auto localRef = _jsObjectRef.Get(isolate);
         return *reinterpret_cast<uintptr_t*>(*localRef);
     }
-    
+
     transaction_key_t GetOriginalTransactionKey() const noexcept {
         return _id;
     }
-    
+
     void UpdateTransactionKey(transaction_key_t newKey) noexcept {
         _id = newKey;
     }
-    
+
     void UpdateJsObjectReference(v8::Local<v8::Value> jsObject) noexcept {
         if (!_jsObjectRef.IsEmpty()) {
             _jsObjectRef.Reset();

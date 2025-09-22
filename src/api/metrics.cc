@@ -3,6 +3,7 @@
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
 #include <node.h>
+#include <string>
 
 #include "metrics.h"
 

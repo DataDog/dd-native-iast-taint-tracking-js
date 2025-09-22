@@ -42,6 +42,14 @@ inline std::string GetCString(v8::Isolate* isolate, v8::Local<v8::Value> val) {
 
 
 
+inline std::string GetStringValue(v8::Isolate* isolate, v8::Local<v8::Value> val) {
+    if (val->IsString()) {
+        v8::String::Utf8Value utf8Value(isolate, val);
+        return std::string(*utf8Value);
+    }
+    return "";
+}
+
 inline int GetLength(v8::Isolate* isolate, v8::Local<v8::Value> val) {
     if (val->IsString()) {
         return v8::String::Cast(*val)->Length();

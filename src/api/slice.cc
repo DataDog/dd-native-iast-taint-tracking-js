@@ -9,6 +9,7 @@
 #include "../tainted/transaction.h"
 #include "../iast.h"
 #include "../utils/propagation.h"
+#include "../utils/string_utils.h"
 
 namespace iast {
 namespace api {
@@ -47,7 +48,7 @@ void slice(const FunctionCallbackInfo<Value>& args) {
 
     int sliceStart = args[3]->IntegerValue(context).FromJust();
 
-    Transaction* transaction = GetTransaction(GetLocalPointer(args[0]));
+    Transaction* transaction = GetTransaction(utils::GetStringValue(isolate, args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(vResult);
         return;

@@ -12,6 +12,7 @@
 #include <queue>
 #include <unordered_map>
 #include <vector>
+#include <string>
 
 #include "../tainted/range.h"
 #include "../tainted/tainted_object.h"
@@ -26,7 +27,7 @@ using SharedRangesPool = iast::container::QueuedPool<SharedRanges, iast::Limits:
 
 namespace iast {
 namespace tainted {
-using transaction_key_t = uintptr_t;
+using transaction_key_t = std::string;
 
 class Transaction {
  public:

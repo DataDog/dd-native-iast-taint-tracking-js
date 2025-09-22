@@ -10,7 +10,7 @@
 namespace iast {
 struct Limits {
     static const size_t MAX_RANGES = 50;
-    static const size_t MAX_TAINTED_OBJECTS = 12096;  // result of pow(2, 12);
+    static const size_t MAX_TAINTED_OBJECTS = 4096;  // result of pow(2, 12);
     static const size_t MAX_GLOBAL_TAINTED_RANGES = MAX_RANGES * MAX_TAINTED_OBJECTS;
     static const size_t MAX_TAINTED_RANGE_VECTORS = MAX_TAINTED_OBJECTS;
 };

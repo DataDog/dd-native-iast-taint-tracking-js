@@ -13,6 +13,7 @@
 #include "../tainted/transaction.h"
 #include "../iast.h"
 #include "../utils/validation_utils.h"
+#include "../utils/string_utils.h"
 #include "v8.h"
 
 using v8::FunctionCallbackInfo;
@@ -200,6 +201,7 @@ inline SharedRanges* adjustRegexReplacementRanges(Transaction* transaction,
 }
 
 void TaintReplaceStringByStringMethod(const FunctionCallbackInfo<Value>& args) {
+    auto isolate = args.GetIsolate();
     if (!utils::ValidateMethodArguments(args, 6, "Wrong number of arguments")) {
         return;
     }
@@ -209,7 +211,7 @@ void TaintReplaceStringByStringMethod(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transaction = GetTransaction(GetLocalPointer(args[0]));
+    auto transaction = GetTransaction(utils::GetStringValue(isolate, args[0]));
     if (!transaction) {
         args.GetReturnValue().Set(replaceResult);
         return;
@@ -248,6 +250,7 @@ void TaintReplaceStringByStringMethod(const FunctionCallbackInfo<Value>& args) {
 
 void TaintReplaceStringByStringUsingRegexMethod(const FunctionCallbackInfo<Value>& args) {
     // transactionId, result, subject, matcher, replacer, replacements
+    auto isolate = args.GetIsolate();
     if (!utils::ValidateMethodArguments(args, 6, "Wrong number of arguments")) {
         return;
     }
@@ -257,7 +260,7 @@ void TaintReplaceStringByStringUsingRegexMethod(const FunctionCallbackInfo<Value
         return;
     }
 
-    auto transaction = GetTransaction(GetLocalPointer(args[0]));
+    auto transaction = GetTransaction(utils::GetStringValue(isolate, args[0]));
     if (!transaction) {
         args.GetReturnValue().Set(replaceResult);
         return;

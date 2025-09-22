@@ -12,6 +12,7 @@
 #include "../tainted/string_resource.h"
 #include "../tainted/transaction.h"
 #include "../iast.h"
+#include "../utils/string_utils.h"
 
 #define TO_V8STRING(arg) (v8::Local<v8::String>::Cast(arg))
 
@@ -42,7 +43,7 @@ void StringCaseOperator(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transaction = GetTransaction(utils::GetLocalPointer(args[0]));
+    auto transaction = GetTransaction(utils::GetStringValue(isolate, args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(args[1]);
         return;

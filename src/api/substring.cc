@@ -15,6 +15,7 @@
 #include "../tainted/string_resource.h"
 #include "../iast.h"
 #include "../utils/propagation.h"
+#include "../utils/string_utils.h"
 #include "v8.h"
 
 #define SUBSTRING_MIN_ARGC  3
@@ -68,7 +69,7 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         args.GetReturnValue().Set(result);
         return;
     }
-    auto transaction = GetTransaction(GetLocalPointer(args[0]));
+    auto transaction = GetTransaction(utils::GetStringValue(isolate, args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(result);
         return;
@@ -135,7 +136,7 @@ void substr(const FunctionCallbackInfo<Value>& args) {
         length = TO_INTEGER_VALUE(args[4], context);
     }
 
-    auto transaction = GetTransaction(GetLocalPointer(args[0]));
+    auto transaction = GetTransaction(utils::GetStringValue(isolate, args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(result);
         return;

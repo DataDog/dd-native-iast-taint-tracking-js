@@ -86,7 +86,7 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
 
     args.GetReturnValue().Set(parameterValue);
 
-    uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
+    std::string transactionId = utils::GetStringValue(isolate, transactionIdArgument);
 
     try {
         auto transaction = NewTransaction(transactionId);
@@ -155,7 +155,7 @@ void AddSecureMarksToTaintedString(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
+    std::string transactionId = utils::GetStringValue(isolate, transactionIdArgument);
 
     auto transaction = GetTransaction(transactionId);
     if (transaction == nullptr) {
@@ -205,7 +205,7 @@ void IsTainted(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    uintptr_t transactionId = utils::GetLocalPointer(args[0]);
+    std::string transactionId = utils::GetStringValue(args.GetIsolate(), args[0]);
     auto transaction = GetTransaction(transactionId);
     if (!transaction) {
         args.GetReturnValue().Set(false);
@@ -231,7 +231,7 @@ void GetRanges(const FunctionCallbackInfo<Value>& args) {
                 NewStringType::kNormal).ToLocalChecked()));
         return;
     }
-    uintptr_t transactionId = utils::GetLocalPointer(args[0]);
+    std::string transactionId = utils::GetStringValue(isolate, args[0]);
     auto transaction = GetTransaction(transactionId);
     if (transaction != nullptr) {
         auto taintedObj = transaction->FindTaintedObject(utils::GetLocalPointer(args[1]));
@@ -264,7 +264,7 @@ void DeleteTransaction(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transactionId = utils::GetLocalPointer(args[0]);
+    std::string transactionId = utils::GetStringValue(isolate, args[0]);
     RemoveTransaction(transactionId);
 }
 
@@ -313,7 +313,7 @@ void NewTaintedObject(const FunctionCallbackInfo<Value>& args) {
 
     args.GetReturnValue().Set(parameterValue);
 
-    uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
+    std::string transactionId = utils::GetStringValue(isolate, transactionIdArgument);
 
     try {
         auto transaction = NewTransaction(transactionId);

@@ -11,6 +11,7 @@
 #include "../tainted/range.h"
 #include "../tainted/transaction.h"
 #include "../iast.h"
+#include "../utils/string_utils.h"
 
 using v8::FunctionCallbackInfo;
 using v8::Value;
@@ -37,7 +38,7 @@ void TaintConcatOperator(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto transaction = GetTransaction(utils::GetLocalPointer(args[0]));
+    auto transaction = GetTransaction(utils::GetStringValue(isolate, args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(args[1]);
         return;

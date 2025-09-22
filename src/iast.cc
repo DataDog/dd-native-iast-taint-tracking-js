@@ -5,7 +5,6 @@
 
 #include <node.h>
 #include <cstddef>
-#include <utility>
 #include "iast.h"
 #include "gc/gc.h"
 #include "container/singleton.h"

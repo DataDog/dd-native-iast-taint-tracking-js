@@ -51,11 +51,11 @@ inline bool ExtractTransactionId(v8::Isolate* isolate, v8::Local<v8::Value> arg,
 
 void CreateTransaction(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
-
+    
     auto result = NewTransactionWithGeneratedId();
     auto transactionId = result.first;
     auto transaction = result.second;
-
+    
     if (transaction == nullptr) {
         isolate->ThrowException(v8::Exception::TypeError(
             v8::String::NewFromUtf8(isolate,
@@ -63,7 +63,7 @@ void CreateTransaction(const FunctionCallbackInfo<Value>& args) {
                 v8::NewStringType::kNormal).ToLocalChecked()));
         return;
     }
-
+    
     args.GetReturnValue().Set(v8::Number::New(isolate, static_cast<double>(transactionId)));
 }
 

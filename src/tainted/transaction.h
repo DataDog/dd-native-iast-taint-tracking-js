@@ -26,7 +26,7 @@ using SharedRangesPool = iast::container::QueuedPool<SharedRanges, iast::Limits:
 
 namespace iast {
 namespace tainted {
-using transaction_key_t = uint64_t;
+using transaction_key_t = uintptr_t;
 
 class Transaction {
  public:

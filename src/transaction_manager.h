@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <map>
 #include <iostream>
-#include <atomic>
 #include "container/queued_pool.h"
 
 
@@ -15,32 +14,10 @@ namespace iast {
 
 template <typename T, typename U>
 class TransactionManager {
- private:
-    static std::atomic<uint64_t> next_id_;
-    
  public:
     TransactionManager() = default;
     TransactionManager(TransactionManager const&) = delete;
     void operator=(TransactionManager const&) = delete;
-    
-    static U GenerateNewId() {
-        U id = static_cast<U>(next_id_++);
-        std::cout << "~ Generated new transaction ID: " << id << std::endl;
-        return id;
-    }
-    
-    std::pair<U, T*> NewWithGeneratedId() {
-        if (_map.size() >= _maxItems) {
-            std::cout << "~ Transaction max items reached " << std::endl;
-            return {0, nullptr};
-        }
-        
-        U id = GenerateNewId();
-        T* item = _pool.Pop(id);
-        _map[id] = item;
-        std::cout << "~ Created transaction with generated ID: " << id << std::endl;
-        return {id, item};
-    }
 
     T* New(U id) {
         std::cout << "~ Transaction New " << id << std::endl;
@@ -115,9 +92,6 @@ class TransactionManager {
     container::QueuedPool<T> _pool;
     std::map<U, T*> _map;
 };
-
-template <typename T, typename U>
-std::atomic<uint64_t> TransactionManager<T, U>::next_id_{1};
 
 }   // namespace iast
 #endif  // SRC_TRANSACTION_MANAGER_H_

@@ -103,7 +103,7 @@ class Transaction {
         }
         _jsObjectRef.Reset(v8::Isolate::GetCurrent(), jsObject);
     }
-    
+
     void Reinitialize(transaction_key_t id, v8::Local<v8::Value> jsObject) noexcept {
         Clean();
 

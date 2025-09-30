@@ -8,6 +8,7 @@
 #include <map>
 #include <iostream>
 #include <vector>
+#include <node.h>
 #include "container/queued_pool.h"
 
 
@@ -20,23 +21,6 @@ class TransactionManager {
     TransactionManager(TransactionManager const&) = delete;
     void operator=(TransactionManager const&) = delete;
 
-    T* New(U id) {
-        auto found = _map.find(id);
-        if (found == _map.end()) {
-            if (_map.size() >= _maxItems) {
-                return nullptr;
-            }
-
-            T* item = _pool.Pop(id);
-            _map[id] = item;
-            return item;
-        } else {
-            auto item = found->second;
-            return item;
-        }
-    }
-
-    // New method to create transaction with V8 object reference for GC tracking
     T* New(U id, v8::Local<v8::Value> jsObject) {
         auto found = _map.find(id);
         if (found == _map.end()) {
@@ -44,12 +28,17 @@ class TransactionManager {
                 return nullptr;
             }
 
-            T* item = _pool.Pop(id, jsObject);
+            T* item;
+            if (_pool.Available() > 0) {
+                item = _pool.Pop();
+                item->Reinitialize(id, jsObject);
+            } else {
+                item = _pool.Pop(id, jsObject);
+            }
             _map[id] = item;
             return item;
         } else {
             auto item = found->second;
-            // Update existing transaction with new JS object reference
             if (item) {
                 item->UpdateJsObjectReference(jsObject);
             }
@@ -77,14 +66,12 @@ class TransactionManager {
     }
 
     void RehashAll(void) noexcept {
-        // First, rehash internal maps of each transaction
         for (auto entry : _map) {
             if (entry.second) {
                 entry.second->RehashMap();
             }
         }
 
-        // Then, check and update transaction keys that may have been moved by GC
         RehashTransactionKeys();
     }
 
@@ -119,6 +106,7 @@ class TransactionManager {
 
     void Clear(void) noexcept {
         for (auto it = _map.begin(); it != _map.end(); ++it) {
+            it->second->Clean();
             _pool.Push(it->second);
         }
         _map.clear();

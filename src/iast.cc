@@ -37,10 +37,6 @@ Transaction* GetTransaction(transaction_key_t id) {
     return transactionManager::GetInstance().Get(id);
 }
 
-Transaction* NewTransaction(transaction_key_t id) {
-    return transactionManager::GetInstance().New(id);
-}
-
 Transaction* NewTransaction(transaction_key_t id, v8::Local<v8::Value> jsObject) {
     return transactionManager::GetInstance().New(id, jsObject);
 }

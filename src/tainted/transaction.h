@@ -31,7 +31,6 @@ using transaction_key_t = uintptr_t;
 class Transaction {
  public:
     Transaction() {}
-    explicit Transaction(transaction_key_t id) : _id(id) {}
     explicit Transaction(transaction_key_t id, v8::Local<v8::Value> jsObject)
         : _id(id), _jsObjectRef(v8::Isolate::GetCurrent(), jsObject) {}
     ~Transaction() noexcept;
@@ -103,6 +102,13 @@ class Transaction {
             _jsObjectRef.Reset();
         }
         _jsObjectRef.Reset(v8::Isolate::GetCurrent(), jsObject);
+    }
+    
+    void Reinitialize(transaction_key_t id, v8::Local<v8::Value> jsObject) noexcept {
+        Clean();
+
+        _id = id;
+        UpdateJsObjectReference(jsObject);
     }
 
  private:

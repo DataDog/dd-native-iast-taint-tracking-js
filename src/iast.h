@@ -9,7 +9,7 @@
 #include <map>
 #include <cstdint>
 #include <iostream>
-
+#include <node.h>
 
 #include "transaction_manager.h"
 #include "tainted/transaction.h"
@@ -22,7 +22,6 @@ namespace iast {
 void RehashAllTransactions(void);
 void RemoveTransaction(transaction_key_t id);
 Transaction* GetTransaction(transaction_key_t id);
-Transaction* NewTransaction(transaction_key_t id);
 Transaction* NewTransaction(transaction_key_t id, v8::Local<v8::Value> jsObject);
 void SetMaxTransactions(size_t maxItems);
 

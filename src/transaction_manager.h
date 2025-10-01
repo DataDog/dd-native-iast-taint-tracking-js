@@ -4,6 +4,7 @@
 **/
 #ifndef SRC_TRANSACTION_MANAGER_H_
 #define SRC_TRANSACTION_MANAGER_H_
+
 #include <node.h>
 #include <cstdint>
 #include <map>

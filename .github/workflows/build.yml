@@ -134,7 +134,7 @@ jobs:
             os: ubuntu-latest
             artifact: linux-x64-gnu
           - name: windows 64 bits
-            os: windows-2019
+            os: windows-2022
             artifact: win32-x64-msvc
           - name: macos 64 bits
             os: macos-latest

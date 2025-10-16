@@ -5,11 +5,11 @@
 #ifndef SRC_IAST_H_
 #define SRC_IAST_H_
 
-#include <node.h>
 #include <cstddef>
 #include <map>
 #include <cstdint>
 #include <iostream>
+#include <v8.h>
 
 #include "transaction_manager.h"
 #include "tainted/transaction.h"

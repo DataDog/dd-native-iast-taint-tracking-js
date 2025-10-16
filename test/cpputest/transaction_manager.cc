@@ -2,6 +2,7 @@
 * Unless explicitly stated otherwise all files in this repository are licensed under the Apache-2.0 License.
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
+
 #include "transaction_manager.h"
 #include <CppUTest/UtestMacros.h>
 #include <CppUTest/TestHarness.h>
@@ -11,45 +12,10 @@ using namespace iast;
 using namespace iast::container;
 using transaction_key_t = uintptr_t;
 
-// Mock V8
-namespace v8 {
-    template<class T> class Local {
-    public:
-        Local() : ptr(nullptr) {}
-        explicit Local(T* p) : ptr(p) {}
-        T* operator->() const { return ptr; }
-        T& operator*() const { return *ptr; }
-        bool IsEmpty() const { return ptr == nullptr; }
-    private:
-        T* ptr;
-    };
-    
-    template<class T> class Persistent {
-    public:
-        Persistent() : ptr(nullptr) {}
-        template<class S> Persistent(void* isolate, Local<S> other) : ptr(reinterpret_cast<T*>(0x1234)) {}
-        void Reset() { ptr = nullptr; }
-        template<class S> void Reset(void* isolate, Local<S> other) { ptr = reinterpret_cast<T*>(0x1234); }
-        bool IsEmpty() const { return ptr == nullptr; }
-    private:
-        T* ptr;
-    };
-    
-    class Value {
-    public:
-        Value() {}
-    };
-    
-    class Isolate {
-    public:
-        static Isolate* GetCurrent() { return reinterpret_cast<Isolate*>(0x5678); }
-    };
-}
-
 struct FakeTransaction final {
     transaction_key_t _id;
     v8::Persistent<v8::Value> _jsObjectRef;
-    
+
     FakeTransaction() : _id(0) {}
     FakeTransaction(transaction_key_t id) : _id(id) {}
     FakeTransaction(transaction_key_t id, v8::Local<v8::Value> jsObject) 
@@ -57,27 +23,27 @@ struct FakeTransaction final {
     FakeTransaction(const FakeTransaction& other) {
         _id = other._id;
     }
-    
+
     transaction_key_t getId() { return _id; }
-    void Clean(void) { 
+    void Clean(void) {
         if (!_jsObjectRef.IsEmpty()) {
             _jsObjectRef.Reset();
         }
     }
-    
+
     void UpdateJsObjectReference(v8::Local<v8::Value> jsObject) {
         if (!_jsObjectRef.IsEmpty()) {
             _jsObjectRef.Reset();
         }
         _jsObjectRef.Reset(v8::Isolate::GetCurrent(), jsObject);
     }
-    
+
     void Reinitialize(transaction_key_t id, v8::Local<v8::Value> jsObject) {
         Clean();
         _id = id;
         UpdateJsObjectReference(jsObject);
     }
-    
+
     void RehashMap() {}
 };
 
@@ -190,7 +156,7 @@ TEST(TransactionManager, create_beyond_limit)
     int elems = 0;
     TransactionManager<FakeTransaction, transaction_key_t> iastManager;
     v8::Local<v8::Value> mockJsObject;
-    
+
     elems = iastManager.getMaxItems();
     CHECK_EQUAL(2, elems);
 

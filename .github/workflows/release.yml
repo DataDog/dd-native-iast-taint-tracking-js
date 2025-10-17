@@ -80,5 +80,6 @@ jobs:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
       - uses: actions/setup-node@v3
         with:
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm publish ./datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz --provenance
+      - run: npm publish ./datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz

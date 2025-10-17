@@ -6,6 +6,7 @@
 #define SRC_CONTAINER_POOL_H_
 
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <iostream>
 #include <memory>

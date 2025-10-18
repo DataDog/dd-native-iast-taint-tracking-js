@@ -27,7 +27,19 @@
             ],
             "cflags!": [ "-fno-exceptions", "-fno-rtti" ],
             "cflags_cc!": [ "-fno-exceptions", "-fno-rtti", "-std=gnu++20"  ],
-            "cflags_cc": [ "-std=gnu++2a" ],
+            "cflags_cc": [
+                "-std=gnu++2a",
+                "-Os",
+                "-ffunction-sections",
+                "-fdata-sections",
+                "-fvisibility=hidden",
+                "-flto"
+            ],
+            "ldflags": [
+                "-flto",
+                "-Wl,--gc-sections",
+                "-Wl,--strip-all"
+            ],
             "conditions": [
                 ['OS=="mac"', {
                     "xcode_settings": {
@@ -38,7 +50,17 @@
                         "OTHER_CFLAGS": [
                             "-std=c++20",
                             "-stdlib=libc++",
-                            "-Wall"
+                            "-Wall",
+                            "-Os",
+                            "-ffunction-sections",
+                            "-fdata-sections",
+                            "-fvisibility=hidden",
+                            "-flto"
+                        ],
+                        "OTHER_LDFLAGS": [
+                            "-Wl,-dead_strip",
+                            "-Wl,-x",
+                            "-flto"
                         ]
                     }
                 }],

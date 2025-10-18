@@ -3,14 +3,7 @@
 * This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 **/
 #include <node.h>
-#include <cstddef>
 #include <string>
-#include <map>
-#include <locale>
-#include <codecvt>
-#include <list>
-#include <iterator>
-#include <memory>
 
 #include "taint_methods.h"
 #include "../tainted/string_resource.h"

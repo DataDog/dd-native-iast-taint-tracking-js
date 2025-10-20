@@ -44,7 +44,7 @@ jobs:
 
   build:
     needs: ['cpp-lint', 'js-lint']
-    uses: Datadog/action-prebuildify/.github/workflows/build.yml@main
+    uses: Datadog/action-prebuildify/.github/workflows/build.yml@ccapell/node-25
     with:
       cache: false
       napi: false

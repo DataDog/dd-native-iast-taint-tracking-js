@@ -31,13 +31,11 @@
             "conditions": [
                 ['OS=="mac"', {
                     "xcode_settings": {
-                        "MACOSX_DEPLOYMENT_TARGET": "10.10",
-                        "CLANG_CXX_LIBRARY": "libc++",
+                        "MACOSX_DEPLOYMENT_TARGET": "11",
+                        "CLANG_CXX_LANGUAGE_STANDARD": "c++20",
                         "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
                         "GCC_ENABLE_CPP_RTTI": "YES",
                         "OTHER_CFLAGS": [
-                            "-std=c++20",
-                            "-stdlib=libc++",
                             "-Wall"
                         ]
                     }

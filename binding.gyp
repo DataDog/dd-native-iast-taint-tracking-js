@@ -45,12 +45,8 @@
                 }]
 
             ],
-            'dependencies': [
-                "<!(node -p \"require('node-addon-api').gyp\")"
-            ],
-            "defines": [
-                'NODE_VERSION_<!(echo $NODE_VERSION)=1'
-            ]
+            'dependencies': [],
+            "defines": []
         },
         {
             "target_name": "action_after_build",

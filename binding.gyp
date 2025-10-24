@@ -26,18 +26,16 @@
                 "<!(node -e \"require('nan')\")"
             ],
             "cflags!": [ "-fno-exceptions", "-fno-rtti" ],
-            "cflags_cc!": [ "-fno-exceptions", "-fno-rtti", "-std=gnu++20"  ],
-            "cflags_cc": [ "-std=gnu++2a" ],
+            "cflags_cc!": [ "-fno-exceptions", "-fno-rtti" ],
+            "cflags_cc": [ "-std=gnu++20" ],
             "conditions": [
                 ['OS=="mac"', {
                     "xcode_settings": {
-                        "MACOSX_DEPLOYMENT_TARGET": "10.10",
-                        "CLANG_CXX_LIBRARY": "libc++",
+                        "MACOSX_DEPLOYMENT_TARGET": "11",
+                        "CLANG_CXX_LANGUAGE_STANDARD": "c++20",
                         "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
                         "GCC_ENABLE_CPP_RTTI": "YES",
                         "OTHER_CFLAGS": [
-                            "-std=c++20",
-                            "-stdlib=libc++",
                             "-Wall"
                         ]
                     }
@@ -47,12 +45,8 @@
                 }]
 
             ],
-            'dependencies': [
-                "<!(node -p \"require('node-addon-api').gyp\")"
-            ],
-            "defines": [
-                'NODE_VERSION_<!(echo $NODE_VERSION)=1'
-            ]
+            'dependencies': [],
+            "defines": []
         },
         {
             "target_name": "action_after_build",

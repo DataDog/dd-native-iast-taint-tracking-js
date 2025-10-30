@@ -25,6 +25,11 @@ void Transaction::Clean() noexcept {
     cleanSharedVectors();
     _sharedRangesPool.Clear();
     _taintedObjPool.Clear();
+
+    // Clean up V8 persistent reference
+    if (!_jsObjectRef.IsEmpty()) {
+        _jsObjectRef.Reset();
+    }
 }
 
 Transaction::~Transaction() noexcept {
@@ -40,6 +45,7 @@ void Transaction::cleanInputInfos() noexcept {
     }
     _usedInputInfo.resize(0);
 }
+
 void Transaction::cleanSharedVectors() {
     while (!_usedSharedRanges.empty()) {
         auto sr = _usedSharedRanges.front();

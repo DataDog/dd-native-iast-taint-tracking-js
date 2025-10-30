@@ -88,7 +88,7 @@ void NewTaintedString(const FunctionCallbackInfo<Value>& args) {
     uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
 
     try {
-        auto transaction = NewTransaction(transactionId);
+        auto transaction = NewTransaction(transactionId, transactionIdArgument);
         if (transaction == nullptr) {
             return;
         }
@@ -313,7 +313,7 @@ void NewTaintedObject(const FunctionCallbackInfo<Value>& args) {
     uintptr_t transactionId = utils::GetLocalPointer(transactionIdArgument);
 
     try {
-        auto transaction = NewTransaction(transactionId);
+        auto transaction = NewTransaction(transactionId, transactionIdArgument);
         if (transaction == nullptr) {
             return;
         }

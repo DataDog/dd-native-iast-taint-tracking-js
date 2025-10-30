@@ -4,9 +4,13 @@
 **/
 #ifndef SRC_TRANSACTION_MANAGER_H_
 #define SRC_TRANSACTION_MANAGER_H_
+
+#include <v8.h>
 #include <cstdint>
 #include <map>
 #include <iostream>
+#include <vector>
+
 #include "container/queued_pool.h"
 
 
@@ -19,18 +23,27 @@ class TransactionManager {
     TransactionManager(TransactionManager const&) = delete;
     void operator=(TransactionManager const&) = delete;
 
-    T* New(U id) {
+    T* New(U id, v8::Local<v8::Value> jsObject) {
         auto found = _map.find(id);
         if (found == _map.end()) {
             if (_map.size() >= _maxItems) {
                 return nullptr;
             }
 
-            T* item = _pool.Pop(id);
+            T* item;
+            if (_pool.Available() > 0) {
+                item = _pool.Pop();
+                item->Reinitialize(id, jsObject);
+            } else {
+                item = _pool.Pop(id, jsObject);
+            }
             _map[id] = item;
             return item;
         } else {
             auto item = found->second;
+            if (item) {
+                item->UpdateJsObjectReference(jsObject);
+            }
             return item;
         }
     }
@@ -60,10 +73,42 @@ class TransactionManager {
                 entry.second->RehashMap();
             }
         }
+
+        RehashTransactionKeys();
+    }
+
+    void RehashTransactionKeys(void) noexcept {
+        std::vector<std::pair<U, T*>> toReinsert;
+
+        // Find transactions whose keys have changed due to GC
+        for (auto it = _map.begin(); it != _map.end();) {
+            auto transaction = it->second;
+            if (transaction && transaction->HasJsObjectReference()) {
+                auto currentKey = transaction->GetCurrentTransactionKey();
+                auto originalKey = transaction->GetOriginalTransactionKey();
+
+                if (currentKey != originalKey) {
+                    // Key has changed due to GC, need to re-insert with new key
+                    toReinsert.push_back({currentKey, transaction});
+                    transaction->UpdateTransactionKey(currentKey);
+                    it = _map.erase(it);
+                } else {
+                    ++it;
+                }
+            } else {
+                ++it;
+            }
+        }
+
+        // Re-insert transactions with updated keys
+        for (auto& pair : toReinsert) {
+            _map[pair.first] = pair.second;
+        }
     }
 
     void Clear(void) noexcept {
         for (auto it = _map.begin(); it != _map.end(); ++it) {
+            it->second->Clean();
             _pool.Push(it->second);
         }
         _map.clear();

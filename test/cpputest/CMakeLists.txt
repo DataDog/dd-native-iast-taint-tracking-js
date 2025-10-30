@@ -10,4 +10,5 @@ add_executable(native_test
                 weakmap.cc)
 set_property(TARGET native_test PROPERTY CXX_STANDARD 14)
 target_include_directories(native_test PUBLIC ../../src)
+target_compile_options(native_test PRIVATE -I${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(native_test LINK_PUBLIC CppUTest)

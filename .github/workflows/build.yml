@@ -14,10 +14,10 @@ jobs:
         version: [18, 19, 20, 21, 22, 23, 24, 25]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           submodules: true
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: ${{ matrix.version }}
       - run: sudo apt-get update && sudo apt-get install valgrind
@@ -31,10 +31,10 @@ jobs:
         version: [18, 19, 20, 21, 22, 23, 24, 25]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           submodules: true
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: ${{ matrix.version }}
       - run: sudo apt-get update && sudo apt-get install libcpputest-dev cpputest
@@ -44,7 +44,7 @@ jobs:
 
   build:
     needs: ['cpp-lint', 'js-lint']
-    uses: Datadog/action-prebuildify/.github/workflows/build.yml@main
+    uses: Datadog/action-prebuildify/.github/workflows/build.yml@d4e89247e6dd34f485c0f92c12f0cc739c2f8c92 # main
     with:
       cache: false
       napi: false
@@ -70,13 +70,13 @@ jobs:
             libc: libc
             artifact: linux-x64
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           submodules: true
       - run: docker build -t cpputest-libc --build-arg TAG=${{ matrix.debian.tag }} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name test-libc cpputest-libc
       - run: docker cp test-libc:/build/test/cpputest/results/ .
-      - uses: mikepenz/action-junit-report@v3
+      - uses: mikepenz/action-junit-report@150e2f992e4fad1379da2056d1d1c279f520e058 # v3.8.0
         if: always()
         with:
           report_paths: '**/results/cpputest_*.xml'
@@ -98,13 +98,13 @@ jobs:
             libc: musl
             artifact: linuxmusl-x64
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           submodules: true
       - run: docker build -t cpputest-musl --build-arg TAG=${{ matrix.alpine.tag }} -f ./docker/${{ matrix.target.dockerfile }} .
       - run: docker run --name test-musl cpputest-musl
       - run: docker cp test-musl:/build/test/cpputest/results/ .
-      - uses: mikepenz/action-junit-report@v3
+      - uses: mikepenz/action-junit-report@150e2f992e4fad1379da2056d1d1c279f520e058 # v3.8.0
         if: always()
         with:
           report_paths: '**/results/cpputest_*.xml'
@@ -115,12 +115,12 @@ jobs:
       - build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       - run: npm pack
-      - uses: codex-team/action-nodejs-package-info@v1
+      - uses: codex-team/action-nodejs-package-info@ff87ea62824a9084fdf0676ea83e2865de6249f1 # v1.0.0
         id: package
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
           path: '*.tgz'
@@ -146,21 +146,21 @@ jobs:
     env:
       NPM_TAINTEDUTILS: true
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: '18'
       - run: npm ci --ignore-scripts
       - run: npm install node-gyp
-      - uses: codex-team/action-nodejs-package-info@v1
+      - uses: codex-team/action-nodejs-package-info@ff87ea62824a9084fdf0676ea83e2865de6249f1 # v1.0.0
         id: package
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}
       - run: npm i --verbose datadog-native-iast-taint-tracking-${{ steps.package.outputs.version }}.tgz
       - run: npm run test:js-junit
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@150e2f992e4fad1379da2056d1d1c279f520e058 # v3.8.0
         if: always()
         with:
           report_paths: '**/build/junit.xml'
@@ -170,8 +170,8 @@ jobs:
     needs: ['check-licenses']
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-python@3542bca2639a428e1796aaa6a2ffef0c0f575566 # v3.1.4
       - run: pip install cpplint
       - run: cpplint --filter=-build/include_subdir,-whitespace/indent_namespace --linelength=120 --recursive ./src
 
@@ -179,8 +179,8 @@ jobs:
     needs: ['check-licenses']
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: '20'
       - run: npm i --ignore-scripts
@@ -189,8 +189,8 @@ jobs:
   check-licenses:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: '20'
       - run: npm i --ignore-scripts

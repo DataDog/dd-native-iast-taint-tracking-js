@@ -33,7 +33,7 @@
   "devDependencies": {
     "eslint": "^8.57.1",
     "eslint-config-standard": "^17.1.0",
-    "mocha": "^10.8.2",
+    "mocha": "^11.7.5",
     "mocha-junit-reporter": "^2.0.2",
     "nan": "2.14.2",
     "node-addon-api": "^4.3.0",

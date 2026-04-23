@@ -31,7 +31,7 @@
     "url": "https://github.com/DataDog/dd-iast-native-taint-tracking-js/issues"
   },
   "devDependencies": {
-    "eslint": "^8.57.1",
+    "eslint": "^10.2.1",
     "eslint-config-standard": "^17.1.0",
     "mocha": "^10.8.2",
     "mocha-junit-reporter": "^2.0.2",

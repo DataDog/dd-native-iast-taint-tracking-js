@@ -45,7 +45,7 @@ void SetMaxTransactions(size_t maxItems) {
     transactionManager::GetInstance().setMaxItems(maxItems);
 }
 
-void Init(v8::Local<v8::Object> exports) {
+void Init(v8::Local<v8::Object> exports, v8::Isolate* isolate) {
     api::TaintMethods::Init(exports);
     api::ConcatOperations::Init(exports);
     api::TrimOperations::Init(exports);
@@ -55,9 +55,18 @@ void Init(v8::Local<v8::Object> exports) {
     api::StringCaseOperations::Init(exports);
     api::ArrayJoinOperations::Init(exports);
     api::Metrics::Init(exports);
-    exports->GetIsolate()->AddGCEpilogueCallback(iast::gc::OnScavenge, v8::GCType::kGCTypeScavenge);
-    exports->GetIsolate()->AddGCEpilogueCallback(iast::gc::OnMarkSweepCompact, v8::GCType::kGCTypeMarkSweepCompact);
+    isolate->AddGCEpilogueCallback(iast::gc::OnScavenge, v8::GCType::kGCTypeScavenge);
+    isolate->AddGCEpilogueCallback(iast::gc::OnMarkSweepCompact, v8::GCType::kGCTypeMarkSweepCompact);
 }
 
-NODE_MODULE(NODE_GYP_MODULE_NAME, Init);
 }   // namespace iast
+
+void InitModule(v8::Local<v8::Object> exports, v8::Local<v8::Value> module,
+    v8::Local<v8::Context> context, void* priv) {
+    (void) module;
+    (void) context;
+    (void) priv;
+    iast::Init(exports, v8::Isolate::GetCurrent());
+}
+
+NODE_MODULE_CONTEXT_AWARE(NODE_GYP_MODULE_NAME, InitModule)

@@ -6,7 +6,7 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 jobs:
   build:
-    uses: Datadog/action-prebuildify/.github/workflows/build.yml@d4e89247e6dd34f485c0f92c12f0cc739c2f8c92 # main
+    uses: Datadog/action-prebuildify/.github/workflows/build.yml@main # main
     with:
       cache: false
       napi: false

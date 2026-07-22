@@ -5,6 +5,7 @@
   "version": "4.2.0",
   "description": "Datadog IAST tant tracking support for NodeJS",
   "main": "index.js",
+  "gypfile": false,
   "scripts": {
     "build": "node-gyp configure && node-gyp build",
     "build:arm": "node-gyp configure -arch=arm64 && node-gyp build -arch=arm64",

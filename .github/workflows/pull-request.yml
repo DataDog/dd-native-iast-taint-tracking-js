@@ -36,6 +36,9 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install libcpputest-dev cpputest
       - run: npm i --ignore-scripts
       - run: npm run test:asan
+      - name: Suppress Node.js 26 OpenSSL leak
+        if: matrix.version == 26
+        run: echo "LSAN_OPTIONS=suppressions=$GITHUB_WORKSPACE/suppressions/node-lsan.supp" >> "$GITHUB_ENV"
       - run: npm run test:js-asan
 
   build:

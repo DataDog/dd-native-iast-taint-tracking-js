@@ -56,10 +56,44 @@
   },
   "overrides": {
     "eslint": {
-      "brace-expansion": "^1.1.15"
+      "brace-expansion": "^1.1.18",
+      "@eslint/eslintrc": {
+        "minimatch": {
+          "brace-expansion": "^1.1.18"
+        }
+      },
+      "@humanwhocodes/config-array": {
+        "minimatch": {
+          "brace-expansion": "^1.1.18"
+        }
+      },
+      "file-entry-cache": {
+        "flat-cache": {
+          "rimraf": {
+            "glob": {
+              "minimatch": {
+                "brace-expansion": "^1.1.18"
+              }
+            }
+          }
+        }
+      },
+      "minimatch": {
+        "brace-expansion": "^1.1.18"
+      }
     },
     "eslint-config-standard": {
-      "brace-expansion": "^1.1.15"
+      "brace-expansion": "^1.1.18",
+      "eslint-plugin-import": {
+        "minimatch": {
+          "brace-expansion": "^1.1.18"
+        }
+      },
+      "eslint-plugin-n": {
+        "minimatch": {
+          "brace-expansion": "^1.1.18"
+        }
+      }
     }
   }
 }

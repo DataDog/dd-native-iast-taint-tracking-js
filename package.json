@@ -53,47 +53,5 @@
   ],
   "dependencies": {
     "node-gyp-build": "^3.9.0"
-  },
-  "overrides": {
-    "eslint": {
-      "brace-expansion": "^1.1.21",
-      "@eslint/eslintrc": {
-        "minimatch": {
-          "brace-expansion": "^1.1.21"
-        }
-      },
-      "@humanwhocodes/config-array": {
-        "minimatch": {
-          "brace-expansion": "^1.1.21"
-        }
-      },
-      "file-entry-cache": {
-        "flat-cache": {
-          "rimraf": {
-            "glob": {
-              "minimatch": {
-                "brace-expansion": "^1.1.21"
-              }
-            }
-          }
-        }
-      },
-      "minimatch": {
-        "brace-expansion": "^1.1.21"
-      }
-    },
-    "eslint-config-standard": {
-      "brace-expansion": "^1.1.21",
-      "eslint-plugin-import": {
-        "minimatch": {
-          "brace-expansion": "^1.1.21"
-        }
-      },
-      "eslint-plugin-n": {
-        "minimatch": {
-          "brace-expansion": "^1.1.21"
-        }
-      }
-    }
   }
 }

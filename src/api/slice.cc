@@ -9,6 +9,7 @@
 #include "../tainted/transaction.h"
 #include "../iast.h"
 #include "../utils/propagation.h"
+#include "../utils/string_utils.h"
 
 namespace iast {
 namespace api {
@@ -23,11 +24,14 @@ using v8::NewStringType;
 using v8::Exception;
 using utils::GetLocalPointer;
 using utils::getRangesInSlice;
+using utils::ToIntegerOrInfinity;
+using utils::ClampRelativeIndex;
 
 void slice(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
+    int argc = args.Length();
 
-    if (args.Length() < 4) {
+    if (argc < 3) {
         isolate->ThrowException(Exception::TypeError(
                         String::NewFromUtf8(isolate,
                         "Wrong number of arguments",
@@ -35,7 +39,6 @@ void slice(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    auto context = isolate->GetCurrentContext();
     auto vResult = args[1];
     auto vSubject = args[2];
 
@@ -45,7 +48,15 @@ void slice(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    int sliceStart = args[3]->IntegerValue(context).FromJust();
+    auto context = isolate->GetCurrentContext();
+    int subjectLength = Local<String>::Cast(vSubject)->Length();
+    double start = 0;
+    double end = subjectLength;
+    if ((argc > 3 && !ToIntegerOrInfinity(context, args[3], &start)) ||
+        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &end))) {
+        args.GetReturnValue().Set(vResult);
+        return;
+    }
 
     Transaction* transaction = GetTransaction(GetLocalPointer(args[0]));
     if (transaction == nullptr) {
@@ -61,14 +72,11 @@ void slice(const FunctionCallbackInfo<Value>& args) {
     }
 
     try {
-        int subjectLength = Local<String>::Cast(vSubject)->Length();
-        int resultLength = Local<String>::Cast(vResult)->Length();
-        int sliceEnd = args.Length() > 4 ? args[4]->IntegerValue(context).FromJust() : subjectLength;
-        sliceStart = sliceStart < 0 ? MAX(subjectLength + sliceStart, 0) : sliceStart;
-        sliceEnd = sliceEnd < 0 ? subjectLength + sliceEnd : sliceEnd;
+        int sliceStart = ClampRelativeIndex(start, subjectLength);
+        int sliceEnd = ClampRelativeIndex(end, subjectLength);
         auto newRanges = getRangesInSlice(transaction, taintedObj, sliceStart, sliceEnd);
         if (newRanges && newRanges->Size() > 0) {
-            if (resultLength == 1) {
+            if (len == 1) {
                 vResult = tainted::NewExternalString(isolate, args[1]);
             }
             transaction->AddTainted(GetLocalPointer(vResult), newRanges, vResult);

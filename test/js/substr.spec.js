@@ -278,6 +278,18 @@ describe('Substr method', function () {
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
   })
 
+  it('Index argument that removes the transaction during conversion (length)', function () {
+    const tid = 'reentrancy-id'
+    const str = TaintedUtils.newTaintedString(tid, 'hello world', 'param', 'REQUEST')
+    const res = str.substr(0, 6)
+    const index = { valueOf () { TaintedUtils.removeTransaction(tid); return 6 } }
+
+    const ret = TaintedUtils.substr(tid, res, str, 0, index)
+
+    assert.equal(ret, res)
+    assert.equal(TaintedUtils.isTainted(tid, ret), false)
+  })
+
   it('Index argument that throws on conversion', function () {
     const str = TaintedUtils.newTaintedString(id, 'hello world', 'param', 'REQUEST')
     const index = { valueOf () { throw new Error('conversion failed') } }

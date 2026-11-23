@@ -65,6 +65,15 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         args.GetReturnValue().Set(result);
         return;
     }
+
+    double startArg;
+    double endArg = subjectLen;
+    if (!ToIntegerOrInfinity(context, args[3], &startArg) ||
+        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &endArg))) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
     auto transaction = GetTransaction(GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(result);
@@ -78,14 +87,6 @@ void substring(const FunctionCallbackInfo<Value>& args) {
 
     auto taintedObj = transaction->FindTaintedObject(GetLocalPointer(subject));
     if (!taintedObj) {
-        args.GetReturnValue().Set(result);
-        return;
-    }
-
-    double startArg;
-    double endArg = subjectLen;
-    if (!ToIntegerOrInfinity(context, args[3], &startArg) ||
-        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &endArg))) {
         args.GetReturnValue().Set(result);
         return;
     }
@@ -135,6 +136,15 @@ void substr(const FunctionCallbackInfo<Value>& args) {
 
     auto subject = args[2];
     int subjectLen = TO_V8STRING(subject)->Length();
+    // Convert before the lookups: valueOf can run user code that removes the transaction.
+    double startArg;
+    double lengthArg = subjectLen;
+    if (!ToIntegerOrInfinity(context, args[3], &startArg) ||
+        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &lengthArg))) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
     auto transaction = GetTransaction(GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(result);
@@ -148,14 +158,6 @@ void substr(const FunctionCallbackInfo<Value>& args) {
 
     auto taintedObj = transaction->FindTaintedObject(GetLocalPointer(subject));
     if (!taintedObj) {
-        args.GetReturnValue().Set(result);
-        return;
-    }
-
-    double startArg;
-    double lengthArg = subjectLen;
-    if (!ToIntegerOrInfinity(context, args[3], &startArg) ||
-        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &lengthArg))) {
         args.GetReturnValue().Set(result);
         return;
     }

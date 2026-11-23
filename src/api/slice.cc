@@ -48,6 +48,16 @@ void slice(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
+    auto context = isolate->GetCurrentContext();
+    int subjectLength = Local<String>::Cast(vSubject)->Length();
+    double start = 0;
+    double end = subjectLength;
+    if ((argc > 3 && !ToIntegerOrInfinity(context, args[3], &start)) ||
+        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &end))) {
+        args.GetReturnValue().Set(vResult);
+        return;
+    }
+
     Transaction* transaction = GetTransaction(GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(vResult);
@@ -57,16 +67,6 @@ void slice(const FunctionCallbackInfo<Value>& args) {
     auto taintedObj = transaction->FindTaintedObject(GetLocalPointer(vSubject));
 
     if (!taintedObj) {
-        args.GetReturnValue().Set(vResult);
-        return;
-    }
-
-    auto context = isolate->GetCurrentContext();
-    int subjectLength = Local<String>::Cast(vSubject)->Length();
-    double start = 0;
-    double end = subjectLength;
-    if ((argc > 3 && !ToIntegerOrInfinity(context, args[3], &start)) ||
-        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &end))) {
         args.GetReturnValue().Set(vResult);
         return;
     }

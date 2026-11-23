@@ -15,11 +15,11 @@
 #include "../tainted/string_resource.h"
 #include "../iast.h"
 #include "../utils/propagation.h"
+#include "../utils/string_utils.h"
 #include "v8.h"
 
 #define SUBSTRING_MIN_ARGC  3
 #define TO_V8STRING(arg) (v8::Local<v8::String>::Cast(arg))
-#define TO_INTEGER_VALUE(arg, v8_ctx) (arg->IntegerValue(v8_ctx).FromJust())
 
 using v8::Exception;
 using v8::FunctionCallbackInfo;
@@ -32,6 +32,9 @@ using v8::Value;
 
 using iast::utils::GetLocalPointer;
 using iast::utils::getRangesInSlice;
+using iast::utils::ToIntegerOrInfinity;
+using iast::utils::ClampIndex;
+using iast::utils::ClampRelativeIndex;
 
 namespace iast {
 namespace api {
@@ -58,12 +61,6 @@ void substring(const FunctionCallbackInfo<Value>& args) {
     auto subject = args[2];
     int resultLen = TO_V8STRING(result)->Length();
     int subjectLen = TO_V8STRING(subject)->Length();
-    int start = TO_INTEGER_VALUE(args[3], context);
-    int end = subjectLen;
-    if (argc > 4 && !args[4]->IsUndefined()) {
-        end = TO_INTEGER_VALUE(args[4], context);
-    }
-
     if (resultLen == 0) {
         args.GetReturnValue().Set(result);
         return;
@@ -85,8 +82,17 @@ void substring(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
+    double startArg;
+    double endArg = subjectLen;
+    if (!ToIntegerOrInfinity(context, args[3], &startArg) ||
+        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &endArg))) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
+
     try {
-        start = MAX(start, 0);
+        int start = ClampIndex(startArg, subjectLen);
+        int end = ClampIndex(endArg, subjectLen);
         auto newRanges = getRangesInSlice(transaction, taintedObj, MIN(start, end), MAX(start, end));
         if (newRanges && newRanges->Size() > 0) {
             if (resultLen == 1) {
@@ -129,12 +135,6 @@ void substr(const FunctionCallbackInfo<Value>& args) {
 
     auto subject = args[2];
     int subjectLen = TO_V8STRING(subject)->Length();
-    int start = TO_INTEGER_VALUE(args[3], context);
-    int length = subjectLen - start;
-    if (argc > 4 && !args[4]->IsUndefined()) {
-        length = TO_INTEGER_VALUE(args[4], context);
-    }
-
     auto transaction = GetTransaction(GetLocalPointer(args[0]));
     if (transaction == nullptr) {
         args.GetReturnValue().Set(result);
@@ -152,11 +152,19 @@ void substr(const FunctionCallbackInfo<Value>& args) {
         return;
     }
 
-    try {
-        start = (start >= 0) ? start : MAX(subjectLen + start, 0);
-        length = ((start + length) >= subjectLen) ? subjectLen : start + length;
+    double startArg;
+    double lengthArg = subjectLen;
+    if (!ToIntegerOrInfinity(context, args[3], &startArg) ||
+        (argc > 4 && !args[4]->IsUndefined() && !ToIntegerOrInfinity(context, args[4], &lengthArg))) {
+        args.GetReturnValue().Set(result);
+        return;
+    }
 
-        auto newRanges = getRangesInSlice(transaction, taintedObj, start, length);
+    try {
+        int start = ClampRelativeIndex(startArg, subjectLen);
+        int end = MIN(start + ClampIndex(lengthArg, subjectLen), subjectLen);
+
+        auto newRanges = getRangesInSlice(transaction, taintedObj, start, end);
         if (newRanges && newRanges->Size() > 0) {
             if (resultLen == 1) {
                 result = tainted::NewExternalString(isolate, args[1]);

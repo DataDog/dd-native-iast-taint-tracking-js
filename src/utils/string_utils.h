@@ -6,6 +6,8 @@
 #define SRC_UTILS_STRING_UTILS_H_
 
 #include <node.h>
+#include <algorithm>
+#include <cmath>
 #include <string>
 #include <locale>
 #include <codecvt>
@@ -33,6 +35,27 @@ inline int GetCoercedLength(v8::Isolate* isolate, v8::Local<v8::Value> val) {
             return firstLocalString->Length();
         }
     }
+}
+
+// ECMAScript ToIntegerOrInfinity, kept in double precision so that values outside the int range are not truncated.
+// Returns false when the conversion throws; the exception stays pending for the caller.
+inline bool ToIntegerOrInfinity(v8::Local<v8::Context> context, v8::Local<v8::Value> val, double* out) {
+    double number;
+    if (!val->NumberValue(context).To(&number)) {
+        return false;
+    }
+    *out = std::isnan(number) ? 0 : std::trunc(number);
+    return true;
+}
+
+// Index that counts from the end when negative (slice, substr), clamped to [0, length].
+inline int ClampRelativeIndex(double index, int length) {
+    return static_cast<int>(index < 0 ? std::max(length + index, 0.0) : std::min(index, static_cast<double>(length)));
+}
+
+// Absolute index (substring, substr length), clamped to [0, length].
+inline int ClampIndex(double index, int length) {
+    return static_cast<int>(std::clamp(index, 0.0, static_cast<double>(length)));
 }
 
 inline std::string GetCString(v8::Isolate* isolate, v8::Local<v8::Value> val) {

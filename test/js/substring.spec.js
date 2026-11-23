@@ -8,6 +8,12 @@ const assert = require('assert')
 
 const rangesTestCases = [
   {
+    source: 'foo:+-bar-+:baz:+-qux-+:',
+    result: ':+-ar-+:baz:+-qux-+:',
+    start: 4,
+    end: 2 ** 32 + 1
+  },
+  {
     source: ':+-foobarbaz-+:',
     result: ':+-foo-+:',
     start: 3,
@@ -270,6 +276,13 @@ describe('Substring method', function () {
 
     assert.equal(res, ret, 'Unexpected vale')
     assert.equal(false, TaintedUtils.isTainted(id, ret), 'Unexpected value')
+  })
+
+  it('Index argument that throws on conversion', function () {
+    const str = TaintedUtils.newTaintedString(id, 'hello world', 'param', 'REQUEST')
+    const index = { valueOf () { throw new Error('conversion failed') } }
+
+    assert.throws(() => TaintedUtils.substring(id, str.substring(6), str, index), { message: 'conversion failed' })
   })
 
   it('Secure marks are inherited', () => {
